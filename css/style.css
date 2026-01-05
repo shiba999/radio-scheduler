@@ -1,0 +1,1239 @@
+@charset "utf-8";
+
+body {
+	font-family: "游ゴシック", "ヒラギノ角ゴ Pro W3", "メイリオ", sans-serif;
+	background-color: #333;
+	color: #eee;
+	padding-bottom: 135px;
+	margin: 0;
+	text-align: center;
+	position: relative;
+}
+
+a:link,
+a:visited,
+a:active {
+	text-decoration: none;
+	color: #ccc;
+}
+
+a:hover {
+	color: #fff;
+}
+
+header h1,
+header p,
+.card h2,
+.card h3,
+.card p {
+	margin: 0;
+}
+
+header p,
+.card p,
+button,
+a,
+li,
+.station_name,
+.copy {
+	font-size: 86%;
+}
+
+header h1 {
+	color: #ccc;
+	font-size: 175%;
+	font-weight: 500;
+	padding: 0 1.5em;
+	margin: 1.0em 0 0.3em 0;
+}
+
+header p {
+	color: #aaa;
+	font-size: 92%;
+	padding: 0 1.5em;
+}
+
+.card {
+	background-color: #3a3a3a;
+	box-sizing: border-box;
+	border-radius: 7px;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
+}
+
+button, .station a {
+	background-color: #777;
+	color: #ddd;
+	padding: 0.75em 1.5em;
+	border: 0;
+	border-radius: 5px;
+	margin: 0.5em;
+	line-height: 1;
+}
+
+.station_list {
+	display: flex;
+	gap: 1.0em;
+	flex-wrap: wrap;
+	align-items: stretch;
+	justify-content: center;
+	margin: 1.25em 0;
+}
+
+.station {
+	/*width: calc( 216px + 1.0em );*/
+	width: 216px;
+	/*padding: 1.0em;*/
+	background-color: #555;
+	border-radius: 5px;
+	overflow: hidden;
+	position: relative;
+}
+
+/* .station サーバーから情報取得までのダミー */
+
+.dummy {
+	height: 260px;
+	/*background-color: #444;*/
+	background: linear-gradient(to bottom, #444 0, #444 35%, #3a3a3a 100%);
+}
+
+@keyframes blink {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+}
+
+.blink {
+	animation: blink 2s infinite;
+}
+
+.loop_right {
+	animation: loop_animation_right 3s linear infinite;
+	width: 100%;
+}
+
+.station span {
+	display: inline-block;
+	background-color: #eee;
+	padding: 0.75em 0;
+	margin: 0 0 1.5em 0;
+	text-align: center;
+	/*border-radius: 5px;*/
+}
+
+.station .logo img {
+	vertical-align: middle;
+	/*width: 123px;*/
+	width: 216px;
+	height: auto;
+}
+
+.station a {
+	text-decoration: none;
+	display: inline-block;
+}
+
+.station button,
+.station a {
+	cursor: pointer;
+	margin: 0 1.5em 1.5em 1.5em;
+}
+
+#area_name {
+	margin-top: 0.5em;
+}
+
+.station span.in_process {
+	background-color: rgba(0,0,0,0.55) !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border-radius: 0 !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.station .in_process img {
+	width: 100px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+/* フッターの UI 関係 */
+
+.volume_box,
+#volume_length,
+#volume_bg {
+}
+
+.volume_box {
+	position: relative;
+	margin: 10px 0 35px 0;
+}
+
+#volume_length,
+#volume_bg {
+	position: absolute;
+	width: 100%;
+	height: 10px;
+	top: 0;
+	left: 0;
+}
+
+#volume_bg {
+	background: #222;
+}
+
+#volume_length {
+	background: #999;
+}
+
+/* フッターのコントロールパネル UI 関係 */
+/* 1. 再生中の情報 2. 音量・再生停止ボタン の2分割 */
+
+.control_panel {
+	background-color: #999;
+	height: 70px;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	box-sizing: border-box;
+	justify-content: space-between;
+	z-index: 999;
+}
+
+.control_panel_set {
+	text-align: left;
+	height: 70px;
+	display: flex;
+	gap: 1.0em;
+	box-sizing: border-box;
+	justify-content: space-between;
+}
+
+#play_info,
+.volume_ui,
+.buttons {
+	margin-top: 12px;
+}
+
+#play_info {
+	display: inline-block;
+	height: 46px;
+	color: #333;
+	vertical-align: middle;
+}
+
+#play_info .station_logo,
+#play_info .station_name {
+	display: inline-block;
+	height: 46px;
+	line-height: 46px;
+	vertical-align: middle;
+}
+
+#play_info .station_logo {
+	background-color: #eee;
+	border-radius: 5px;
+	margin-right: 25px;
+}
+
+#play_info img {
+	height: 36px;
+	width: auto;
+	margin: 5px;
+}
+
+#play_info .station_name {
+	color: #fff;
+	font-weight: bold;
+}
+
+.volume_ui {
+	display: flex;
+	height: 46px;
+	padding: 0;
+}
+
+.volume_ui svg {
+	display: inline-block;
+	fill: #eee;
+	vertical-align: middle;
+}
+
+.icon_volume {
+	width: 30px;
+	min-width: 30px;
+	height: 30px;
+	margin: 8px 20px 0 0;
+}
+
+.volume_ui button {
+	display: inline-block;
+	box-sizing: border-box;
+	width: 36px;
+	min-width: 36px;
+	height: 36px;
+	padding: initial;
+	margin: 5px 0 5px 24px;
+	text-align: center;
+}
+
+#radiko_stop {
+	display: none;/* 初期は非表示 */
+	cursor: pointer;
+}
+
+.icon_stop {
+	width: 16px;
+	height: 16px;
+	margin: auto;
+}
+
+/* フッターの音量スライドバーの調節 */
+/* https://fuuno.net/web02/range_style/range_style.html */
+
+/*
+	全体の高さの指定は #volume_range
+	JavaScript で色を変更できるのは #volume_range
+	ツマミは #volume_range::-webkit-slider-thumb
+	ツマミが動く範囲のレールは #volume_range::-webkit-slider-runnable-track
+	#volume_range::-webkit-slider-runnable-track に色を付けると
+	JavaScript で付けた色の部分は隠れてしまう
+*/
+
+/* UI の高さは 46px */
+
+#volume_range {
+	appearance: none;
+	height: 10px;
+	background: #666;
+	margin: 16px 0;
+	width: 100%;
+	border: 3px solid #bbb;
+	border-radius: 3px;
+	cursor: col-resize;
+}
+
+#volume_range::-webkit-slider-thumb {
+	appearance: none;
+	width: 2px;
+	height: 10px;
+	background: #fff;
+}
+
+/*#volume_range::-webkit-slider-runnable-track {
+	height: 10px;
+	background: #bbb;
+	border-radius: 0;
+}*/
+
+/* フッタ部分のロゴ領域 */
+
+.logos {
+	display: flex;
+	gap: 1.0em;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+}
+
+.logos img {
+	vertical-align: middle;
+}
+
+.logos .logo_raspberry_pi {
+	width: 75px;
+	height: auto;
+}
+
+.logos .logo_debian {
+	width: 50px;
+	height: auto;
+}
+
+.logos .logo_radiko {
+	width: 75px;
+	height: auto;
+}
+
+.links {
+	list-style: none;
+	padding: 0;
+	margin: 0.5em 0 1.0em 0;
+}
+
+.links li {
+	font-size: 100%;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.links li span {
+	font-size: 88%;
+	font-weight: normal;
+	letter-spacing: 0;
+	color: #aaa;
+}
+
+/* Copyright notice */
+
+.copy {
+	color: #999;
+	letter-spacing: 0.2em;
+	margin: 0;
+	padding: 0 1.5em;
+}
+
+/* オプションメニュー */
+
+#option_open {
+}
+
+#option_open_btn {
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 115%;
+	letter-spacing: -0.35em;
+	color: #aaa;
+	padding: 0.3em 1.0em 0.3em 0.65em;
+	border-radius: 5px;
+}
+
+#option_open_btn:hover {
+	background-color: #3a3a3a;
+	color: #ccc;
+}
+
+#option_nemu_box {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.5s ease;
+	background-color: #282828;
+	display: inline-block;
+	border-radius: 10px;
+}
+
+#option_nemu_box.is_open {
+	padding: 2.5em 3.5em;
+	max-height: 420px;
+	margin: 3.0em 0;
+}
+
+#reboot_log,
+.settings_link,
+#super_reload,
+#system_reboot,
+#system_power_off {
+	cursor: pointer;
+	background-color: initial;
+	text-align: center;
+	padding: 0.5em;
+	margin: 0.5em;
+}
+
+#reboot_log svg,
+.settings_link svg,
+#super_reload svg,
+#system_reboot svg,
+#system_power_off svg {
+	fill: #999;
+	width: 32px;
+	height: 32px;
+	margin: auto;
+}
+
+#reboot_log:hover svg,
+.settings_link:hover svg,
+#super_reload:hover svg,
+#system_reboot:hover svg,
+#system_power_off:hover svg {
+	fill: #ccc;
+}
+
+/* CSS版 ツールチップ */
+
+.has_tip {
+	position: relative;
+}
+
+.has_tip .tip {
+	position: absolute;
+	top: -2.75em;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #111;
+	color: #eee;
+	padding: 0.75em 1.0em;
+	font-size: 92%;
+	white-space: nowrap;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.1s;
+}
+
+.has_tip:hover .tip {
+	z-index: 90;
+	opacity: 1;
+}
+
+/* メッセージ表示関係 */
+
+#message_box,
+#message_bg {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+}
+
+#message_box {
+	z-index: 100;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#message_bg {
+	background-color: rgba(0, 0, 0, 0.68);
+	z-index: 101;
+}
+
+#message_display {
+	z-index: 102;
+	background-color: #eee;
+	color: #111;
+	display: inline-block;
+	padding: 1.0em 1.5em;
+	border-radius: 5px;
+}
+
+/* フェード効果 */
+
+.fade {
+	opacity: 0;
+	pointer-events: none;/* 透明時はクリック不可 */
+	transition: opacity 0.5s;/* アニメーション時間 */
+}
+
+.fade.is-visible {
+	opacity: 1;
+	pointer-events: auto;/* 表示時はクリック可 */
+}
+
+/* memoページ */
+
+ul {
+	text-align: left;
+	padding: 0 1.0em 0 2.0em
+}
+
+p, li {
+	line-height: 1.75em;
+	word-break: break-all;
+}
+
+li {
+	margin: 0 0 1.0em 0;
+}
+
+pre {
+	padding: 1.0em 1.5em;
+	margin: 1.5em 1.25em;
+	background-color: #222;
+	border: solid 1px #555;
+	line-height: 1.5em;
+	overflow-x: auto;
+}
+
+hr {
+	border: 0;
+	border-top: solid 1px #666;
+	margin: 0.5em 0;
+}
+
+b {
+	font-weight: bold;
+	color: #fffedc;
+}
+
+s {
+	color: #aaa;
+}
+
+.links {
+	text-align: center;
+}
+
+.links li {
+	line-height: 1.25em;
+	margin: 1.0em;
+}
+
+.note .card {
+	text-align: left;
+}
+
+.note h2, .note h4 {
+	margin: 1.5em 0;
+}
+
+.note h5, .note p {
+	margin: 1.0em 0;
+}
+
+.note h3 {
+	padding: 0.75em 0.85em;
+}
+
+.note h4 {
+	padding: 0 1.0em;
+}
+
+.note h5 {
+	font-size: 90%;
+	font-weight: bold;
+}
+
+.note p, .note h5 {
+	padding: 0 1.25em;
+}
+
+/* お知らせ関係 */
+
+.info_set {
+	margin: 0.3em 0;
+	text-align: left;
+}
+
+.info_body {
+	padding: 0 1.5em;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.5s ease;
+}
+
+.info_title,
+.info_body {
+	pointer-events: none;
+}
+
+.info_title {
+	background-color: #555;
+	padding: 0.7em 1.5em;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.info_body.is_open {
+	margin: 1.25em 0;
+	max-height: 500px;
+	pointer-events: auto;
+}
+
+input[type="button"] {
+	-webkit-appearance: none;
+	margin-top: 0.5em;
+	padding: 0.5em 2.0em;
+	border: 0;
+	background-color: #0054b5;
+	color: #fff;
+	border-radius: 3px;
+}
+
+/* スケジュールリスト */
+
+.schedule_list_box {
+	margin: 0.5em 0 0 0;
+	width: 100%;
+	text-align: center;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+/* スケジュール追加ボタン */
+
+#add_button {
+	font-size: 72%;
+	margin: 10px !important;
+}
+
+#schedule_list table {
+	table-layout: fixed;
+	border-spacing: 1px 1px;
+	background-color: #666;
+	vertical-align: middle;
+}
+
+/* スケジュール UI */
+
+#schedule_list table,
+#schedule_list table thead,
+#schedule_list table tbody,
+#schedule_list table tfoot,
+#schedule_list td {
+	width: 100%;
+	min-width: 680px;
+}
+
+#schedule_list thead th,
+#schedule_list tbody th,
+#schedule_list tbody td,
+#schedule_list tfoot th {
+	font-size: 80%;
+	line-height: 1;
+	padding: 0.5em 0.75em 0.5em 0.75em;
+	font-weight: normal;
+}
+
+#schedule_list thead th {
+	font-size: 74%;
+	background-color: #444;
+	color: #fff6c3;
+	padding: 0.85em 0.50em 0.75em 0.50em;
+}
+
+#schedule_list th,
+#schedule_list td {
+	min-width: 5.0em;
+}
+
+#schedule_list tbody th {
+	background-color: #444;
+}
+
+#schedule_list tbody td {
+	background-color: #333;
+}
+
+#schedule_list tfoot th {
+	background-color: #444;
+}
+
+#schedule_list button {
+	margin: 0;
+	background-color: #bbb;
+	color: #333;
+	cursor: pointer;
+}
+
+#schedule_list button:hover {
+	background-color: #eee;
+	color: #111;
+}
+
+.column_id {
+	width: 2.5em;
+}
+
+.column_time,
+.column_action,
+.column_repeat {
+	width: 5em;
+}
+
+.column_enabled,
+.column_edit,
+.column_del {
+	width: 5.5em;
+}
+
+#schedule_list tbody td {
+	word-break: break-all;
+}
+
+#schedule_ui {
+	font-size: 74%;
+	background-color: #444;
+	/*padding: 0.75em 1.0em;
+	margin: 0.5em 0 0 0;*/
+	border: 1px solid #555;
+	box-sizing: border-box;
+	position: relative;
+	transition: max-height 1s ease;
+	max-height: 0;
+	padding: 0;
+	overflow: hidden;
+	visibility: hidden;
+	margin: 0;
+}
+
+.schedule_ui_visible {
+	padding: 0.75em 1.0em !important;
+	margin: 0.5em 0 0 0 !important;
+	max-height: 600px !important;
+	overflow: initial !important;
+	visibility: initial !important;
+}
+
+/* スケジュール UI 閉じるボタン */
+
+#ui_close {
+	display: inline-block;
+	height: 28px;
+	border-radius: 4px;
+	color: #aaa;
+	background-color: #333;
+	font-size: 100%;
+	line-height: 28px;
+	padding: 0 15px;
+	cursor: pointer;
+	position: absolute;
+	top: calc(0.9em + 3px);
+	right: calc(0.9em + 2px);
+}
+
+#ui_close:hover {
+	color: #eee;
+	background-color: #111;
+}
+
+#schedule_ui .edit {
+	display: block;
+	text-align: left;
+	padding: 3px 0;
+}
+
+#schedule_ui .partition {
+	border-bottom: 1px dotted #666;
+}
+
+#schedule_ui button {
+	margin: 0;
+	background-color: #ccc;
+	color: #000;
+	padding: 0.75em 1.5em 0.70em 1.5em;
+}
+
+#schedule_ui #edit_index {
+	font-size: 125%;
+	background-color: #555;
+	color: #ccc;
+	font-weight: bold;
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.25em 1.0em 0.2em 1.0em;
+	/*border-radius: 4px;*/
+	border-left: 5px solid #666;
+	margin: 0;
+}
+
+/* チェックボックスの容姿変更 */
+
+#schedule_ui .check,
+#schedule_ui label {
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 32px;
+}
+
+#schedule_ui label {
+	color: #eee;
+	margin: 0 15px 0 0;
+}
+
+#schedule_ui input[type=time] {
+	background-color: #ccc;
+	font-size: 125%;
+	padding: 5px 50px 5px 60px;
+	border: 0;
+	border-radius: 4px;
+}
+
+#schedule_ui input[type=time],
+#schedule_ui button {
+	margin: 5px 10px 5px 0;
+	cursor: pointer;
+}
+
+#schedule_ui input[type=checkbox],
+#schedule_ui input[type=radio] {
+	display: none;
+}
+
+#schedule_ui .check {
+	position: relative;
+	padding-left: 30px;
+	cursor: pointer;
+}
+
+#schedule_ui .check::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 22px;
+	height: 22px;
+	transform: translateY(-50%);
+	border-radius: 4px;
+	background-color: #666;
+}
+
+#schedule_ui input[type=checkbox]:checked + .check::before,
+#schedule_ui input[type=radio]:checked + .check::before {
+	background: #e5e4da;
+}
+
+#schedule_ui input[type=checkbox]:checked + .check::after,
+#schedule_ui input[type=radio]:checked + .check::after {
+	content: "✔";
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 22px;
+	height: 22px;
+	transform: translateY(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #297600;
+	font-size: 14px;
+}
+
+/* Enabled > true or false の場合のスタイル */
+
+#schedule_list button[data-enabled="true"] {
+	background-color: #eee;
+	font-weight: bold;
+	color: #e36800;
+}
+
+#schedule_list button[data-enabled="false"] {
+	background-color: #777;
+	color: #555;
+}
+
+#schedule_ui button.schedule_enab {
+	padding: 0.75em 1.4em 0.65em 1.5em;
+}
+
+/* アップロードファイル一覧 (audio) */
+
+#audio_file_list {
+	background-color: #333;
+	margin: 1.0em 0;
+	box-sizing: border-box;
+	padding: 0.7em 1.0em;
+	border: 2px solid #555;
+}
+
+#audio_file_list ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+#audio_file_list li {
+	font-size: 100%;
+	margin: 0.3em 0;
+	background-color: #444;
+	padding: 0.5em 1.25em;
+	border-radius: 4px;
+	position: relative;
+}
+
+#audio_file_list .audio_del,
+#audio_file_list .audio_play {
+	display: inline-block;
+	background-color: #999;
+	color: #444;
+	font-size: 84%;
+	font-weight: bold;
+	border-radius: 2px;
+	padding: 0 1.0em 0 1.0em;
+	cursor: pointer;
+	position: absolute;
+}
+
+#audio_file_list .audio_del {
+	right: 0.5em;
+}
+
+#audio_file_list .audio_play {
+	right: 4.75em;
+}
+
+#audio_file_list .audio_del:hover,
+#audio_file_list .audio_play:hover {
+	background-color: #ccc;
+	color: #111;
+}
+
+/* ファイルアップロード領域 */
+
+#upload {
+	background-color: #333;
+	font-size: 86%;
+	color: #777;
+	margin: 1.0em 0;
+	box-sizing: border-box;
+	padding: 2.5em;
+	border: 5px solid #444;
+}
+
+#upload.drag_and_drop {
+	background-color: #002a39;
+	color: #fff;
+	border: 5px solid #aaa;
+}
+
+/* test */
+
+/* settings */
+
+.settings h2 {
+	text-align: center;
+	margin: 1.0em 0;
+}
+
+.settings ul {
+	margin: 1.5em 1.2em;
+}
+
+.settings li {
+	margin: 0 0 0.5em 0;
+}
+
+.settings label {
+    display: inline-block;
+	margin: 1.0em 0 0.5em 0;
+}
+
+.settings label span {
+    margin-left: 1.0em;
+	color: #999;
+	font-size: 96%;
+}
+
+.settings input[type="text"] {
+    width: 100%;
+	box-sizing: border-box;
+	background-color: #bbb;
+	padding: 0.75em 1.25em;
+	border: 0;
+	border-radius: 3px;
+}
+
+.settings input[type="text"]:hover {
+	background-color: #ddd;
+}
+
+.settings input[type="text"]:focus {
+	background-color: #eee;
+}
+
+.settings button {
+	padding: 1.0em 2.0em;
+	margin: 1.5em 1.0em 1.5em 0;
+}
+
+.settings button:hover {
+	background-color: #999;
+	color: #333;
+}
+
+#permissions_output {
+    background-color: #222;
+	border: 3px solid #666;
+	box-sizing: border-box;
+	padding: 0.7em 1.5em;
+	margin-bottom: 1.5em;
+}
+
+#permissions_output span {
+    display: block;
+}
+
+#permissions_output .permission {
+    color: #0ebe00;
+}
+
+#permissions_output .unauthorized {
+    color: #ea0051;
+}
+
+/* レスポンシブに関する記載 */
+
+/* 860px 以上に適用 */
+
+@media ( min-width: 861px ) {
+
+	body {
+		padding-top: 0;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	.control_panel {
+		padding-left: 1.0em;
+		padding-right: 1.0em;
+	}
+
+	.card {
+		padding: 1.2em 2.0em;
+	}
+
+	.control_panel_set {
+		padding: 0 2.0;
+	}
+
+	.card,
+	.control_panel_set {
+		width: 780px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+}
+
+/* フッターの UI は幅によって非表示の要素を決める */
+
+/* 860px ～ 421px に適用 */
+
+@media screen and (min-width: 521px) and (max-width: 860px) {
+
+	body {
+		padding-top: 0;
+		padding-left: 1.0em;
+		padding-right: 1.0em;
+	}
+
+	.card {
+		padding: 1.0em 1.0em;
+	}
+
+	.control_panel {
+	}
+
+	.control_panel_set {
+		width: 100%;
+		padding-left: 2.0em;
+		padding-right: 2.0em;
+	}
+
+	.note h3, .note h4, .note h5, .note p {
+		padding: 0;
+	}
+
+	pre {
+		margin: 1.5em 0 !important;
+	}
+
+	ul {
+		padding: 0 0 0 1.75em;
+	}
+
+	.icon_volume {
+		margin-right: 10px;
+	}
+
+}
+
+@media ( max-width: 520px ) {
+
+	body {
+		padding-top: 0;
+		padding-left: 0.5em;
+		padding-right: 0.5em;
+	}
+
+	.card {
+		padding: 0.5em 0.5em;
+	}
+
+	ul {
+		padding: 0 0 0 1.25em;
+	}
+
+	.station,
+	.station span {
+		width: 100%;
+	}
+
+	.station img {
+		max-width: 100%;
+	}
+
+	.control_panel {
+	}
+
+	.control_panel_set {
+		gap: initial;
+		width: 100%;
+		padding-left: 1.0em;
+		padding-right: 1.0em;
+	}
+
+	.volume_ui {
+		width: 100%;
+	}
+
+	.volume_ui button {
+		margin-left: 1.0em;
+	}
+
+	/*#play_info .station_logo {
+		display: none;
+	}*/
+
+	#play_info {
+		display: none;
+	}
+
+}
+
+/* offline */
+
+.offline {
+	padding: 0 1.0em;
+	overflow: hidden;
+}
+
+.offline h2,
+.offline h3 {
+	margin: 1.5em;
+	color: #ddd;
+}
+
+.offline h2 {
+	font-size: 100%;
+}
+
+.offline h3 {
+	font-size: 90%;
+}
+
+.ascii_art,
+.kaomoji {
+	white-space: pre;
+}
+
+.ascii_art {
+	font-size: 32% !important;
+	line-height: 2.5em;
+	text-align: left;
+	width: 10em;
+	margin: 3.5em auto !important;
+}
+
+.kaomoji {
+    font-family: monospace;
+    font-size: 1.0em !important;
+    line-height: 1.0;
+    margin: 1.15em !important;
+}
+

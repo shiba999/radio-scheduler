@@ -1,0 +1,185 @@
+[   0.024][v][cplayer] mpv 0.35.1 Copyright © 2000-2023 mpv/MPlayer/mplayer2 projects
+[   0.024][v][cplayer]  built on UNKNOWN
+[   0.024][v][cplayer] FFmpeg library versions:
+[   0.024][v][cplayer]    libavutil       57.28.100
+[   0.024][v][cplayer]    libavcodec      59.37.100
+[   0.024][v][cplayer]    libavformat     59.27.100
+[   0.024][v][cplayer]    libswscale      6.7.100
+[   0.024][v][cplayer]    libavfilter     8.44.100
+[   0.024][v][cplayer]    libswresample   4.7.100
+[   0.024][v][cplayer] FFmpeg version: 5.1.7-0+deb12u1+rpt1
+[   0.024][v][cplayer] 
+[   0.024][v][cplayer] Configuration: meson configure build -Dprefix=/usr -Dbuildtype=plain -Doptimization=plain
+[   0.024][v][cplayer] List of enabled features: alsa av-channel-layout caca cdda cplayer cplugins dmabuf-interop-gl dmabuf-interop-pl dmabuf-wayland drm drm-is-kms dvbin dvdnav egl egl-drm egl-helpers egl-x11 ffmpeg gbm gl gl-wayland glibc-thread-name glob glob-posix gpl iconv jack javascript jpeg jpegxl lcms2 libarchive libass libavdevice libbluray libdl libm libmpv-shared libplacebo libplacebo-next librt linux-fstatfs lua52 manpage-build memfd_create noexecstack pipewire plain-gl posix pulse rubberband rubberband-3 sdl2 sdl2-audio sdl2-gamepad sdl2-video sixel spirv-cross stdatomic threads uchardet vaapi vaapi-drm vaapi-egl vaapi-libplacebo vaapi-wayland vaapi-x-egl vaapi-x11 vdpau vector vt.h vulkan wayland wayland_protocols_1_24 x11 xv zimg zlib
+[   0.024][v][cplayer] Command line options: '--no-video' '--log-file=/var/www/html/log/player.log' '/var/www/html/upload/dhv_magellan.mp3'
+[   0.024][v][cplayer] mpv 0.35.1 Copyright © 2000-2023 mpv/MPlayer/mplayer2 projects
+[   0.025][v][cplayer]  built on UNKNOWN
+[   0.025][v][cplayer] FFmpeg library versions:
+[   0.025][v][cplayer]    libavutil       57.28.100
+[   0.025][v][cplayer]    libavcodec      59.37.100
+[   0.025][v][cplayer]    libavformat     59.27.100
+[   0.025][v][cplayer]    libswscale      6.7.100
+[   0.025][v][cplayer]    libavfilter     8.44.100
+[   0.025][v][cplayer]    libswresample   4.7.100
+[   0.025][v][cplayer] FFmpeg version: 5.1.7-0+deb12u1+rpt1
+[   0.025][v][cplayer] 
+[   0.025][v][cplayer] Configuration: meson configure build -Dprefix=/usr -Dbuildtype=plain -Doptimization=plain
+[   0.025][v][cplayer] List of enabled features: alsa av-channel-layout caca cdda cplayer cplugins dmabuf-interop-gl dmabuf-interop-pl dmabuf-wayland drm drm-is-kms dvbin dvdnav egl egl-drm egl-helpers egl-x11 ffmpeg gbm gl gl-wayland glibc-thread-name glob glob-posix gpl iconv jack javascript jpeg jpegxl lcms2 libarchive libass libavdevice libbluray libdl libm libmpv-shared libplacebo libplacebo-next librt linux-fstatfs lua52 manpage-build memfd_create noexecstack pipewire plain-gl posix pulse rubberband rubberband-3 sdl2 sdl2-audio sdl2-gamepad sdl2-video sixel spirv-cross stdatomic threads uchardet vaapi vaapi-drm vaapi-egl vaapi-libplacebo vaapi-wayland vaapi-x-egl vaapi-x11 vdpau vector vt.h vulkan wayland wayland_protocols_1_24 x11 xv zimg zlib
+[   0.025][d][global] config path: '' -> '-'
+[   0.025][d][global] user path: '~~home/' -> ''
+[   0.025][d][global] user path: '~~old_home/' -> ''
+[   0.025][d][global] config path: 'encoding-profiles.conf' -> '/etc/mpv/encoding-profiles.conf'
+[   0.025][v][cplayer] Reading config file /etc/mpv/encoding-profiles.conf
+[   0.034][v][cplayer] Applying profile 'default'...
+[   0.034][d][global] config path: 'mpv.conf' -/-> '/etc/mpv/mpv.conf'
+[   0.034][d][global] config path: 'config' -/-> '/etc/mpv/config'
+[   0.034][v][cplayer] Setting option 'video' = 'no' (flags = 8)
+[   0.034][v][cplayer] Setting option 'log-file' = '/var/www/html/log/player.log' (flags = 8)
+[   0.044][d][global] config path: 'input.conf' -/-> '/etc/mpv/input.conf'
+[   0.044][d][global] user path: '/var/www/html/log/player.log' -> '/var/www/html/log/player.log'
+[   0.045][d][osc] Loading lua script @osc.lua...
+[   0.045][d][ytdl_hook] Loading lua script @ytdl_hook.lua...
+[   0.045][d][stats] Loading lua script @stats.lua...
+[   0.045][d][console] Loading lua script @console.lua...
+[   0.045][d][auto_profiles] Loading lua script @auto_profiles.lua...
+[   0.062][d][stats] loading mp.defaults
+[   0.062][d][ytdl_hook] loading mp.defaults
+[   0.062][d][global] config path: 'scripts' -/-> '/etc/mpv/scripts'
+[   0.062][v][cplayer] Waiting for scripts...
+[   0.063][d][console] loading mp.defaults
+[   0.063][d][osc] loading mp.defaults
+[   0.063][d][stats] loading @stats.lua
+[   0.063][d][auto_profiles] loading mp.defaults
+[   0.063][d][osc] loading @osc.lua
+[   0.063][d][auto_profiles] loading @auto_profiles.lua
+[   0.063][d][ytdl_hook] loading @ytdl_hook.lua
+[   0.063][d][console] loading @console.lua
+[   0.065][d][stats] reading options for stats 
+[   0.065][d][global] config path: 'script-opts/stats.conf' -/-> '/etc/mpv/script-opts/stats.conf'
+[   0.065][d][stats] script-opts/stats.conf not found. 
+[   0.065][d][global] config path: 'lua-settings/stats.conf' -/-> '/etc/mpv/lua-settings/stats.conf'
+[   0.065][d][stats] lua-settings/stats.conf not found. 
+[   0.072][d][ytdl_hook] reading options for ytdl_hook 
+[   0.072][d][global] config path: 'script-opts/ytdl_hook.conf' -/-> '/etc/mpv/script-opts/ytdl_hook.conf'
+[   0.072][d][ytdl_hook] script-opts/ytdl_hook.conf not found. 
+[   0.072][d][global] config path: 'lua-settings/ytdl_hook.conf' -/-> '/etc/mpv/lua-settings/ytdl_hook.conf'
+[   0.072][d][ytdl_hook] lua-settings/ytdl_hook.conf not found. 
+[   0.073][d][auto_profiles] Exiting...
+[   0.074][d][console] reading options for console 
+[   0.074][d][global] config path: 'script-opts/console.conf' -/-> '/etc/mpv/script-opts/console.conf'
+[   0.074][d][console] script-opts/console.conf not found. 
+[   0.074][d][global] config path: 'lua-settings/console.conf' -/-> '/etc/mpv/lua-settings/console.conf'
+[   0.074][d][console] lua-settings/console.conf not found. 
+[   0.082][d][global] config path: 'fonts' -/-> '/etc/mpv/fonts'
+[   0.082][d][osd/libass] ASS library version: 0x1701000 (runtime 0x1701000)
+[   0.083][v][osd/libass] libass API version: 0x1701000
+[   0.083][v][osd/libass] libass source: tarball: 0.17.1
+[   0.083][v][osd/libass] Shaper: FriBidi 1.0.8 (SIMPLE) HarfBuzz-ng 6.0.0 (COMPLEX)
+[   0.083][d][global] config path: 'subfont.ttf' -/-> '/etc/mpv/subfont.ttf'
+[   0.083][d][global] config path: 'fonts.conf' -/-> '/etc/mpv/fonts.conf'
+[   0.083][v][osd/libass] Setting up fonts...
+[   0.095][d][osc] reading options for osc 
+[   0.095][d][global] config path: 'script-opts/osc.conf' -/-> '/etc/mpv/script-opts/osc.conf'
+[   0.095][d][osc] script-opts/osc.conf not found. 
+[   0.095][d][global] config path: 'lua-settings/osc.conf' -/-> '/etc/mpv/lua-settings/osc.conf'
+[   0.095][d][osc] lua-settings/osc.conf not found. 
+[   0.107][v][osd/libass] Using font provider fontconfig
+[   0.107][v][osd/libass] Done.
+[   0.111][d][cplayer] Run command: define-section, flags=64, args=[name="input_stats", contents="", flags="default"]
+[   0.111][d][cplayer] Run command: enable-section, flags=64, args=[name="input_stats", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.111][d][cplayer] Run command: define-section, flags=64, args=[name="input_forced_stats", contents="", flags="force"]
+[   0.111][d][cplayer] Run command: enable-section, flags=64, args=[name="input_forced_stats", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.112][d][cplayer] Run command: define-section, flags=64, args=[name="input_console", contents="", flags="default"]
+[   0.112][d][cplayer] Run command: enable-section, flags=64, args=[name="input_console", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.112][d][cplayer] Run command: define-section, flags=64, args=[name="input_forced_console", contents="", flags="force"]
+[   0.112][d][cplayer] Run command: enable-section, flags=64, args=[name="input_forced_console", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.115][d][cplayer] Run command: define-section, flags=64, args=[name="showhide", contents="mouse_move script-binding osc/__keybinding1\nmouse_leave script-binding osc/__keybinding2\n", flags="force"]
+[   0.115][d][cplayer] Run command: define-section, flags=64, args=[name="showhide_wc", contents="mouse_move script-binding osc/__keybinding3\nmouse_leave script-binding osc/__keybinding4\n", flags="force"]
+[   0.115][d][cplayer] Run command: enable-section, flags=64, args=[name="showhide", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.115][d][cplayer] Run command: enable-section, flags=64, args=[name="showhide_wc", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.115][d][cplayer] Run command: define-section, flags=64, args=[name="input", contents="mbtn_left script-binding osc/__keybinding5\nshift+mbtn_left script-binding osc/__keybinding6\nmbtn_right script-binding osc/__keybinding7\nmbtn_mid script-binding osc/__keybinding8\nwheel_up script-binding osc/__keybinding9\nwheel_down script-binding osc/__keybinding10\nmbtn_left_dbl ignore\nshift+mbtn_left_dbl ignore\nmbtn_right_dbl ignore\n", flags="force"]
+[   0.116][d][cplayer] Run command: enable-section, flags=64, args=[name="input", flags=""]
+[   0.116][d][cplayer] Run command: define-section, flags=64, args=[name="window-controls", contents="mbtn_left script-binding osc/__keybinding11\n", flags="force"]
+[   0.116][d][cplayer] Run command: enable-section, flags=64, args=[name="window-controls", flags=""]
+[   0.116][d][cplayer] Run command: change-list, flags=64, args=[name="shared-script-properties", operation="append", value="osc-visibility=auto"]
+[   0.116][v][cplayer] Set property: shared-script-properties -> 1
+[   0.116][d][cplayer] Run command: disable-section, flags=64, args=[name="input"]
+[   0.116][d][cplayer] Run command: disable-section, flags=64, args=[name="window-controls"]
+[   0.116][d][cplayer] Run command: change-list, flags=64, args=[name="shared-script-properties", operation="append", value="osc-margins=0.000000,0.000000,0.000000,0.000000"]
+[   0.116][v][cplayer] Set property: shared-script-properties -> 1
+[   0.117][v][cplayer] Done loading scripts.
+[   0.117][d][global] config path: 'watch_later' -> '-'
+[   0.117][d][global] config path: 'watch_later' -> '-'
+[   0.117][v][cplayer] Running hook: ytdl_hook/on_load
+[   0.118][v][ytdl_hook] ytdl:// hook 
+[   0.118][d][osc] osc_init 
+[   0.118][v][ytdl_hook] not a ytdl:// url 
+[   0.119][v][ifo_dvdnav] Opening /var/www/html/upload/dhv_magellan.mp3
+[   0.119][v][bdmv/bluray] Opening /var/www/html/upload/dhv_magellan.mp3
+[   0.119][v][file] Opening /var/www/html/upload/dhv_magellan.mp3
+[   0.119][d][file] resize stream to 131072 bytes, drop 0 bytes
+[   0.120][d][file] Stream opened successfully.
+[   0.122][v][demux] Trying demuxers for level=normal.
+[   0.122][d][demux] Trying demuxer: disc (force-level: normal)
+[   0.122][d][demux] Trying demuxer: edl (force-level: normal)
+[   0.122][d][demux] Trying demuxer: cue (force-level: normal)
+[   0.123][d][demux] Trying demuxer: rawaudio (force-level: normal)
+[   0.123][d][demux] Trying demuxer: rawvideo (force-level: normal)
+[   0.123][d][demux] Trying demuxer: mkv (force-level: normal)
+[   0.123][d][demux] Trying demuxer: libarchive (force-level: normal)
+[   0.123][d][cplayer] Run command: change-list, flags=64, args=[name="shared-script-properties", operation="append", value="osc-margins=0.000000,0.000000,0.000000,0.000000"]
+[   0.123][v][cplayer] Set property: shared-script-properties -> 1
+[   0.124][d][global] config path: 'fonts' -/-> '/etc/mpv/fonts'
+[   0.124][d][osd/libass] ASS library version: 0x1701000 (runtime 0x1701000)
+[   0.124][v][osd/libass] libass API version: 0x1701000
+[   0.124][v][osd/libass] libass source: tarball: 0.17.1
+[   0.124][d][demux] Trying demuxer: lavf (force-level: normal)
+[   0.125][v][osd/libass] Shaper: FriBidi 1.0.8 (SIMPLE) HarfBuzz-ng 6.0.0 (COMPLEX)
+[   0.125][d][global] config path: 'subfont.ttf' -/-> '/etc/mpv/subfont.ttf'
+[   0.125][d][global] config path: 'fonts.conf' -/-> '/etc/mpv/fonts.conf'
+[   0.125][v][osd/libass] Setting up fonts...
+[   0.148][v][lavf] No format found, try lowering probescore or forcing the format.
+[   0.148][d][demux] Trying demuxer: mf (force-level: normal)
+[   0.148][d][demux] Trying demuxer: playlist (force-level: normal)
+[   0.148][d][demux] Trying demuxer: null (force-level: normal)
+[   0.149][v][demux] Trying demuxers for level=unsafe.
+[   0.149][d][demux] Trying demuxer: disc (force-level: unsafe)
+[   0.149][d][demux] Trying demuxer: edl (force-level: unsafe)
+[   0.149][d][demux] Trying demuxer: cue (force-level: unsafe)
+[   0.149][d][demux] Trying demuxer: rawaudio (force-level: unsafe)
+[   0.149][d][demux] Trying demuxer: rawvideo (force-level: unsafe)
+[   0.149][d][demux] Trying demuxer: mkv (force-level: unsafe)
+[   0.149][d][demux] Trying demuxer: libarchive (force-level: unsafe)
+[   0.149][d][file] resize stream to 262144 bytes, drop 0 bytes
+[   0.150][d][demux] Trying demuxer: lavf (force-level: unsafe)
+[   0.161][v][osd/libass] Using font provider fontconfig
+[   0.162][v][osd/libass] Done.
+[   0.167][d][cplayer] Run command: change-list, flags=64, args=[name="shared-script-properties", operation="append", value="osc-margins=0.000000,0.000000,0.000000,0.000000"]
+[   0.167][v][cplayer] Set property: shared-script-properties -> 1
+[   0.167][d][osc] osc_init 
+[   0.168][d][file] resize stream to 131072 bytes, drop 0 bytes
+[   0.169][v][lavf] Found 'mp3' at score=1 size=34.
+[   0.169][v][lavf] Found 'mp3' at score=1 size=34.
+[   0.170][d][cplayer] Run command: change-list, flags=64, args=[name="shared-script-properties", operation="append", value="osc-margins=0.000000,0.000000,0.000000,0.000000"]
+[   0.170][v][cplayer] Set property: shared-script-properties -> 1
+[   0.171][d][cplayer] Run command: define-section, flags=64, args=[name="input_osc", contents="", flags="default"]
+[   0.171][d][cplayer] Run command: enable-section, flags=64, args=[name="input_osc", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.171][d][cplayer] Run command: define-section, flags=64, args=[name="input_forced_osc", contents="", flags="force"]
+[   0.171][d][cplayer] Run command: enable-section, flags=64, args=[name="input_forced_osc", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.173][v][lavf] No format found, try lowering probescore or forcing the format.
+[   0.173][d][demux] Trying demuxer: mf (force-level: unsafe)
+[   0.173][d][demux] Trying demuxer: playlist (force-level: unsafe)
+[   0.174][d][demux] Trying demuxer: null (force-level: unsafe)
+[   0.174][v][cplayer] Opening failed or was aborted: /var/www/html/upload/dhv_magellan.mp3
+[   0.174][v][cplayer] Running hook: ytdl_hook/on_load_fail
+[   0.174][v][ytdl_hook] full hook 
+[   0.174][v][cplayer] finished playback, unrecognized file format (reason 4)
+[   0.174][e][cplayer] Failed to recognize file format.
+[   0.174][i][cplayer] 
+[   0.174][i][cplayer] Exiting... (Errors when loading file)
+[   0.175][d][cplayer] Run command: change-list, flags=64, args=[name="shared-script-properties", operation="remove", value="osc-margins"]
+[   0.175][v][cplayer] Set property: shared-script-properties -> 1
+[   0.176][d][console] Exiting...
+[   0.178][d][stats] Exiting...
+[   0.178][d][ytdl_hook] Exiting...
+[   0.178][d][osc] Exiting...

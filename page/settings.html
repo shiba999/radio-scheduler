@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<link rel="stylesheet" href="../css/style.css" type="text/css" />
+	<title>らぢ助 - Radio Scheduler -</title>
+</head>
+
+<body class="note">
+
+<header>
+	<h1>Radio Scheduler 設定</h1>
+</header>
+
+<section class="card settings">
+
+	<h2>Settings</h2>
+
+	<p>ツールを使用するためには、以下のソフトウェアを事前にインストールさせておく必要があります。</p>
+
+	<ul>
+		<li>音声再生プレイヤー (mpvを使用することを前提に作っています)</li>
+		<li>Python ライブラリー (python3-pip)</li>
+		<li>streamlink</li>
+		<li>streamlink radiko.py</li>
+	</ul>
+
+	<p>インストールしたソフトウェア情報を入力してください。</p>
+
+	<p><label for="streamlink_path" class="check">Path to streamlink<span>[例] /var/www/.local/bin/streamlink</span></label><input type="text" id="streamlink_path" name="streamlink_path" value="" /></p>
+
+	<p><label for="player" class="check">Player<span>[例] mpv</span></label><input type="text" id="player" name="player" value="" /></p>
+
+	<p><label for="player_path" class="check">Path to player<span>[例] /usr/bin/mpv</span></label><input type="text" id="player_path" name="player_path" value="" /></p>
+
+	<p><label for="timezone" class="check">timezone<span>[例] Asia/Tokyo</span></label><input type="text" id="timezone" name="timezone" value="" /></p>
+
+	<p><span id="setting_message">各設定情報を入力してください。</span><br /><button id="setting_set" type="submit">Submit</button></p>
+
+	<h2>Permissions</h2>
+
+	<p>システムで使用する以下のファイルとディレクトリ全てに書き込み許可を付与してください。</p>
+	<p id="permissions_output">permissions_output</p>
+
+	<h2>Play test</h2>
+
+	<p>Software 設定が完了したら、各ボタンで音声が再生可能か確認してみましょう。<br />再生されない場合は、ソフト名かパスを間違えている場合があります。</p>
+
+	<p class="test_btn">
+		<button id="radiko" data-value="RN1" type="button">ラジオ再生 (RN1)</button>
+		<button id="audio" data-value="awakening.mp3" type="button">音声ファイル再生</button>
+		<button id="stop" type="button">プレイヤー停止</button>
+	</p>
+
+	<p id="test_btn_output">ラジオ及び音声ファイルの再生ボタンを押してください。</p>
+
+	<h2>ServiceWorker</h2>
+
+	<p>
+		<button id="sw_btn_status">状態確認</button>
+		<button id="sw_btn_reset">ServiceWorker解除 / キャッシュ削除</button>
+	</p>
+
+	<p id="sw_btn_output">こちらでサービスワーカー関係の登録解除が可能です。</p>
+
+</section>
+
+<section class="card">
+
+	<ul class="links">
+		<li><a href="../">コントロールパネルへ戻る</a></li>
+		<li><a href="../tool/phpinfo.php" target="_blank">phpinfo 確認</a></li>
+		<li><a href="../tool/timezone.php" target="_blank">timezone 確認</a></li>
+		<li><a href="../tool/post_size.php" target="_blank">post_max_size 確認</a></li>
+		<li id="https_href">https href</li>
+	</ul>
+
+</section>
+
+<footer>
+	<p class="copy">らぢ助 - Radio Scheduler -<br />&copy; 2025 <a href="https://weblabyrinth.net" target="_blank">WebLabyrinth</a></p>
+</footer>
+
+<script type="module">
+
+	import * as tol from "../js/tool.js";
+
+	//console.log(window.location);
+
+	function validate_input(value) {
+
+		// 1) マルチバイト（ASCII以外）チェック
+		// ASCIIは 0x00〜0x7F、それ以外が含まれていたらNG
+
+		const has_multibyte = /[^\x00-\x7F]/.test(value);
+
+		// 2) 禁止したい文字チェック
+		//    @ : ; \ ^ = - ? # " ' !
+		//    \ や " ' などは正規表現内でエスケープが必要
+
+		const forbidden_pattern = /[@:;\\^=\-?#"'!]/;
+		const has_forbidden = forbidden_pattern.test(value);
+
+		return {
+			result: ! has_multibyte && ! has_forbidden,
+			has_multibyte,
+			has_forbidden,
+		};
+
+	}
+
+	const streamlink_path = document.getElementById("streamlink_path");
+	const player = document.getElementById("player");
+	const player_path = document.getElementById("player_path");
+	const setting_set = document.getElementById("setting_set");
+	const set_msg = document.getElementById("setting_message");
+	const permissions_msg = document.getElementById("permissions_output");
+	const test_btn_msg = document.getElementById("test_btn_output");
+
+	// 現在保存中の設定情報を取得してフォーム項目に反映
+
+	async function get_setting_values() {
+
+		const setting_object = await tol.fetch_template("../php/setting_get.php", "");
+
+		//console.log(setting_object);
+
+		if (setting_object.streamlink_path) {
+			streamlink_path.value = setting_object.streamlink_path;
+		}
+
+		if (setting_object.player) {
+			player.value = setting_object.player;
+		}
+
+		if (setting_object.player_path) {
+			player_path.value = setting_object.player_path;
+		}
+
+		if (setting_object.timezone) {
+			timezone.value = setting_object.timezone;
+		}
+
+	}
+
+	get_setting_values();
+
+	// 設定項目を保存する関数
+
+	setting_set.addEventListener("click", async function(event) {
+
+		const sl_path_value = streamlink_path.value;
+		const player_value = player.value;
+		const p_path_value = player_path.value;
+		const timezone_value = timezone.value;
+
+		if ( sl_path_value && player_value && p_path_value && timezone_value ) {
+
+			const value_array = new Array(sl_path_value, player_value, p_path_value, timezone_value);
+
+			//console.log(value_array);
+
+			let false_count = 0
+			let false_value_array = new Array();
+
+			for ( let n = 0; n < value_array.length; n++ ) {
+
+				const this_result = validate_input(value_array[n]);
+
+				//console.log(this_result);
+
+				if ( this_result.result === false ) {
+					//console.log(value_array[n]);
+					false_value_array.push(value_array[n]);
+					false_count++;
+				}
+
+			}
+
+			if ( false_count === 0 ) {
+
+				// 保存処理へ
+
+				const send_params = {
+					streamlink_path: sl_path_value,
+					player: player_value,
+					player_path: p_path_value,
+					timezone: timezone_value
+				};
+
+				const query_string = new URLSearchParams(send_params).toString();
+				const save_result = await tol.fetch_template( "../php/setting_set.php", query_string );
+
+				console.log(save_result);
+
+				if ( save_result > 0 ) {
+					set_msg.innerHTML = "設定を保存しました。";
+					get_setting_values();
+				} else {
+					set_msg.innerHTML = "設定の保存に失敗しました。";
+				}
+
+			} else {
+
+				set_msg.innerHTML = "不正な文字列が含まれています。" + false_value_array.join(", ");
+
+			}
+
+		} else {
+
+			set_msg.innerHTML = "設定項目をすべて入力してください。";
+
+		}
+
+	});
+
+	// システムで必要なファイルとディレクトリが書き込み可能か確認する関数
+
+	async function check_permissions() {
+
+		const permissions_object = await tol.fetch_template("../php/setting_check_permissions.php", "");
+
+		//console.log(permissions_object);
+
+		// permissions_msg
+
+		let pms_msg_html = "";
+
+		for ( let n = 0; n < permissions_object.length; n++ ) {
+
+			if ( permissions_object[n]["result"] ) {
+				pms_msg_html += '<span class="permission">書き込みが許可されています　';
+			} else {
+				pms_msg_html += '<span class="unauthorized">書き込みは許可されていません　';
+			}
+
+			pms_msg_html += permissions_object[n]["target"] + '</span>';
+
+		}
+
+		permissions_msg.innerHTML = pms_msg_html;
+
+	}
+
+	check_permissions();
+
+	// 再生テストボタン
+
+	document.getElementById("radiko").addEventListener("click", async function(event) {
+
+		test_btn_msg.innerHTML = "ラジオ再生のリクエスト中です... (再生まで数秒要します)";
+
+		//console.log(event);
+		//console.log(event.target.dataset.value);
+
+		const this_channel = event.target.dataset.value;
+
+		//console.log(this_channel);
+
+		const params = new URLSearchParams({
+			channel: this_channel
+		});
+
+		const query_string = new URLSearchParams(params).toString();
+		const res = await tol.fetch_template("../php/player_radiko_play.php", query_string);
+
+		//console.log(res);
+
+		if ( res.result === "success" ) {
+			test_btn_msg.innerHTML = "只今ラジオ再生中です。";
+		} else {
+			test_btn_msg.innerHTML = "ラジオの再生に失敗しました。";
+		}
+
+	});
+
+	document.getElementById("audio").addEventListener("click", async function(event) {
+
+		//console.log(event);
+
+		const this_file = event.target.dataset.value;
+
+		const params = new URLSearchParams({
+			file: this_file
+		});
+
+		const query_string = new URLSearchParams(params).toString();
+		const res = await tol.fetch_template("../php/player_audio_play.php", query_string);
+
+		//console.log(res);
+
+		if ( res === "playing" ) {
+			test_btn_msg.innerHTML = "音声ファイルを再生しました。";
+		} else {
+			test_btn_msg.innerHTML = "音声ファイル再生に失敗しました。";
+		}
+
+	});
+
+	document.getElementById("stop").addEventListener("click", async function(event) {
+
+		const res = await tol.fetch_template("../php/player_stop.php", "");
+
+		//console.log(res);
+
+		if ( res === "stopped" ) {
+			test_btn_msg.innerHTML = "プレイヤーを停止しました。";
+		} else {
+			test_btn_msg.innerHTML = "プレイヤー停止に失敗しました。";
+		}
+
+	});
+
+	// サービスワーカー関係のボタン
+
+	const sw_output = document.getElementById("sw_btn_output");
+
+	// サービスワーカー状況確認
+
+	async function check_sw_status() {
+
+		if ( ! ("serviceWorker" in navigator) ) {
+			sw_output.innerHTML = "Service Worker未サポート";
+			return;
+		}
+
+		const registration = await navigator.serviceWorker.getRegistration();
+
+		sw_output.innerHTML = registration 
+			? "Service Worker は有効です (" + registration.active.scriptURL + ")"
+			: "Service Worker 未登録です"
+		;
+
+	}
+
+	document.getElementById("sw_btn_status").addEventListener("click", async function(event) {
+		check_sw_status();
+	});
+
+	// サービスワーカーキャッシュ削除
+
+	async function reset_service_worker() {
+
+		if ( ! confirm("Service Worker とキャッシュを削除しますか？") ) return;
+
+		try {
+
+			if ( "serviceWorker" in navigator ) {
+
+				// サービスワーカー削除
+
+				const registrations = await navigator.serviceWorker.getRegistrations();
+				await Promise.all( registrations.map(r => r.unregister()) );
+
+				// キャッシュ削除
+
+				const cache_names = await caches.keys();
+				await Promise.all( cache_names.map(name => caches.delete(name)) );
+
+			}
+
+			// 完全リフレッシュ
+
+			window.location.reload(true);
+
+		} catch (error) {
+			alert('リセットエラー: ' + error.message);
+		}
+
+	}
+ 
+	document.getElementById("sw_btn_reset").addEventListener("click", async function(event) {
+		reset_service_worker();
+	});
+
+	// http でアクセスした場合に https へ移動させるリンクを表示
+	// PWA を使いたい場合に使えるかと
+
+	const current_url_object = new URL(window.location.href);
+	const path_parts = current_url_object.pathname.split("/").filter(Boolean);// 空要素除去
+	path_parts.splice(-2, 2);
+	const parent_path = path_parts.length ? "/" + path_parts.join("/") : "";
+	const parent_url = "https://" + current_url_object.hostname + parent_path;
+
+	const current_parent_url = current_url_object.protocol + "//" + current_url_object.hostname + parent_path;
+
+	const parent_url_html = '<a href="' + parent_url + '">' + parent_url + ' でアクセス<br />( 現在の protocol ' + current_parent_url + ' )</a>';
+
+	//console.log(current_url_object);
+	//console.log(path_parts);
+	//console.log(parent_url);
+	//console.log(parent_url_html);
+
+	document.getElementById("https_href").innerHTML = parent_url_html;
+
+</script>
+
+</body>
+</html>
