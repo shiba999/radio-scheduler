@@ -15,5 +15,8 @@ Raspberry Pi にインストールを行ってスケジュール設定を行い�
 
 -----
 
-*Shibazaki*: https://github.com/shiba999  
-[https://weblabyrinth.net/]
+*Shibazaki*  
+https://github.com/shiba999
+
+WebLabyrinth
+https://weblabyrinth.net/
