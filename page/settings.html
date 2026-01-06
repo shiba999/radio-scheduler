@@ -44,6 +44,12 @@
 	<p>システムで使用する以下のファイルとディレクトリ全てに書き込み許可を付与してください。</p>
 	<p id="permissions_output">permissions_output</p>
 
+	<h2>Streamlink check</h2>
+
+	<p><button id="sl_check" type="button">Streamlink 確認</button></p>
+
+	<p id="sl_check_output">PHP から実行する Streamlink が有効の場合はバージョン情報が得られます。</p>
+
 	<h2>Play test</h2>
 
 	<p>Software 設定が完了したら、各ボタンで音声が再生可能か確認してみましょう。<br />再生されない場合は、ソフト名かパスを間違えている場合があります。</p>
@@ -100,7 +106,8 @@
 		//    @ : ; \ ^ = - ? # " ' !
 		//    \ や " ' などは正規表現内でエスケープが必要
 
-		const forbidden_pattern = /[@:;\\^=\-?#"'!]/;
+		const forbidden_pattern = /[@:;\\^=?#"\'!]/;
+	//	const forbidden_pattern = /[@:;\\^=\-?#"'!]/;
 		const has_forbidden = forbidden_pattern.test(value);
 
 		return {
@@ -117,6 +124,8 @@
 	const setting_set = document.getElementById("setting_set");
 	const set_msg = document.getElementById("setting_message");
 	const permissions_msg = document.getElementById("permissions_output");
+	const sl_check_btn = document.getElementById("sl_check");
+	const sl_check_msg = document.getElementById("sl_check_output");
 	const test_btn_msg = document.getElementById("test_btn_output");
 
 	// 現在保存中の設定情報を取得してフォーム項目に反映
@@ -245,6 +254,18 @@
 	}
 
 	check_permissions();
+
+	// Streamlink チェックボタン
+
+	sl_check_btn.addEventListener("click", async function(event) {
+
+		sl_check_msg.innerHTML = "Streamlink 確認中です。";
+
+		const res = await tol.fetch_template("../php/streamlink_check.php", "");
+
+		sl_check_msg.innerHTML = res;
+
+	});
 
 	// 再生テストボタン
 
