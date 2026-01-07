@@ -12,6 +12,7 @@ $check_array = array(
 	"../log/player.log",
 	"../log/audio.log",
 	"../log/reboot.log",
+	"../log/cron.log",
 	"../json/schedule.json",
 	"../upload_tmp",
 	"../upload"

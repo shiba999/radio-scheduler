@@ -83,14 +83,14 @@ foreach ( $schedule_object as $schedule ) {
 
 	// 有効なら次へ 無効ならストップ
 
-	$roop_log .= "\n\n" . $roop . ". [" . $current_date . "]"
-		. " ... current " . $current_hour . ":" . $current_minute 
-		. " | this " . $this_hour . ":" . $this_minute
-		. "\naction: " . $this_action . " , channel: " . $this_channel
+	$roop_log .= $roop . ". [" . $current_date . "]"
+		. " ... Current time: " . $current_hour . ":" . $current_minute 
+		. " | This schedule time: " . $this_hour . ":" . $this_minute
+		. " | Action: " . $this_action . " , channel: " . $this_channel
 	;
 
 	if ( $this_enabled === false ) {
-		$roop_log .= "\n# 未実行 (enabled: false)";
+		$roop_log .= " ... # 未実行 (enabled: false)";
 		continue;// false (無効) の場合は何もしない
 	}
 
@@ -98,7 +98,7 @@ foreach ( $schedule_object as $schedule ) {
 	// 設定されている場合 > チェックして該当する曜日でない場合はストップ
 
 	if ( count($this_week_array) > 0 && in_array($current_week, $this_week_array) === false ) {
-		$roop_log .= "\n# 未実行 (week: false)";
+		$roop_log .= " ... # 未実行 (week: false)";
 		continue;// 曜日を設定しており、かつ該当の曜日でない場合は何もしない
 	}
 
@@ -110,7 +110,7 @@ foreach ( $schedule_object as $schedule ) {
 	// [仮採用] 1 の方法を採用してみる。cron が確実に実行されることを祈りましょう。
 
 	if ( $current_hour !== $this_hour || $current_minute !== $this_minute ) {
-		$roop_log .= "\n# 未実行 (time: false)";
+		$roop_log .= " ... # 未実行 (time: false)";
 		continue;// 時 と 分 両方一致しない場合は何もしない
 	}
 
@@ -160,6 +160,8 @@ foreach ( $schedule_object as $schedule ) {
 
 	}
 
+	$roop_log .= "\n";
+
 }
 
 // 必要に応じてスケジュール情報を更新
@@ -174,7 +176,7 @@ if ( $update === true ) {
 }
 
 $result = file_put_contents(
-	PROJECT_ROOT . "/log/cron_test.log",
+	PROJECT_ROOT . "/log/cron.log",
 	$roop_log,
 	LOCK_EX
 );
