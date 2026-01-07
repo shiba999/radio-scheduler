@@ -1,0 +1,243 @@
+[   0.000][d][global] user path: '../log/settings.log' -> '../log/settings.log'
+[   0.006][v][cplayer] mpv 0.37.0 Copyright © 2000-2023 mpv/MPlayer/mplayer2 projects
+[   0.006][v][cplayer] libplacebo version: v6.338.2
+[   0.006][v][cplayer] FFmpeg version: 6.1.1-3ubuntu5
+[   0.006][v][cplayer] FFmpeg library versions:
+[   0.006][v][cplayer]    libavutil       58.29.100
+[   0.006][v][cplayer]    libavcodec      60.31.102
+[   0.006][v][cplayer]    libavformat     60.16.100
+[   0.006][v][cplayer]    libswscale      7.5.100
+[   0.006][v][cplayer]    libavfilter     9.12.100
+[   0.006][v][cplayer]    libswresample   4.12.100
+[   0.006][v][cplayer] 
+[   0.006][v][cplayer] Configuration: -Dpython.bytecompile=-1 -Dlibmpv=true -Dbuild-date=false -Dcdda=enabled -Ddvdnav=enabled -Dsdl2=enabled -Dsndio=disabled -Ddvbin=enabled -Dprefix=/usr -Dlibdir=lib/x86_64-linux-gnu -Dlocalstatedir=/var -Dsysconfdir=/etc -Dbuildtype=plain -Dwrap_mode=nodownload
+[   0.006][v][cplayer] List of enabled features: alsa av-channel-layout avif-muxer caca cdda cplugins cuda-hwaccel cuda-interop dmabuf-interop-gl dmabuf-wayland drm dvbin dvdnav egl egl-drm egl-helpers egl-wayland egl-x11 ffmpeg ffnvcodec gbm gl glibc-thread-name glob glob-posix gpl iconv jack javascript jpeg jpegxl lavu-uuid lcms2 libarchive libass libavdevice libbluray libdl libm libplacebo librt linux-fstatfs lua52 manpage-build memfd-create noexecstack pipewire posix posix-shm ppoll pulse rubberband rubberband-3 sdl2 sdl2-audio sdl2-gamepad sdl2-video sixel spirv-cross threads uchardet vaapi vaapi-drm vaapi-wayland vaapi-x11 vdpau vector vk-khr-display vt.h vulkan vulkan-interop wayland wayland-protocols-1-27 wayland-protocols-1-31 wayland-protocols-1-32 x11 xv zimg zimg-st428 zlib
+[   0.006][v][cplayer] Command line options: '--no-video' '--log-file=../log/settings.log' '../upload/awakening.mp3'
+[   0.006][v][cplayer] mpv 0.37.0 Copyright © 2000-2023 mpv/MPlayer/mplayer2 projects
+[   0.006][v][cplayer] libplacebo version: v6.338.2
+[   0.006][v][cplayer] FFmpeg version: 6.1.1-3ubuntu5
+[   0.006][v][cplayer] FFmpeg library versions:
+[   0.006][v][cplayer]    libavutil       58.29.100
+[   0.006][v][cplayer]    libavcodec      60.31.102
+[   0.006][v][cplayer]    libavformat     60.16.100
+[   0.006][v][cplayer]    libswscale      7.5.100
+[   0.006][v][cplayer]    libavfilter     9.12.100
+[   0.006][v][cplayer]    libswresample   4.12.100
+[   0.006][v][cplayer] 
+[   0.006][v][cplayer] Configuration: -Dpython.bytecompile=-1 -Dlibmpv=true -Dbuild-date=false -Dcdda=enabled -Ddvdnav=enabled -Dsdl2=enabled -Dsndio=disabled -Ddvbin=enabled -Dprefix=/usr -Dlibdir=lib/x86_64-linux-gnu -Dlocalstatedir=/var -Dsysconfdir=/etc -Dbuildtype=plain -Dwrap_mode=nodownload
+[   0.006][v][cplayer] List of enabled features: alsa av-channel-layout avif-muxer caca cdda cplugins cuda-hwaccel cuda-interop dmabuf-interop-gl dmabuf-wayland drm dvbin dvdnav egl egl-drm egl-helpers egl-wayland egl-x11 ffmpeg ffnvcodec gbm gl glibc-thread-name glob glob-posix gpl iconv jack javascript jpeg jpegxl lavu-uuid lcms2 libarchive libass libavdevice libbluray libdl libm libplacebo librt linux-fstatfs lua52 manpage-build memfd-create noexecstack pipewire posix posix-shm ppoll pulse rubberband rubberband-3 sdl2 sdl2-audio sdl2-gamepad sdl2-video sixel spirv-cross threads uchardet vaapi vaapi-drm vaapi-wayland vaapi-x11 vdpau vector vk-khr-display vt.h vulkan vulkan-interop wayland wayland-protocols-1-27 wayland-protocols-1-31 wayland-protocols-1-32 x11 xv zimg zimg-st428 zlib
+[   0.006][d][global] home path: '' -> '-'
+[   0.006][d][global] user path: '~~home/' -> ''
+[   0.006][d][global] user path: '~~old_home/' -> ''
+[   0.006][d][global] config path: 'encoding-profiles.conf' -> '/etc/mpv/encoding-profiles.conf'
+[   0.006][v][cplayer] Reading config file /etc/mpv/encoding-profiles.conf
+[   0.006][v][ifo_dvdnav] Opening /etc/mpv/encoding-profiles.conf
+[   0.006][v][bdmv/bluray] Opening /etc/mpv/encoding-profiles.conf
+[   0.007][v][file] Opening /etc/mpv/encoding-profiles.conf
+[   0.007][d][file] resize stream to 131072 bytes, drop 0 bytes
+[   0.007][d][file] Stream opened successfully.
+[   0.008][v][cplayer] Applying profile 'default'...
+[   0.008][d][global] config path: 'mpv.conf' -> '/etc/mpv/mpv.conf'
+[   0.008][d][global] config path: 'config' -/-> '/etc/mpv/config'
+[   0.008][v][cplayer] Reading config file /etc/mpv/mpv.conf
+[   0.008][v][ifo_dvdnav] Opening /etc/mpv/mpv.conf
+[   0.008][v][bdmv/bluray] Opening /etc/mpv/mpv.conf
+[   0.008][v][file] Opening /etc/mpv/mpv.conf
+[   0.008][d][file] resize stream to 131072 bytes, drop 0 bytes
+[   0.008][d][file] Stream opened successfully.
+[   0.008][v][cplayer] Applying profile 'default'...
+[   0.008][v][cplayer] Setting option 'hwdec' = 'vaapi' (flags = 4)
+[   0.008][v][cplayer] Setting option 'video' = 'no' (flags = 8)
+[   0.008][v][cplayer] Setting option 'log-file' = '../log/settings.log' (flags = 8)
+[   0.010][d][global] config path: 'input.conf' -/-> '/etc/mpv/input.conf'
+[   0.010][d][global] user path: '../log/settings.log' -> '../log/settings.log'
+[   0.010][d][osc] Loading lua script @osc.lua...
+[   0.010][d][ytdl_hook] Loading lua script @ytdl_hook.lua...
+[   0.011][d][stats] Loading lua script @stats.lua...
+[   0.011][d][ytdl_hook] loading mp.defaults
+[   0.011][d][osc] loading mp.defaults
+[   0.011][d][console] Loading lua script @console.lua...
+[   0.011][d][auto_profiles] Loading lua script @auto_profiles.lua...
+[   0.011][d][console] loading mp.defaults
+[   0.011][d][global] config path: 'scripts' -/-> '/etc/mpv/scripts'
+[   0.011][v][cplayer] Waiting for scripts...
+[   0.011][d][auto_profiles] loading mp.defaults
+[   0.012][d][console] loading @console.lua
+[   0.012][d][auto_profiles] loading @auto_profiles.lua
+[   0.013][d][ytdl_hook] loading @ytdl_hook.lua
+[   0.014][d][stats] loading mp.defaults
+[   0.014][d][console] reading options for console 
+[   0.014][d][global] config path: 'script-opts/console.conf' -/-> '/etc/mpv/script-opts/console.conf'
+[   0.014][d][console] script-opts/console.conf not found. 
+[   0.014][d][global] config path: 'lua-settings/console.conf' -/-> '/etc/mpv/lua-settings/console.conf'
+[   0.014][d][console] lua-settings/console.conf not found. 
+[   0.015][d][cplayer] Run command: define-section, flags=64, args=[name="input_console", contents="", flags="default"]
+[   0.015][d][cplayer] Run command: enable-section, flags=64, args=[name="input_console", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.015][d][cplayer] Run command: define-section, flags=64, args=[name="input_forced_console", contents="", flags="force"]
+[   0.015][d][cplayer] Run command: enable-section, flags=64, args=[name="input_forced_console", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.015][d][ytdl_hook] reading options for ytdl_hook 
+[   0.015][d][global] config path: 'script-opts/ytdl_hook.conf' -/-> '/etc/mpv/script-opts/ytdl_hook.conf'
+[   0.015][d][ytdl_hook] script-opts/ytdl_hook.conf not found. 
+[   0.015][d][global] config path: 'lua-settings/ytdl_hook.conf' -/-> '/etc/mpv/lua-settings/ytdl_hook.conf'
+[   0.015][d][ytdl_hook] lua-settings/ytdl_hook.conf not found. 
+[   0.016][d][stats] loading @stats.lua
+[   0.016][d][osc] loading @osc.lua
+[   0.018][d][auto_profiles] Exiting...
+[   0.018][d][stats] reading options for stats 
+[   0.018][d][global] config path: 'script-opts/stats.conf' -/-> '/etc/mpv/script-opts/stats.conf'
+[   0.018][d][stats] script-opts/stats.conf not found. 
+[   0.018][d][global] config path: 'lua-settings/stats.conf' -/-> '/etc/mpv/lua-settings/stats.conf'
+[   0.018][d][stats] lua-settings/stats.conf not found. 
+[   0.019][d][cplayer] Run command: define-section, flags=64, args=[name="input_stats", contents="", flags="default"]
+[   0.019][d][cplayer] Run command: enable-section, flags=64, args=[name="input_stats", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.019][d][cplayer] Run command: define-section, flags=64, args=[name="input_forced_stats", contents="", flags="force"]
+[   0.019][d][cplayer] Run command: enable-section, flags=64, args=[name="input_forced_stats", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.020][d][osc] reading options for osc 
+[   0.020][d][global] config path: 'script-opts/osc.conf' -/-> '/etc/mpv/script-opts/osc.conf'
+[   0.020][d][osc] script-opts/osc.conf not found. 
+[   0.020][d][global] config path: 'lua-settings/osc.conf' -/-> '/etc/mpv/lua-settings/osc.conf'
+[   0.020][d][osc] lua-settings/osc.conf not found. 
+[   0.021][d][cplayer] Run command: define-section, flags=64, args=[name="showhide", contents="mouse_move script-binding osc/__keybinding1\nmouse_leave script-binding osc/__keybinding2\n", flags="force"]
+[   0.021][d][cplayer] Run command: define-section, flags=64, args=[name="showhide_wc", contents="mouse_move script-binding osc/__keybinding3\nmouse_leave script-binding osc/__keybinding4\n", flags="force"]
+[   0.021][d][cplayer] Run command: enable-section, flags=64, args=[name="showhide", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.021][d][cplayer] Run command: enable-section, flags=64, args=[name="showhide_wc", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.021][d][cplayer] Run command: define-section, flags=64, args=[name="input", contents="mbtn_left script-binding osc/__keybinding5\nshift+mbtn_left script-binding osc/__keybinding6\nmbtn_right script-binding osc/__keybinding7\nmbtn_mid script-binding osc/__keybinding8\nwheel_up script-binding osc/__keybinding9\nwheel_down script-binding osc/__keybinding10\nmbtn_left_dbl ignore\nshift+mbtn_left_dbl ignore\nmbtn_right_dbl ignore\n", flags="force"]
+[   0.021][d][cplayer] Run command: enable-section, flags=64, args=[name="input", flags=""]
+[   0.021][d][cplayer] Run command: define-section, flags=64, args=[name="window-controls", contents="mbtn_left script-binding osc/__keybinding11\n", flags="force"]
+[   0.021][d][cplayer] Run command: enable-section, flags=64, args=[name="window-controls", flags=""]
+[   0.021][v][cplayer] Set property: user-data/osc/visibility="auto" -> 1
+[   0.021][d][cplayer] Run command: disable-section, flags=64, args=[name="input"]
+[   0.021][d][cplayer] Run command: disable-section, flags=64, args=[name="window-controls"]
+[   0.021][v][cplayer] Set property: user-data/osc/margins={"b":0,"r":0,"t":0,"l":0} -> 1
+[   0.021][v][cplayer] Done loading scripts.
+[   0.021][d][global] state path: 'watch_later' -> '-'
+[   0.021][d][global] state path: 'watch_later' -> '-'
+[   0.021][v][cplayer] Running hook: ytdl_hook/on_load
+[   0.022][v][ytdl_hook] ytdl:// hook 
+[   0.022][v][ytdl_hook] not a ytdl:// url 
+[   0.022][v][cplayer] Running hook: ytdl_hook/on_load
+[   0.022][v][ytdl_hook] playlist hook 
+[   0.022][v][ifo_dvdnav] Opening ../upload/awakening.mp3
+[   0.022][v][cplayer] Set property: user-data/osc/margins={"b":0,"r":0,"t":0,"l":0} -> 1
+[   0.022][v][bdmv/bluray] Opening ../upload/awakening.mp3
+[   0.022][v][file] Opening ../upload/awakening.mp3
+[   0.022][d][file] resize stream to 131072 bytes, drop 0 bytes
+[   0.023][d][osc] osc_init 
+[   0.023][d][file] Stream opened successfully.
+[   0.023][v][demux] Trying demuxers for level=normal.
+[   0.023][d][demux] Trying demuxer: disc (force-level: normal)
+[   0.023][d][demux] Trying demuxer: edl (force-level: normal)
+[   0.023][d][demux] Trying demuxer: cue (force-level: normal)
+[   0.023][d][demux] Trying demuxer: rawaudio (force-level: normal)
+[   0.023][d][demux] Trying demuxer: rawvideo (force-level: normal)
+[   0.023][d][demux] Trying demuxer: mkv (force-level: normal)
+[   0.023][d][demux] Trying demuxer: libarchive (force-level: normal)
+[   0.023][d][demux] Trying demuxer: lavf (force-level: normal)
+[   0.023][v][cplayer] Set property: user-data/osc/margins={"b":0,"r":0,"t":0,"l":0} -> 1
+[   0.023][d][global] config path: 'fonts' -/-> '/etc/mpv/fonts'
+[   0.023][d][osd/libass] ASS library version: 0x1701000 (runtime 0x1701000)
+[   0.023][v][osd/libass] libass API version: 0x1701000
+[   0.023][v][osd/libass] libass source: tarball: 0.17.1
+[   0.023][v][osd/libass] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)
+[   0.023][d][global] config path: 'subfont.ttf' -/-> '/etc/mpv/subfont.ttf'
+[   0.025][d][global] config path: 'fonts.conf' -/-> '/etc/mpv/fonts.conf'
+[   0.025][v][osd/libass] Setting up fonts...
+[   0.031][v][lavf] Found 'mp3' at score=12 size=2048.
+[   0.032][v][lavf] Found 'mp3' at score=12 size=4096.
+[   0.032][v][lavf] Found 'mp3' at score=12 size=8192.
+[   0.032][v][lavf] Found 'mp3' at score=25 size=16384.
+[   0.032][v][lavf] Found 'mp3' at score=51 size=32768.
+[   0.033][d][ffmpeg/demuxer] mp3: Skipping 0 bytes of junk at 12785.
+[   0.034][v][lavf] avformat_find_stream_info() finished after 98304 bytes.
+[   0.034][v][demux] Detected file format: mp3 (libavformat)
+[   0.034][v][cplayer] Opening done: ../upload/awakening.mp3
+[   0.035][v][osd/libass] Using font provider fontconfig
+[   0.035][v][osd/libass] Done.
+[   0.036][v][find_files] Loading external files in ../upload/
+[   0.036][d][global] config path: 'sub' -/-> '/etc/mpv/sub'
+[   0.036][v][cplayer] Running hook: ytdl_hook/on_preloaded
+[   0.036][v][lavf] select track 0
+[   0.036][i][cplayer]  (+) Audio --aid=1 (mp3 2ch 44100Hz)
+[   0.036][i][display-tags] File tags:
+[   0.036][i][display-tags]  Date: 2025-12-30 20:21
+[   0.036][v][ad] Codec list:
+[   0.036][v][ad]     mp3float (mp3) - MP3 (MPEG audio layer 3)
+[   0.036][v][ad]     mp3 - MP3 (MPEG audio layer 3)
+[   0.036][v][ad] Opening decoder mp3float
+[   0.036][v][ad] Requesting 1 threads for decoding.
+[   0.036][v][ad] Selected codec: MP3 (MPEG audio layer 3)
+[   0.036][v][af] User filter list:
+[   0.036][v][af]   (empty)
+[   0.036][v][cplayer] Starting playback...
+[   0.037][d][cplayer] Run command: define-section, flags=64, args=[name="input_osc", contents="", flags="default"]
+[   0.037][d][cplayer] Run command: enable-section, flags=64, args=[name="input_osc", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.037][v][af] [in] 44100Hz stereo 2ch floatp
+[   0.037][v][af] [userspeed] 44100Hz stereo 2ch floatp
+[   0.037][v][af] [userspeed] (disabled)
+[   0.037][v][af] [convert] 44100Hz stereo 2ch floatp
+[   0.037][d][cplayer] Run command: define-section, flags=64, args=[name="input_forced_osc", contents="", flags="force"]
+[   0.037][d][cplayer] Run command: enable-section, flags=64, args=[name="input_forced_osc", flags="allow-hide-cursor+allow-vo-dragging"]
+[   0.037][v][ao] Trying audio driver 'pipewire'
+[   0.037][v][ao/pipewire] requested format: 44100 Hz, stereo channels, floatp
+[   0.037][v][ao/pipewire] Headers version: 1.0.4
+[   0.037][v][ao/pipewire] Library version: 1.0.5
+[   0.038][v][ao] Trying audio driver 'pulse'
+[   0.038][v][ao/pulse] requested format: 44100 Hz, stereo channels, floatp
+[   0.038][v][ao/pulse] Library version: 16.1.0
+[   0.038][v][ao/pulse] Proto: 35
+[   0.038][v][ao/pulse] Server proto: 4294967295
+[   0.038][v][ao] Trying audio driver 'alsa'
+[   0.038][v][ao/alsa] requested format: 44100 Hz, stereo channels, floatp
+[   0.038][v][ao/alsa] using ALSA version: 1.2.11
+[   0.038][v][ao/alsa] opening device 'default'
+[   0.039][e][ao/alsa] Playback open error: No such file or directory
+[   0.039][v][ao] Trying audio driver 'jack'
+[   0.039][v][ao/jack] requested format: 44100 Hz, stereo channels, floatp
+[   0.039][v][ao/jack] Channel layouts:
+[   0.039][v][ao/jack]  - waveext
+[   0.039][v][ao/jack] result: stereo
+[   0.043][f][ao/jack] cannot open server
+[   0.043][v][ao] Trying audio driver 'sdl'
+[   0.043][v][ao/sdl] requested format: 44100 Hz, stereo channels, floatp
+[   0.046][v][ao/sdl] Channel layouts:
+[   0.046][v][ao/sdl]  - mono
+[   0.046][v][ao/sdl]  - stereo
+[   0.046][v][ao/sdl]  - 2.1
+[   0.046][v][ao/sdl]  - 4.0
+[   0.046][v][ao/sdl]  - 5.0
+[   0.046][v][ao/sdl]  - 5.1
+[   0.046][v][ao/sdl]  - 6.1
+[   0.046][v][ao/sdl]  - 7.1
+[   0.046][v][ao/sdl]  - unknown9
+[   0.046][v][ao/sdl]  - unknown10
+[   0.046][v][ao/sdl]  - unknown11
+[   0.046][v][ao/sdl]  - unknown12
+[   0.046][v][ao/sdl]  - unknown13
+[   0.046][v][ao/sdl]  - unknown14
+[   0.046][v][ao/sdl]  - unknown15
+[   0.046][v][ao/sdl]  - unknown16
+[   0.046][v][ao/sdl]  - unknown17
+[   0.046][v][ao/sdl]  - unknown18
+[   0.046][v][ao/sdl]  - unknown19
+[   0.046][v][ao/sdl]  - unknown20
+[   0.046][v][ao/sdl] result: stereo
+[   0.046][v][ao/sdl] requested format: 44100 Hz, 2 channels, 8120, buffer size: 0 samples
+[   0.046][e][ao/sdl] could not open audio: ALSA: Couldn't open audio device: No such file or directory
+[   0.150][e][ao] Failed to initialize audio driver 'sdl'
+[   0.150][e][cplayer] Could not open/initialize audio device -> no sound.
+[   0.150][d][ad] Uninit decoder.
+[   0.150][v][lavf] deselect track 0
+[   0.150][i][cplayer] Audio: no audio
+[   0.150][v][cplayer] playback restart complete @ -9223372036854775808.000000, audio=eof, video=eof
+[   0.150][v][cplayer] EOF code: 6  
+[   0.150][d][cplayer] Terminating demuxers...
+[   0.150][d][cplayer] Done terminating demuxers.
+[   0.150][v][cplayer] finished playback, audio output initialization failed (reason 4)
+[   0.150][i][cplayer] Exiting... (Errors when loading file)
+[   0.150][d][ytdl_hook] Exiting...
+[   0.151][d][console] Exiting...
+[   0.151][d][osc] osc_init 
+[   0.151][d][stats] Exiting...
+[   0.151][v][cplayer] Set property: user-data/osc/margins={"b":0,"r":0,"t":0,"l":0} -> 1
+[   0.151][d][cplayer] Run command: del, flags=64, args=[name="user-data/osc"]
+[   0.152][d][osc] Exiting...

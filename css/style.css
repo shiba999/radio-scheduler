@@ -1046,6 +1046,11 @@ input[type="button"] {
 	color: #333;
 }
 
+.settings a {
+	font-size: 100%;
+	font-weight: bold;
+}
+
 #permissions_output {
     background-color: #222;
 	border: 3px solid #666;

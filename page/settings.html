@@ -46,13 +46,19 @@
 
 	<h2>Streamlink check</h2>
 
+	<p>PHP から Streamlink が実行可能か確認しましょう。実行可能な場合はバージョン情報が得られます。</p>
 	<p><button id="sl_check" type="button">Streamlink 確認</button></p>
+	<p id="sl_check_output">Streamlink 確認ボタンを押してください。</p>
 
-	<p id="sl_check_output">PHP から実行する Streamlink が有効の場合はバージョン情報が得られます。</p>
+	<h2>Audio playback permission check</h2>
+
+	<p>PHP が音声再生権限を持っているか確認しましょう。</p>
+	<p><button id="app_check" type="button">音声再生権限確認</button></p>
+	<p id="app_check_output">音声再生権限確認ボタンを押してください。</p>
 
 	<h2>Play test</h2>
 
-	<p>Software 設定が完了したら、各ボタンで音声が再生可能か確認してみましょう。<br />再生されない場合は、ソフト名かパスを間違えている場合があります。</p>
+	<p>Software 設定が完了したら、各ボタンで音声が再生可能か確認してみましょう。<br />再生されない場合は、ソフト名やパスを間違えているか、音声再生権限が無い可能性があります。</p>
 
 	<p class="test_btn">
 		<button id="radiko" data-value="RN1" type="button">ラジオ再生 (RN1)</button>
@@ -64,11 +70,12 @@
 
 	<h2>ServiceWorker</h2>
 
+	<p>PWAでホーム画面に登録させたい場合は、<a href="../manifest.json" target="_blank">マニフェストファイル</a>の内容を編集し、自己署名証明書を発行したうえで https からアクセスしてください。</p>
+	<p id="https_href">https href</p>
 	<p>
 		<button id="sw_btn_status">状態確認</button>
 		<button id="sw_btn_reset">ServiceWorker解除 / キャッシュ削除</button>
 	</p>
-
 	<p id="sw_btn_output">こちらでサービスワーカー関係の登録解除が可能です。</p>
 
 </section>
@@ -80,7 +87,6 @@
 		<li><a href="../tool/phpinfo.php" target="_blank">phpinfo 確認</a></li>
 		<li><a href="../tool/timezone.php" target="_blank">timezone 確認</a></li>
 		<li><a href="../tool/post_size.php" target="_blank">post_max_size 確認</a></li>
-		<li id="https_href">https href</li>
 	</ul>
 
 </section>
@@ -126,6 +132,8 @@
 	const permissions_msg = document.getElementById("permissions_output");
 	const sl_check_btn = document.getElementById("sl_check");
 	const sl_check_msg = document.getElementById("sl_check_output");
+	const app_check_btn = document.getElementById("app_check");
+	const app_check_msg = document.getElementById("app_check_output");
 	const test_btn_msg = document.getElementById("test_btn_output");
 
 	// 現在保存中の設定情報を取得してフォーム項目に反映
@@ -263,7 +271,23 @@
 
 		const res = await tol.fetch_template("../php/streamlink_check.php", "");
 
-		sl_check_msg.innerHTML = res;
+		sl_check_msg.innerHTML = "<b>" + res + "</b>";
+
+	});
+
+	// 音声再生権限 確認ボタン
+
+	app_check_btn.addEventListener("click", async function(event) {
+
+		app_check_msg.innerHTML = "音声再生権限 確認中です。";
+
+		const res = await tol.fetch_template("../php/audio_permission_check.php", "");
+
+		if ( res.success === true ) {
+			app_check_msg.innerHTML = "音声再生権限が<b>有効</b>です。";
+		} else {
+			app_check_msg.innerHTML = "音声再生権限は<b>無効</b>の様です。[ <b>" + res.reason + "</b> ]<br />usermod で audio グループに、ユーザー www-data の追加を試みてください。<br />※www-data は OS によってはユーザー名が異なる場合があります。";
+		}
 
 	});
 
@@ -287,9 +311,13 @@
 		const query_string = new URLSearchParams(params).toString();
 		const res = await tol.fetch_template("../php/player_radiko_play.php", query_string);
 
-		//console.log(res);
+		console.log(res);
 
-		if ( res.result === "success" ) {
+		if ( res === "timeout" ) {
+			test_btn_msg.innerHTML = "タイムアウトしました。Streamlink へアクセスできていない可能性があります。<b>Path to streamlink</b> パスに至るディレクトリのパーミッションは <b>751</b> 以上である必要があります。";
+		} else if ( res === "error" ) {
+			test_btn_msg.innerHTML = "例外エラーです。";
+		} else if ( res.result === "success" ) {
 			test_btn_msg.innerHTML = "只今ラジオ再生中です。";
 		} else {
 			test_btn_msg.innerHTML = "ラジオの再生に失敗しました。";
@@ -343,7 +371,7 @@
 	async function check_sw_status() {
 
 		if ( ! ("serviceWorker" in navigator) ) {
-			sw_output.innerHTML = "Service Worker未サポート";
+			sw_output.innerHTML = "Service Worker 未サポート";
 			return;
 		}
 
@@ -407,7 +435,7 @@
 
 	const current_parent_url = current_url_object.protocol + "//" + current_url_object.hostname + parent_path;
 
-	const parent_url_html = '<a href="' + parent_url + '">' + parent_url + ' でアクセス<br />( 現在の protocol ' + current_parent_url + ' )</a>';
+	const parent_url_html = '<a href="' + parent_url + '">' + parent_url + '</a> でアクセス<br />( 現在の protocol ' + current_url_object.protocol + ' )';
 
 	//console.log(current_url_object);
 	//console.log(path_parts);

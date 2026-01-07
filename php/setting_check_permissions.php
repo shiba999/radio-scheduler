@@ -7,6 +7,7 @@ header("Content-Type: application/json; charset=UTF-8");// json を受け取る�
 
 $check_array = array(
 	"../json/settings.json",
+	"../log/settings.log",
 	"../log/radiko_play.log",
 	"../log/player.log",
 	"../log/audio.log",
