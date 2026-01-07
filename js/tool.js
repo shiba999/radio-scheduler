@@ -174,6 +174,8 @@
 
 	export async function fetch_template(source, send, timeout = 10000) {
 
+		let result = "";
+
 		try {
 
 			const controller = new AbortController();
@@ -203,8 +205,6 @@
 			//console.log(content_type);
 			//console.log(content_type.includes("application/json"));
 
-			let result = "";
-
 			if ( content_type.includes("application/json") ) {
 				//console.log("json");
 				result = await response.json();
@@ -220,12 +220,15 @@
 		} catch (error) {
 
 			if (error.name === "AbortError") {
-				console.error("Ajax error: The process timed out.");
+				console.error("fetch_template(): The process timed out.");
+				result = "timeout";
 			} else {
-				console.error("Ajax error: ", error);
+				console.error("fetch_template(): ", error);
+				result = "error";
 			}
 
 			throw error;// エラーも投げる
+			return result;
 
 		}
 
