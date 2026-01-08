@@ -1,4 +1,0 @@
-[cli][info] Found matching plugin radiko for URL http://radiko.jp/#!/live/STV
-[cli][info] Available streams: 49k (worst, best)
-[cli][info] Opening stream: 49k (hls)
-[cli][info] Starting player: /usr/bin/mpv

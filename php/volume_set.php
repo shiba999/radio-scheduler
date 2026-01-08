@@ -1,19 +1,12 @@
 <?php
 
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
-
-// 受信した値へ音量を変更
-// PCM は端末に接続した USB スピーカーの出力先
-
-/*if ( $_GET["v"] ) {
-	//$cmd = "amixer sset 'Master' " . $_GET["v"] . "%";
-	$cmd = "amixer sset PCM " . $_GET["v"] . "%";
-}*/
+$settings_json = file_get_contents("../json/settings.json");
+$settings_object = json_decode($settings_json, true);
+$amixer_path = $settings_object["amixer_path"];
 
 if ( $_POST["v"] ) {
-	$cmd = "amixer sset PCM " . $_POST["v"] . "%";
+	//$cmd = "amixer sset PCM " . $_POST["v"] . "%";
+	$cmd = $amixer_path . " sset PCM " . $_POST["v"] . "%";
 }
 
 $output = shell_exec($cmd);

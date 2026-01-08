@@ -12,14 +12,20 @@ $setting_file = "../json/settings.json";
 $streamlink_path = $_POST["streamlink_path"];
 $player = $_POST["player"];
 $player_path = $_POST["player_path"];
+$amixer_path = $_POST["amixer_path"];
+$reboot_path = $_POST["reboot_path"];
+$shutdown_path = $_POST["shutdown_path"];
 $timezone = $_POST["timezone"];
 
-if ( $streamlink_path && $player && $player_path ) {
+if ( $streamlink_path && $player && $player_path && $amixer_path && $reboot_path && $shutdown_path ) {
 
 	$setting_object = array(
 		"streamlink_path" => $streamlink_path,
 		"player" => $player,
 		"player_path" => $player_path,
+		"amixer_path" => $amixer_path,
+		"reboot_path" => $reboot_path,
+		"shutdown_path" => $shutdown_path,
 		"timezone" => $timezone
 	);
 

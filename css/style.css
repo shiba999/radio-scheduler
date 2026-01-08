@@ -997,7 +997,7 @@ input[type="button"] {
 
 .settings h2 {
 	text-align: center;
-	margin: 1.0em 0;
+	margin: 1.5em 0;
 }
 
 .settings ul {
@@ -1010,6 +1010,7 @@ input[type="button"] {
 
 .settings label {
     display: inline-block;
+	font-weight: bold;
 	margin: 1.0em 0 0.5em 0;
 }
 
@@ -1017,6 +1018,7 @@ input[type="button"] {
     margin-left: 1.0em;
 	color: #999;
 	font-size: 96%;
+	font-weight: normal;
 }
 
 .settings input[type="text"] {
@@ -1036,14 +1038,24 @@ input[type="button"] {
 	background-color: #eee;
 }
 
+.settings .comment {
+	background-color: #333;
+	padding: 0.75em 1.25em;
+	font-size: 90%;
+	line-height: 1.35em;
+	margin: 0 1.20em 1.0em 1.20em;
+}
+
 .settings button {
-	padding: 1.0em 2.0em;
-	margin: 1.5em 1.0em 1.5em 0;
+	padding: 1.25em 2.25em;
+	border: 3px solid #555;
+	margin: 1.0em 1.0em 1.0em 0;
 }
 
 .settings button:hover {
 	background-color: #999;
-	color: #333;
+	color: #111;
+	border-color: #ddd;
 }
 
 .settings a {
@@ -1051,12 +1063,14 @@ input[type="button"] {
 	font-weight: bold;
 }
 
-#permissions_output {
+#last_reboot,
+#permissions_output,
+.cron_path {
     background-color: #222;
 	border: 3px solid #666;
 	box-sizing: border-box;
-	padding: 0.7em 1.5em;
-	margin-bottom: 1.5em;
+	padding: 0.7em 1.5em !important;
+	margin-bottom: 1.5em !important;
 }
 
 #permissions_output span {
@@ -1069,6 +1083,19 @@ input[type="button"] {
 
 #permissions_output .unauthorized {
     color: #ea0051;
+}
+
+.playing {
+	display: inline-block;
+	width: 54px;
+	height: 16px;
+	vertical-align: middle;
+	background-image: url(../image/playing.gif);
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	overflow: hidden;
+	margin: 0 7px 3px 0;
 }
 
 /* レスポンシブに関する記載 */

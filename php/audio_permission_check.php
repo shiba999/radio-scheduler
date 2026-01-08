@@ -1,8 +1,8 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
 
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -13,15 +13,8 @@ $streamlink = $settings_object["streamlink_path"];
 $player = $settings_object["player"];
 $player_path = $settings_object["player_path"];
 
-$audio_file = "../upload/awakening.mp3";
+$audio_file = "../audio/hello_world.mp3";
 $settings_log = "../log/settings.log";
-
-/*exec(
-	$player . " --no-video --log-file=" . escapeshellarg($audio_file)
-	. " " . escapeshellarg($file)
-	. " > /dev/null 2>&1 & echo \"\$! " . escapeshellarg($audio_file) . "\" > "
-	. escapeshellarg($audio_log_file)
-);*/
 
 // 実行前にログを空にする
 
@@ -33,7 +26,7 @@ shell_exec("pkill " . $player);
 
 // コマンド実行
 
-$exec_command = $player . " --no-video --log-file=" . escapeshellarg($settings_log) . " " . escapeshellarg($audio_file) . " > /dev/null 2>&1 &";
+$exec_command = $player_path . " --no-video --log-file=" . escapeshellarg($settings_log) . " " . escapeshellarg($audio_file) . " > /dev/null 2>&1 &";
 
 exec($exec_command);
 

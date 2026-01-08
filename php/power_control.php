@@ -42,7 +42,6 @@ function system_reboot( $delay = 0 ) {
 
 	if ( $delay > 0 ) {
 		$log_storage = true;
-		//exec("echo 'sudo /sbin/reboot' | at now + " . $delay . " seconds 2>&1", $output, $return_var);
 		exec("sh -c 'sleep " . $delay . " && sudo /sbin/reboot' & 2>&1", $output, $return_var);
 	} else {
 		exec("sudo /sbin/reboot & 2>&1", $output, $return_var);

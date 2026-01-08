@@ -30,12 +30,9 @@ function radiko_play($channel, $length = 0) {
 
 	// 1. 再生中だった場合はプレイヤーを停止
 
-	//shell_exec("pkill mpv");
 	shell_exec("pkill " . $player);
 
 	// 2. streamlink + mpv のコマンドをPHP側で組み立てる
-
-	//$player_path = "/usr/bin/mpv";
 
 	$exec_command = sprintf(
 		//"sudo -u www-data %s -p %s",
@@ -58,8 +55,6 @@ function radiko_play($channel, $length = 0) {
 	// ログ出力 & バックグラウンド
 
 	$exec_command .= " > " . escapeshellarg($log_file) . " 2>&1 &";
-
-	//$return_array["command"] = $exec_command;
 
 	// 実行
 
@@ -114,6 +109,7 @@ function audio_play($file) {
 
 	$settings_object = get_settings();
 	$player = $settings_object["player"];
+	$player_path = $settings_object["player_path"];
 
 	// 1. 再生中だった場合はプレイヤーを停止
 
@@ -136,16 +132,12 @@ function audio_play($file) {
 
 	// 2. 再生開始
 
-	//$result = exec("mpv --no-video " . escapeshellarg($file) . " > /dev/null 2>&1 &");
-	//exec($player . " --no-video " . escapeshellarg($file) . " > /dev/null 2>&1 &");
-	//exec($player . " --no-video " . $file . " > /dev/null 2>&1 &");
 	exec(
-		$player . " --no-video --log-file=" . escapeshellarg($log_file)
+		$player_path . " --no-video --log-file=" . escapeshellarg($log_file)
 		. " " . escapeshellarg($file)
 		. " > /dev/null 2>&1 & echo \"\$! " . escapeshellarg($file_name) . "\" > "
 		. escapeshellarg($audio_log_file)
 	);
-
 
 	// 3. 待機しながら起動確認
 
@@ -168,12 +160,8 @@ function audio_play($file) {
 		// プレイヤーのプロセスが存在する → 再生開始と判断
 
 		if ( ! empty($pgrep_output) ) {
-
-			//file_put_contents($audio_log_file, $file_name);// ログファイルに再生したファイル名を保存
 			$status = "playing";
-
 			break;
-
 		}
 
 		usleep($interval);
@@ -206,8 +194,6 @@ function player_kill($echo = true) {
 
 	// 1. プレイヤーを停止
 
-	//$result = exec("pkill mpv");
-	//$result = exec("pkill " . $player);
 	exec(
 		"pkill " . $player . " 2>&1",
 		$output,
