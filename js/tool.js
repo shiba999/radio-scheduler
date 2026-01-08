@@ -46,7 +46,7 @@
 		} else {
 
 			schedule_html += "<tr>";
-			schedule_html += '<td colspan="9">スケジュールが登録されていません。</td>';
+			schedule_html += '<td colspan="9" style="padding: 1.5em;">スケジュールが登録されていません。</td>';
 			schedule_html += "</tr>";
 
 		}
