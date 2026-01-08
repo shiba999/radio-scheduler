@@ -163,7 +163,7 @@
 
 		// Add schedule ボタン追加
 
-		schedule_html += '<span id="add_button_box"><button id="add_button" type="submit">Add schedule</button></span>';
+		schedule_html += '<span id="add_button_box"><button id="add_button" type="submit">スケジュール追加</button></span>';
 
 		return schedule_html;
 
