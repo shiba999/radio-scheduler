@@ -5,63 +5,33 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
 	<link rel="stylesheet" class="cachebuster" href="../css/style.css" type="text/css" />
+	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 	<title>らぢ助 - Radio Scheduler -</title>
 </head>
 
-<body>
+<body id="controller">
 
 <header>
-	<h1>Radio Scheduler</h1>
+	<h1>COULD NOT CONNECT</h1>
 </header>
 
-<section class="card offline">
-
-	<h2>Currently offline</h2>
-
-	<p class="ascii_art">■　　　■
-■　　　■
-■■■■■
-■　　　■
-■　　　■
-
-■■■■■
-　　■
-　　■
-　　■
-　　■
-
-■■■■■
-　　■
-　　■
-　　■
-　　■
-
-■■■■
-■　　　■
-■■■■
-■
-■
-
-　■■■
-■　　■■
-■　■　■
-■■　　■
-　■■■</p>
-
-	<h3>HTTP: 0</h3>
-
-	<p class="kaomoji">∧＿∧
-（ o . o ）
-^</p>
-	<p>サーバーと同じネットワーク内で使用してください。</p>
-	<p style="margin: 1.5em 0;"><button onclick="window.location.reload();" type="button">リロード</button></p>
-	
-
+<section class="timeout">
+	<h2>TIMEOUT</h2>
+	<p>サーバーへ接続できませんでした</p>
 </section>
 
-<footer>
-	<p class="copy">らぢ助 - Radio Scheduler -<br />&copy; 2025 <a href="https://weblabyrinth.net" target="_blank">WebLabyrinth</a></p>
-</footer>
+<section class="kaomoji">∧＿∧
+（ o . o ）
+^</section>
+
+<section class="timeout">
+	<h2>確認してください</h2>
+	<ul>
+		<li>サーバーと同じネットワークからアクセスしてください</li>
+		<li>サーバーが応答できる状態か確認してください</li>
+		<li><button onclick="window.location.reload();" type="button">リロード</button></li>
+	</ul>
+</section>
 
 </body>
 </html>

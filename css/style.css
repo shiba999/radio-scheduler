@@ -1218,35 +1218,35 @@ input[type="button"] {
 		margin-left: 1.0em;
 	}
 
-	/*#play_info .station_logo {
-		display: none;
-	}*/
-
 	#play_info {
 		display: none;
 	}
 
 }
 
-/* offline */
+/* timeout */
 
-.offline {
-	padding: 0 1.0em;
-	overflow: hidden;
-}
-
-.offline h2,
-.offline h3 {
-	margin: 1.5em;
-	color: #ddd;
-}
-
-.offline h2 {
+.timeout h2 {
 	font-size: 100%;
+	color: #e0ebc7;
+	margin: 1.5em 0 1.0em 0;
 }
 
-.offline h3 {
-	font-size: 90%;
+.timeout ul {
+	text-align: center;
+	list-style-type: none;
+	padding: 0 1.0em;
+}
+
+.timeout li {
+	font-size: 98%;
+	color: #ccc;
+	margin: 0.3em 0;
+}
+
+.timeout button {
+	padding: 1.0em 2.5em;
+	margin: 1.0em;
 }
 
 .ascii_art,

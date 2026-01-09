@@ -133,7 +133,6 @@
 
 <script type="module">
 
-
 	// スケジュール関係
 
 	const schedule_list = document.getElementById("schedule_list");
@@ -150,7 +149,6 @@
 
 	let modules;
 
-
 	// サービスワーカーからメッセージを受信したときに使用する関数
 
 	function serviceworker_Message_processing(event) {
@@ -166,7 +164,6 @@
 		}
 
 	}
-
 
 	// 電源操作関係で使用
 	// 経過秒数を表示させる
@@ -661,6 +658,29 @@
 
 	});
 
+	// 音声ファイルの再生状況を監視する関数
+	// 戻り値で player_state.state === true なら再生中
+	// player_state.state === false なら停止
+
+	let si_array = new Array();
+
+	async function check_audio() {
+
+		const player_state = await modules.tol.fetch_template("./php/audio_check.php", "");
+
+		//console.log(player_state);
+
+		const play_btn_array = document.getElementsByClassName("audio_play");
+		const del_btn_array = document.getElementsByClassName("audio_del");
+
+		if ( player_state.state === true ) {// 再生中だった場合は停止
+			audio_play_button_control(player_state.file);
+		} else if ( player_state.state === false ) {// 停止中だった場合は再生
+			audio_stop_button_control();
+		}
+
+	}
+
 	// 端末をシャットダウン
 
 	const system_power_off = document.getElementById("system_power_off");
@@ -733,7 +753,6 @@
 
 	}
 
-
 	// 受け取った URL で fetch を実行し、文字列を返す。
 	// オフラインモードの場合、またはタイムアウトした場合等は相応の文字列を返す
 
@@ -789,7 +808,6 @@
 		}
 
 	}
-
 
 	// 読み込み時に実行する関数
 	// 現在のキャッシュ値を indexedDB から取得する関数
@@ -891,7 +909,6 @@
 
 	}
 
-
 	// -------------------------------------------------------
 	// ページ読込時に実行
 	// 1. IndexedDB の読み込み
@@ -917,7 +934,9 @@
 
 		// 端末の生存確認 1 ( PHP からサーバーの IP を確認 )
 
-		const server_ip_json = await fetch_get_value("./php/server.php", {cache: "no-store"}, 4000);
+		const server_ip_json = await fetch_get_value("./php/server.php", {cache: "no-store"}, 3000);
+
+		let server_access = false;
 
 		try {
 
@@ -927,23 +946,23 @@
 
 			const server_ip_res = JSON.parse(server_ip_json);
 
-			console.log(server_ip_res);
+			//console.log(server_ip_res);
 
 			document.getElementById("this_ip").innerText = server_ip_res.ip;
 
-			//console.log("jsonだよ");
-			//console.log(server_ip_json);
+			server_access = true;// サーバーにアクセスできた
 
 		} catch (error) {
 
 			// json ではなく文字列だった -> オフラインです
 
-			//console.log("オフラインです");
-			console.log(server_ip_res);
+			console.log(error);
 
 			// サーバーにアクセスできない状態の場合はオフラインメッセージを表示
 
 			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view();
+
+			return;// サーバーに繋がってないので終了
 
 		}
 
@@ -1215,6 +1234,10 @@
 
 		await radiko_status_check();
 
+		// 音声ファイルが再生中か監視開始
+
+		si_array.push( setInterval(check_audio, 2000) );
+
 		// 地域ID からお知らせ情報を取得する
 
 		//console.log("地域ID: " + region);
@@ -1278,7 +1301,6 @@
 		});
 
 	};
-
 
 	// オプションメニューの開閉
 
@@ -1367,7 +1389,6 @@
 		});
 
 	}
-
 
 	// スケジュール関係ボタンの挙動: class によって挙動分岐
 
@@ -1736,7 +1757,6 @@
 
 	});
 
-
 	// 音声ファイル関係ボタンの挙動: class によって挙動分岐
 
 	list_output.addEventListener("click", async function(event) {
@@ -1823,7 +1843,6 @@
 
 	});
 
-
 	// ファイルドラッグアンドドロップの制御
 	// http://iwb.jp/return-false-preventdefault-stoppropagation/
 
@@ -1869,36 +1888,6 @@
 		}
 
 	}, false);
-
-
-	// 音声ファイルの再生状況を監視する関数
-	// 戻り値で player_state.state === true なら再生中
-	// player_state.state === false なら停止
-
-	let si_array = new Array();
-
-	async function check_audio() {
-
-		const player_state = await modules.tol.fetch_template("./php/audio_check.php", "");
-
-		//console.log(player_state);
-
-		const play_btn_array = document.getElementsByClassName("audio_play");
-		const del_btn_array = document.getElementsByClassName("audio_del");
-
-		if ( player_state.state === true ) {// 再生中だった場合は停止
-			audio_play_button_control(player_state.file);
-		} else if ( player_state.state === false ) {// 停止中だった場合は再生
-			audio_stop_button_control();
-		}
-
-	}
-
-	//window.addEventListener("load", function() {
-	window.addEventListener("pageshow", async function() {
-		si_array.push( setInterval(check_audio, 2000) );
-		await radiko_status_check();
-	});
 
 	// スーパーリロード
 

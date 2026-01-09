@@ -361,57 +361,26 @@
 
 		const html = `
 <header>
-	<h1>Radio Scheduler</h1>
+	<h1>COULD NOT CONNECT</h1>
 </header>
 
-<section class="card">
-
-	<h2>Currently offline</h2>
-
-	<p class="ascii_art offline">■　　　■
-■　　　■
-■■■■■
-■　　　■
-■　　　■
-
-■■■■■
-　　■
-　　■
-　　■
-　　■
-
-■■■■■
-　　■
-　　■
-　　■
-　　■
-
-■■■■
-■　　　■
-■■■■
-■
-■
-
-　■■■
-■　　■■
-■　■　■
-■■　　■
-　■■■</p>
-
-	<h3>HTTP: 0</h3>
-
-	<p class="kaomoji">∧＿∧
-（ o . o ）
-^</p>
-	<p>サーバーと同じネットワーク内で使用してください。</p>
-	<p style="margin: 1.5em 0;"><button onclick="window.location.reload();" type="button">リロード</button></p>
-
+<section class="timeout">
+	<h2>TIMEOUT</h2>
+	<p>サーバーへ接続できませんでした</p>
 </section>
 
-<footer>
-	<p class="copy">らぢ助 - Radio Scheduler -<br />&copy; 2025 <a href="https://weblabyrinth.net" target="_blank">WebLabyrinth</a></p>
-</footer>
+<section class="kaomoji">∧＿∧
+（ o . o ）
+^</section>
 
+<section class="timeout">
+	<h2>確認してください</h2>
+	<ul>
+		<li>サーバーと同じネットワークからアクセスしてください</li>
+		<li>サーバーが応答できる状態か確認してください</li>
+		<li><button onclick="window.location.reload();" type="button">リロード</button></li>
+	</ul>
+</section>
 `;
 
 		return html;
