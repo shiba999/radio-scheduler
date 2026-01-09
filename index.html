@@ -61,7 +61,7 @@
 
 			<input type="range" id="volume_range" name="volume" min="0" max="100" />
 
-			<button id="radiko_stop">
+			<button id="radio_stop">
 				<svg viewBox="0 0 100 100" class="icon_stop"><rect width="100%" height="100%" rx="2" ry="2"/></svg>
 			</button>
 
@@ -133,391 +133,759 @@
 
 <script type="module">
 
-	// スケジュール関係
+let mod;// モジュール収納先
 
-	const schedule_list = document.getElementById("schedule_list");
+// サービスワーカーからメッセージを受信したときに使用する関数
 
-	// ファイルアップロード関係
+function serviceworker_Message_processing(event) {
 
-	const um_output = document.getElementById("upload_message");
-	const list_output = document.getElementById("audio_file_list");
-	const drop_zone_element = document.getElementById("upload");// ここに放り込むとアップロードされる
-	let available_audio = new Array();
-	let list_audio_play = false;
+	console.log("@ [message] Received from Service Worker");
 
-	// サービスワーカー関係
+	// キャッシュの更新通知
+	// キャッシュバスターを実行してリロードメッセージを表示
 
-	let modules;
+	if (event.data.type === "CACHE_UPDATE_COMPLETE") {
+		css_js_cachebuster(event.data.version, "Cache update complete");
+		mod.fnc.msg_fade_in( event.data.message + '<br />反映を行うためにページのリロードを行ってください。<br /><input type="button" value="リロード" onclick="window.location.reload();" />' );
+	}
 
-	// サービスワーカーからメッセージを受信したときに使用する関数
+}
 
-	function serviceworker_Message_processing(event) {
+// 電源操作関係で使用
+// 経過秒数を表示させる
 
-		console.log("@ [message] Received from Service Worker");
+let device_started = false;
 
-		// キャッシュの更新通知
-		// キャッシュバスターを実行してリロードメッセージを表示
+function standby_time_display() {
 
-		if (event.data.type === "CACHE_UPDATE_COMPLETE") {
-			css_js_cachebuster(event.data.version, "Cache update complete");
-			modules.fnc.msg_fade_in( event.data.message + '<br />反映を行うためにページのリロードを行ってください。<br /><input type="button" value="リロード" onclick="window.location.reload();" />' );
+	console.log("*** standby time display ***");
+
+	let seconds = 0;
+
+	const interval_id = setInterval(function() {
+
+		seconds++;
+
+		console.log(seconds);
+
+		// device_started === true なら停止
+		// 時間かかりすぎたら停止しておこう (5分目安)
+
+		if ( seconds >= 300 ) {
+
+			clearInterval(interval_id);// タイマー停止
+			mod.fnc.msg_fade_in("起動に時間がかかりすぎているようです。<br />端末の電源を確認してください。");
+
+		} else if ( device_started === true ) {
+
+			clearInterval(interval_id);// タイマー停止
+			mod.fnc.msg_fade_out();
+
+		} else {
+
+			mod.fnc.msg_fade_in("起動待機中: " + seconds + "秒経過");
+
+		}
+
+	}, 1000);
+
+}
+
+// ページ読み込み時や電源操作時に実行する
+// 端末が起動しているかの確認と復帰までの待機
+
+async function check_server_alive(retries = 5) {
+
+	console.log("### サーバー生存確認中: " + retries);
+
+	for ( let i = 0; i < retries; i++ ) {
+
+		console.log(device_started);
+
+		try {
+
+			// ログファイルを読み込んで、端末が動いているかの確認とする。
+			// method: "HEAD", cache: "no-store" を使用しているので
+			// fetch_template() は使用しない
+
+			const response = await fetch(
+				"./log/radiko_play.log",
+				{ method: "HEAD", cache: "no-store" }
+			);
+
+			console.log(response);
+			console.log(response.ok);
+
+			if ( response.ok === true ) {
+				mod.fnc.device_started = true;// サーバー起動フラグ
+				console.log(device_started);
+				return true;// サーバ応答あり
+			}
+
+		} catch (event) {
+			console.log("応答なし (" + i + ") リトライ");
+		}
+
+		await new Promise(resolve => setTimeout(resolve, 3000));// 一定待機してリトライ
+
+	}
+
+	// サーバーにアクセスできない状態の場合はオフラインメッセージを表示
+
+	document.getElementById("controller").innerHTML = mod.fnc.change_to_offline_view("error3");
+
+	clearInterval( mod.var.v.set_interval.shift() );// 音声ファイル監視を停止
+
+	return false;// ここまで来たら全て失敗
+
+}
+
+// ラジオ局の情報一式を収納する場所
+
+let stations = new Array();
+
+// 局のIDから諸情報を検索して表示を行う関数
+// 一覧から再生中の局の領域への変更も行ってみる
+// 局のIDを引数に入れれば動くようにしてみる
+
+// ラジオ停止関数
+
+async function stop_request() {
+
+	// 停止に伴う表示の初期化
+	// 厳密に考えると停止のコールバックを受け取ってから
+	// 初期化を行った方が良いが可能なのかな？
+
+	//mod.fnc.init_play_info();
+
+	const result = await mod.fnc.fetch_template("./php/player_stop.php", "");
+
+	let result_value = false;
+
+	if ( result == "stopped" ) {
+
+		mod.fnc.init_play_info(mod.var);// 停止に伴う表示の初期化
+
+		console.log("Stopped successfully");
+
+		result_value = true;
+
+	} else {
+
+		// 停止できなかった場合
+		// 無いと思うが停止できなかった場合の処理も考える必要はあるかも
+		// 必要に応じて「再生停止に失敗したので、後に続く処理を停止しました。時間をおいて再度実行を試みてください。」の様なメッセージを表示させた方が良いかもしれない。
+
+		console.log("[!] Stop failed...");
+
+	}
+
+	return result_value;
+
+}
+
+// クリックでラジオ再生および停止
+
+document.addEventListener("click", async function(event) {
+
+	//console.log(event);
+
+	// ラジオ再生 > パラメータで局のIDを送る
+	// class="radiko_ch" をクリックで php へ id を送信
+
+	if ( event.target.classList.contains("radiko_ch") ) {
+
+		// クリックした再生ボタン要素と兄弟要素である in_process を非表示から表示へ切り替える
+
+		const station_box = event.target.closest(".station");// 親要素
+		const in_process = station_box.querySelector(".in_process");// 親要素内の .in_process を取得
+
+		if (in_process) {
+			in_process.style.display = "flex";// .in_process 表示
+		}
+
+		// チャンネル情報を取り出して php へ送る
+
+		let this_ch_id = event.target.dataset.ch;
+
+		const params = new URLSearchParams({
+			cmd: "play",
+			channel: this_ch_id
+		});
+
+		const query_string = new URLSearchParams(params).toString();
+		const object = await mod.fnc.fetch_template("./php/player_radiko_play.php", query_string);
+
+		// object.result > success なら再生成功
+
+		if ( object.result == "success" ) {
+
+			// 再生結果に伴う表示切り替え処理
+
+			const this_channel = object.channel;
+
+			// 再生情報をフッターや一覧にも反映
+
+			mod.fnc.show_playing_info(this_ch_id, mod.var);
+
+			// 再生しているメッセージを表示し、少し待ってからメッセージ非表示させる。
+
+			mod.fnc.msg_fade_in("只今再生中です ( Channel ID: " + this_ch_id + " )");
+			await mod.fnc.js_sleep(3000);
+			mod.fnc.msg_fade_out();
+
+		} else {
+
+			mod.fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " )");
+
 		}
 
 	}
 
-	// 電源操作関係で使用
-	// 経過秒数を表示させる
+	if ( event.target.classList.contains("in_process") ) {
+		const result = await stop_request();
+	}
 
-	let device_started = false;
+});
 
-	function standby_time_display() {
 
-		console.log("*** standby time display ***");
 
-		let seconds = 0;
+// 音声ファイル再生時に各ボタンを調整
+// 再生中は音声ファイル削除ボタンは無効
 
-		const interval_id = setInterval(function() {
+function audio_play_button_control(filename) {
 
-			seconds++;
+	const play_btn_array = document.getElementsByClassName("audio_play");
+	const del_btn_array = document.getElementsByClassName("audio_del");
 
-			console.log(seconds);
+	for ( let m = 0; m < del_btn_array.length; m++ ) {
+		del_btn_array[m].style.opacity = "0.5";
+		del_btn_array[m].style.pointerEvents = "none";
+	}
 
-			// device_started === true なら停止
-			// 時間かかりすぎたら停止しておこう (5分目安)
+	for ( let n = 0; n < play_btn_array.length; n++ ) {
 
-			if ( seconds >= 300 ) {
+		const this_filename = play_btn_array[n].dataset.name;
 
-				clearInterval(interval_id);// タイマー停止
-				modules.fnc.msg_fade_in("起動に時間がかかりすぎているようです。<br />端末の電源を確認してください。");
+		if ( this_filename === filename ) {
+			play_btn_array[n].style.backgroundColor = "#fff";
+			play_btn_array[n].style.opacity = "1";
+			mod.var.v.audio_play = true;
+			mod.var.e.up_msg.innerHTML = '<spam class="playing"></spam>' + this_filename + " (再度 Play ボタンで停止)";
+		}
 
-			} else if ( device_started === true ) {
+	}
 
-				clearInterval(interval_id);// タイマー停止
-				modules.fnc.msg_fade_out();
+}
+
+// 音声ファイル停止時に各ボタンを調整
+// 音声ファイル削除ボタンは無効を解除
+// 再生ボタンのスタイルを初期化
+
+function audio_stop_button_control() {
+
+	clearInterval( mod.var.v.set_interval.shift() );
+
+	const play_btn_array = document.getElementsByClassName("audio_play");
+	const del_btn_array = document.getElementsByClassName("audio_del");
+
+	for ( let n = 0; n < play_btn_array.length; n++ ) {
+		play_btn_array[n].style.backgroundColor = null;
+		play_btn_array[n].style.opacity = null;
+	}
+
+	for ( let m = 0; m < del_btn_array.length; m++ ) {
+		del_btn_array[m].style.opacity = null;
+		del_btn_array[m].style.pointerEvents = null;
+	}
+
+	mod.var.v.audio_play = false;
+	mod.var.e.up_msg.innerHTML = "スケジュール再生に使用する音声ファイルをここで登録可能です。";
+
+}
+
+// 端末を再起動
+
+const system_reboot = document.getElementById("system_reboot");
+
+system_reboot.addEventListener("click", async function() {
+
+	mod.fnc.device_started = false;// 端末停止フラグ
+	let stop_playing = false;// 再生停止フラグ
+
+	if ( confirm("端末の再起動を行います。") ) {
+
+		// 再生中なら停止処理
+
+		const result = await stop_request();
+
+		// 停止出来たら再起動を実行
+
+		if (result) {
+
+			const message = await mod.fnc.fetch_template("./php/pow_reboot.php", "");
+
+			mod.fnc.msg_fade_in(message);
+
+			// 少し待機してから...
+
+			//await mod.fnc.js_sleep(2000);
+
+			// 待機中のカウントメッセージを表示
+
+			await standby_time_display();
+
+			// 更に少し待機してから...
+
+			//await mod.fnc.js_sleep(2300);
+
+			// 端末の起動確認
+			// Raspberry Pi Zero 2 W は、OS のシャットダウンから再起動後
+			// wifi のネットワークが安定するまでの時間を含めると、約30秒は必要と言われている。
+			// 段階的にメッセージを表示させてもいいかもしれない
+
+			const alive = await check_server_alive(15);// 引数は試行回数
+
+			console.log(alive);
+
+			if ( alive ) {
+
+				console.log("再起動完了 reboot.addEventListener");
+				//mod.fnc.msg_fade_out();
+				mod.fnc.msg_fade_in("再起動が完了しました。");
+
+				await mod.fnc.js_sleep(3000);
+
+				mod.fnc.msg_fade_out();
 
 			} else {
 
-				modules.fnc.msg_fade_in("起動待機中: " + seconds + "秒経過");
+				console.log("再起動後のコールバックに失敗");
+				mod.fnc.msg_fade_in("起動チェックエラー<br />サーバーが起動していない可能性があります。");
 
 			}
 
-		}, 1000);
+		}
 
 	}
 
-	// ページ読み込み時や電源操作時に実行する
-	// 端末が起動しているかの確認と復帰までの待機
+});
 
-	async function check_server_alive(retries = 5) {
+// 音声ファイルの再生状況を監視する関数
+// 戻り値で player_state.state === true なら再生中
+// player_state.state === false なら停止
 
-		console.log("### サーバー生存確認中: " + retries);
+let si_array = new Array();
 
-		for ( let i = 0; i < retries; i++ ) {
+async function check_audio() {
 
-			console.log(device_started);
+	const player_state = await mod.fnc.fetch_template("./php/audio_check.php", "");
 
-			try {
+	//console.log(player_state);
 
-				// ログファイルを読み込んで、端末が動いているかの確認とする。
-				// method: "HEAD", cache: "no-store" を使用しているので
-				// fetch_template() は使用しない
+	const play_btn_array = document.getElementsByClassName("audio_play");
+	const del_btn_array = document.getElementsByClassName("audio_del");
 
-				const response = await fetch(
-					"./log/radiko_play.log",
-					{ method: "HEAD", cache: "no-store" }
-				);
+	if ( player_state.state === true ) {// 再生中だった場合は停止
+		audio_play_button_control(player_state.file);
+	} else if ( player_state.state === false ) {// 停止中だった場合は再生
+		audio_stop_button_control();
+	}
 
-				console.log(response);
-				console.log(response.ok);
+}
 
-				if ( response.ok === true ) {
-					modules.fnc.device_started = true;// サーバー起動フラグ
-					console.log(device_started);
-					return true;// サーバ応答あり
-				}
+// 端末をシャットダウン
 
-			} catch (event) {
-				console.log("応答なし (" + i + ") リトライ");
-			}
+const system_power_off = document.getElementById("system_power_off");
 
-			await new Promise(resolve => setTimeout(resolve, 3000));// 一定待機してリトライ
+system_power_off.addEventListener("click", async function() {
+
+	if ( confirm("端末のシャットダウンを行います。") ) {
+
+		// 再生中なら停止処理
+
+		const result = await stop_request();
+
+		// 停止出来たらシャットダウンを実行
+
+		if (result) {
+
+			const message = await mod.fnc.fetch_template("./php/pow_off.php", "");
+
+			mod.fnc.msg_fade_in(message);
 
 		}
+
+	}
+
+});
+
+// キャッシュバスター
+// css ファイルを ***.css?v=*** の様にパラメータ付きの形式に置き換える
+// 複数回実行すると ***.css?v=123?v=123?v=123 の様にパラメータが増え続けるので
+// オリジナルのファイルに整形を行ってから再度パラメータを付与している
+
+function css_js_cachebuster(version, location = "Unknown") {
+
+	const cb_elements = document.getElementsByClassName("cachebuster");
+
+	//console.log( "class: cachebuster ... " + cb_elements.length );
+	//console.log("+ version: " + version);
+
+	for ( let n = 0; n < cb_elements.length; n++ ) {
+
+		const old_link = cb_elements[n];
+
+		// 元のhrefを取得
+		// ここでは css のみの更新とする
+		// js ファイルをここでキャッシュバスターするとエラーの原因となるので mod へインポートすること
+
+		const old_link_href = old_link.href;
+		const old_link_split = old_link_href.split("?");
+		const original_href = old_link_split[0];
+
+		// 新しいlink要素を作成
+
+		const new_link = document.createElement("link");
+
+		new_link.rel = "stylesheet";
+		new_link.className = "cachebuster";
+		new_link.type = "text/css";
+
+		new_link.onload = function() {
+			console.log("- [" + location + "] Cache Buster (CSS): " + new_link.href);
+		};
+
+		new_link.href = original_href + "?v=" + version;
+
+		// 古いlink要素へ置き換え
+
+		old_link.parentNode.replaceChild(new_link, old_link);
+
+	}
+
+}
+
+// 受け取った URL で fetch を実行し、文字列を返す。
+// オフラインモードの場合、またはタイムアウトした場合等は相応の文字列を返す
+
+async function fetch_get_value(url, options = {}, timeout = 5000) {
+
+	//console.log("- fetch_get_value() 2: " + url);
+
+	const controller = new AbortController();
+	const id = setTimeout(() => controller.abort(), timeout);
+
+	options.signal = controller.signal;
+
+	try {
+
+		const response = await fetch(url, options);
+
+		//console.log(response);
+
+		clearTimeout(id);
+
+		if ( ! response.ok ) {
+
+			// Service Worker が返す "Offline and not cached" を確認
+
+			if ( response.status === 503 ) {
+
+				const text = await response.text();
+
+				if (text === "Offline and not cached") {
+					return "offline";
+				}
+
+			}
+
+			return "http-error: " + response.status;
+
+		}
+
+		const response_text = await response.text();
+
+		return response_text;
+
+	} catch (error) {
+
+		clearTimeout(id);
+
+		if (error.name === "AbortError") {
+			return "timeout";
+		} else {
+			return "network-error";
+		}
+
+	}
+
+}
+
+// 読み込み時に実行する関数
+// 現在のキャッシュ値を indexedDB から取得する関数
+// ここで取得した値を使用して import の JS ファイルをキャッシュバスターする
+// 取得のみなの事と、細かく書くと共有部分のコードがもったいないので
+// ここでは簡素な内容で取得させている
+
+async function load_idb_cache_version() {
+
+	const object = await new Promise( function(resolve, reject) {
+
+		const idb_open = indexedDB.open("radiko_info", 1);
+
+		// 成功時に実行
+
+		idb_open.onsuccess = function(event) {
+
+			const db = event.target.result;
+			const transaction = db.transaction("radiko", "readonly");
+			const db_store = transaction.objectStore("radiko");
+			const value_get_request = db_store.get("version");
+
+			value_get_request.onsuccess = function(event) {
+				resolve(event);
+			}
+
+			value_get_request.onerror = function(event) {
+				resolve(event);
+			}
+
+		};
+
+		idb_open.onerror = function(error) {
+			resolve(error);
+		};
+
+		// indexedDB のバージョンが変更された場合に実行 (新規作成時含む)
+		// このタイミングで必要な情報を保存する
+
+		idb_open.onupgradeneeded = function(error) {
+
+			let db = event.target.result;
+			let table_object = db.createObjectStore("radiko", { keyPath: "name" });
+
+			let value_get_request = table_object.getAll();
+
+			value_get_request.onsuccess = function(event) {
+				resolve(event);
+			}
+
+			value_get_request.onerror = function(event) {
+				resolve(event);
+			}
+
+			db.close();// 接続を解除する
+
+		};
+
+	});
+
+	//console.log(object);
+
+	// バージョン情報が保存されていない場合は 1 とする
+
+	if ( object?.target?.result?.value !== undefined ) {
+		return object.target.result.value;
+	} else {
+		return 1;
+	}
+
+}
+
+// 読み込むモジュールをキャッシュバスターで import()
+
+async function load_import_module(location = "Unknown") {
+
+	let cv = await load_idb_cache_version();
+
+	console.log("- [" + location + "] load_import_module(): " + cv);
+
+	// js の import
+
+	const return_object = {
+		var: await import("./js/variable.js?v=" + cv),
+		fnc: await import("./js/function.js?v=" + cv),
+		idb: await import("./js/indexeddb.js?v=" + cv),
+		cv: cv// キャッシュバージョン
+	};
+
+	return return_object;
+
+}
+
+// -------------------------------------------------------
+// ページ読込時に実行
+// 1. IndexedDB の読み込み
+// 2-1. サービスワーカーの起動
+// 2-2. バージョン（キャッシュ）の更新があった場合は再起動通知
+// 3. 端末の生存確認
+// 4. 地域IDとチャンネル情報の取得・更新
+// 5. 音量状態の取得
+// 6. チャンネル再生状況の取得
+// 7. 地域IDからお知らせ情報を取得
+// -------------------------------------------------------
+
+window.onload = async function() {
+
+	console.log("* * * Load setup start * * *");
+
+	// [処理1]
+	// indexedDB から現在のキャッシュバージョンを取得
+
+	// 使用するモジュールをインポートする (仮インポートのシチュエーションあり)
+
+	mod = await load_import_module("load 1");
+
+	//console.log(mod);
+
+	// 端末の生存確認 1 ( PHP からサーバーの IP を確認 )
+
+	const server_ip_json = await fetch_get_value("./php/server.php", {cache: "no-store"}, 3000);
+
+	let server_access = false;
+
+	try {
+
+		JSON.parse(server_ip_json);
+
+		// json を受け取れた場合 -> IP 表示
+
+		const server_ip_res = JSON.parse(server_ip_json);
+
+		//console.log(server_ip_res);
+
+		document.getElementById("this_ip").innerText = server_ip_res.ip;
+
+		server_access = true;// サーバーにアクセスできた
+
+	} catch (error) {
+
+		// json ではなく文字列だった -> オフラインです
+
+		console.log(error);
 
 		// サーバーにアクセスできない状態の場合はオフラインメッセージを表示
 
-		document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view("error3");
+		mod.var.e.controller.innerHTML = mod.fnc.change_to_offline_view("error1");
 
-		clearInterval( si_array.shift() );// 音声ファイル監視を停止
-
-		return false;// ここまで来たら全て失敗
+		return;// サーバーに繋がってないので終了
 
 	}
 
-	// ラジオ局の情報一式を収納する場所
+	// 端末の生存確認 2
 
-	let stations = new Array();
+	const idb_cv = mod.cv;// キャッシュ値も含まれている
 
-	// 再生中の背景を一括でクリアにする
+	// 読込時のバージョンを保存しておく
+	// サービスワーカー更新時にバージョンが変わったことを
+	// 判断させるために使用する
 
-/*	function stations_bg_initialization() {
+	const starting_version = idb_cv;
 
-		// 再生中のアニメーションアイコンの非表示
+	// 静的リンクの CSS ファイルと JS ファイルについて
+	// キャッシュ値を使用してキャッシュバスターを実施 (静的にリンクしている部分)
+	// キャッシュ値を取得できなかった場合はそのまま
 
-		const process_e_array = document.getElementsByClassName("in_process");
+	// キャッシュバスター実行 (css, js)
 
-		for ( let n = 0; n < process_e_array.length; n++ ) {
-			process_e_array[n].style.display = "none";
-		}
+	css_js_cachebuster(idb_cv, "load 1");
 
-		// 背景色削除
+	// fetch でサービスワーカーの最新バージョンを確認
+	// オフラインや例外的エラーが出た場合は indexedDB で保存された値を使用
+	// バージョンが受け取れた場合はその値を使用する
+	// 疑似オフラインの設定を有効にしていても
+	// それはサービスワーカーがまだ有効になっていない状態であれば
+	// インターネットに繋がっている状態であればバージョンは取得可能（のはず）
 
-		const station_e_array = document.getElementsByClassName("station");
+	const fetch_cv_value = await fetch_get_value("./cv.txt", {cache: "no-store"}, 4000);
 
-		for ( let n = 0; n < station_e_array.length; n++ ) {
-			station_e_array[n].style.backgroundColor = null;
-		}
+	let latest_version;
 
-		// ボタンのスタイル削除
+	console.log("* fetch_cv_value: " + fetch_cv_value);
 
-		const play_btn_e_array = document.getElementsByClassName("radiko_ch");
+	if ( fetch_cv_value == "offline" || fetch_cv_value == "timeout" || fetch_cv_value == "network-error" ) {
 
-		for ( let n = 0; n < play_btn_e_array.length; n++ ) {
-			play_btn_e_array[n].removeAttribute("style");
-		}
+		// オフラインなら indecedDB の値を使用する
 
-	}*/
+		latest_version = idb_cv;// indexedDB
 
-	// 局のIDから諸情報を検索して表示を行う関数
-	// 一覧から再生中の局の領域への変更も行ってみる
-	// 局のIDを引数に入れれば動くようにしてみる
+		// だけどオフライン状態である表示に切り替える
 
-	const radiko_stop = document.getElementById("radiko_stop");
+		document.getElementById("controller").innerHTML = mod.fnc.change_to_offline_view("error2");
 
-/*	function show_playing_info(station_id) {
+		clearInterval( mod.var.v.set_interval.shift() );// 音声ファイル監視を停止
 
-		//console.log(playback_status_object.channel);
+	} else {
 
-		let this_name = "";
-		let this_image = "";
-		let hit_id = false;// チャンネルIDがヒットしたか否か
+		// キャッシュバージョン値を取得できたなら、その値を使用する。
 
-		// 再生中の場合は手前でエリアIDから取得した各チャンネルの情報の中から該当するチャンネル名やサムネイルを拾い上げる
-
-		for ( let n = 0; n < stations.length; n++ ) {
-
-			if ( stations[n]["id"] == station_id ) {
-				this_name = stations[n]["name"];
-				this_image = stations[n]["logo"];
-				hit_id = true;
-			}
-
-		}
-
-		if ( hit_id ) {
-
-			// 受け取ったIDの情報が stations 内に存在した場合
-
-			// チャンネル情報をフッターに表示
-
-			const html = '<span class="station_logo"><img src="' + this_image + '" alt="' + this_name + '" /></span><span class="station_name">' + this_name + '</span>';
-
-			document.getElementById("play_info").innerHTML = html;
-
-			// チャンネル一覧で再生済みとなっている要素の背景を初期化
-
-			modules.fnc.stations_bg_initialization();
-
-			// 再生中のチャンネル要素の背景を変更
-
-			console.log("*** Currently playing: " + station_id + " ***");
-
-			const this_box = document.getElementById( station_id + "_box" );
-
-			this_box.style.backgroundColor = "#999";
-
-			// 再生中のチャンネル要素にアニメーションを表示
-
-			const this_process = this_box.querySelector(".in_process");// 親要素内の .in_process を取得
-			this_process.style.display = "flex";// .in_process 表示
-
-			// 該当チャンネルのボタン class="radiko_ch" をクリック不可に変更
-			// 色なども変更
-
-			const this_play_btn = this_box.getElementsByClassName("radiko_ch");
-			this_play_btn[0].style.pointerEvents = "none";
-			this_play_btn[0].style.opacity = "0.15";
-			this_play_btn[0].style.background = "#fff";
-			this_play_btn[0].style.color = "#000";
-
-			// 停止ボタンは表示させる
-
-			radiko_stop.style.display = "inline-block";
-
-		} else {
-
-			// 受け取ったIDの情報が stations 内に存在しなかった場合
-
-			init_play_info();
-
-		}
+		latest_version = fetch_cv_value;// fetch value
 
 	}
 
-	// 停止した場合の処理
-	// フッターの局情報と一覧を初期化する
+	// 使用するモジュールを再度インポートする
 
-	function init_play_info() {
+	// 少し上で indexedDB にのバージョン値に更新が入り
+	// キャッシュバージョンが明確になったため
+	// 存在する（であろう）パラメータ付きで再度読み込みして上書き
 
-		// チャンネル一覧で再生済みとなっている要素の背景を初期化
+	mod = await load_import_module("load 2");
 
-		modules.fnc.stations_bg_initialization();
+	// 再度取得したバージョンで再度キャッシュバスター実行
 
-		// 停止中という表示
+	console.log("* latest_version: " + latest_version);
 
-		document.getElementById("play_info").innerHTML = '<span class="station_name">只今ラジオは停止中です</span>';
+	css_js_cachebuster(latest_version, "load 2");
 
-		// 停止ボタンは非表示
+	// IndexedDB から保存情報の確認
 
-		radiko_stop.style.display = "none";
+	const idb_object = await mod.idb.get_idb_object();
 
-	}
+	//console.log(idb_object);
 
-	// radiko 現在再生中か・どの局を再生中かを確認する
-	// この関数はモジュール読み込み前に実行する場合があるため
-	// fetch_template は使用せず fetch で実行する
+	const idb_id = mod.idb.idb_finding_Values(idb_object, "id");
+	const idb_stations = mod.idb.idb_finding_Values(idb_object, "stations");
+	const idb_name = mod.idb.idb_finding_Values(idb_object, "name");
+	const idb_time = mod.idb.idb_finding_Values(idb_object, "time");
 
-	async function radiko_status_check() {
+	// キャッシュバスターでキャッシュ内のファイルを使用させる
 
-		const playback_status_json = await fetch("./php/radiko_playback_status.php");
-		const playback_status_object = await playback_status_json.json();
+	css_js_cachebuster(latest_version, "Window onLoad");
 
-		// 再生している時としていない場合の表示切替
+	// サービスワーカーインストールでキャッシュを保存
+	// ?cv= でサービスワーカーへバージョンを渡す
 
-		if ( playback_status_object.status === "playing" ) {
-			const this_id = playback_status_object.channel;
-			modules.fnc.show_playing_info(this_id, stations);
-		} else {
-			modules.fnc.init_play_info();
-		}
+	if ("serviceWorker" in navigator) {
 
-	}*/
+		// サービスワーカーから受信するメッセージ用イベントの登録
 
-	// radiko 停止関数
+		navigator.serviceWorker.addEventListener("message", function (event) {
+			serviceworker_Message_processing(event);
+		});
 
-	async function stop_request() {
+		// サービスワーカーの登録開始
 
-		// 停止に伴う表示の初期化
-		// 厳密に考えると停止のコールバックを受け取ってから
-		// 初期化を行った方が良いが可能なのかな？
-
-		//modules.fnc.init_play_info();
-
-		const result = await modules.tol.fetch_template("./php/player_stop.php", "");
-
-		let result_value = false;
-
-		if ( result == "stopped" ) {
-
-			modules.fnc.init_play_info();// 停止に伴う表示の初期化
-
-			console.log("Stopped successfully");
-
-			result_value = true;
-
-		} else {
-
-			// 停止できなかった場合
-			// 無いと思うが停止できなかった場合の処理も考える必要はあるかも
-			// 必要に応じて「再生停止に失敗したので、後に続く処理を停止しました。時間をおいて再度実行を試みてください。」の様なメッセージを表示させた方が良いかもしれない。
-
-			console.log("[!] Stop failed...");
-
-		}
-
-		return result_value;
+		navigator.serviceWorker.register(
+			"./sw.js?cv=" + latest_version,
+			{scope: "./", type: "module"}
+		).then(function(registration) {
+			console.log("ServiceWorker を登録しました: [scope] ", registration.scope);
+		}).catch(function(error) {
+			console.log("ServiceWorker の登録に失敗しました: ", error);
+		});
 
 	}
 
-	// クリックで radiko 再生および停止
+	// ラジオ停止 ( .in_process クリックでも停止させます )
 
-	document.addEventListener("click", async function(event) {
-
-		//console.log(event);
-
-		// radiko 再生 > パラメータで局のIDを送る
-		// class="radiko_ch" をクリックで php へ id を送信
-
-		if ( event.target.classList.contains("radiko_ch") ) {
-
-			// クリックした再生ボタン要素と兄弟要素である in_process を非表示から表示へ切り替える
-
-			const station_box = event.target.closest(".station");// 親要素
-			const in_process = station_box.querySelector(".in_process");// 親要素内の .in_process を取得
-
-			if (in_process) {
-				in_process.style.display = "flex";// .in_process 表示
-			}
-
-			// チャンネル情報を取り出して php へ送る
-
-			let this_ch_id = event.target.dataset.ch;
-
-			const params = new URLSearchParams({
-				cmd: "play",
-				channel: this_ch_id
-			});
-
-			const query_string = new URLSearchParams(params).toString();
-			const object = await modules.tol.fetch_template("./php/player_radiko_play.php", query_string);
-
-			// object.result > success なら再生成功
-
-			if ( object.result == "success" ) {
-
-				// 再生結果に伴う表示切り替え処理
-
-				const this_channel = object.channel;
-
-				// 再生情報をフッターや一覧にも反映
-
-				modules.fnc.show_playing_info(this_ch_id, stations);
-
-				// 再生しているメッセージを表示し、少し待ってからメッセージ非表示させる。
-
-				modules.fnc.msg_fade_in("只今再生中です ( Channel ID: " + this_ch_id + " )");
-				await modules.fnc.js_sleep(3000);
-				modules.fnc.msg_fade_out();
-
-			} else {
-
-				modules.fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " )");
-
-			}
-
-		}
-
-		if ( event.target.classList.contains("in_process") ) {
-			const result = await stop_request();
-		}
-
-	});
-
-	// radiko 停止 ( .in_process クリックでも停止させます )
-
-	radiko_stop.addEventListener("click", async function() {
+	mod.var.e.radio_stop.addEventListener("click", async function() {
 		const result = await stop_request();
 	});
 
-	// フッター側の音量調節ツマミ
-
-	const volume_range = document.getElementById("volume_range");
-
-	// 音量表示処理
+	// フッターのつまみで音量表示処理
 
 	function f_volume_display(value) {
-
-		//console.log(value);
 
 		volume_range.style.background = "linear-gradient(to right, #eee 0%, #eee " + value + "%, #666 " + value + "%, #666 100%)";
 
@@ -525,7 +893,7 @@
 
 	// ツマミ変更時に値を取得
 
-	volume_range.addEventListener("change",  async function(event) {
+	mod.var.e.vol_range.addEventListener("change",  async function(event) {
 
 		//console.log("Current value:", event.target.value);
 
@@ -534,7 +902,7 @@
 		});
 
 		const query_string = new URLSearchParams(params).toString();
-		const volume = await modules.tol.fetch_template("./php/volume_set.php", query_string);
+		const volume = await mod.fnc.fetch_template("./php/volume_set.php", query_string);
 
 		//console.log(volume);
 
@@ -542,745 +910,209 @@
 
 	});
 
-	// 音声ファイル再生時に各ボタンを調整
-	// 再生中は音声ファイル削除ボタンは無効
+	//mod.fnc.msg_fade_in("端末を確認中");
 
-	function audio_play_button_control(filename) {
+	//const alive = check_server_alive(1);
 
-		const play_btn_array = document.getElementsByClassName("audio_play");
-		const del_btn_array = document.getElementsByClassName("audio_del");
+	//console.log(alive);
 
-		for ( let m = 0; m < del_btn_array.length; m++ ) {
-			del_btn_array[m].style.opacity = "0.5";
-			del_btn_array[m].style.pointerEvents = "none";
-		}
+/*	if ( alive ) {
 
-		for ( let n = 0; n < play_btn_array.length; n++ ) {
+		//console.log("サーバーは起動しています");
+		mod.fnc.msg_fade_out();
 
-			const this_filename = play_btn_array[n].dataset.name;
+	} else {
 
-			if ( this_filename === filename ) {
-				play_btn_array[n].style.backgroundColor = "#fff";
-				play_btn_array[n].style.opacity = "1";
-				list_audio_play = true;
-				um_output.innerHTML = '<spam class="playing"></spam>' + this_filename + " (再度 Play ボタンで停止)";
-			}
+		mod.fnc.msg_fade_in("起動チェックエラー<br />端末の電源を確認してください。");
 
-		}
+		return;// ここで終わり
 
-	}
+		// このページが表示されるなら本来端末は起動しているが、念のための処理になる。
+		// PWA化させてキャッシュ保存をさせたら、ここの処理は有効になると思う。
 
-	// 音声ファイル停止時に各ボタンを調整
-	// 音声ファイル削除ボタンは無効を解除
-	// 再生ボタンのスタイルを初期化
+	}*/
 
-	function audio_stop_button_control() {
+	let region = false;
 
-		clearInterval( si_array.shift() );
+	// id と charray と name 各値の有無で判断
+	// 上記項目が無い場合は api から エリアID と チャンネル情報 を取得
+	// その後に各 IndexedDB のキーへ保存を行う
+	// id: エリアID , charray: チャンネル情報配列 , name: エリア名
+	// また IndexedDB に保存させる期限が過ぎた場合も再取得を行う
 
-		const play_btn_array = document.getElementsByClassName("audio_play");
-		const del_btn_array = document.getElementsByClassName("audio_del");
+	// 条件 1
 
-		for ( let n = 0; n < play_btn_array.length; n++ ) {
-			play_btn_array[n].style.backgroundColor = null;
-			play_btn_array[n].style.opacity = null;
-		}
+	const conditions_a = ( typeof idb_id === "string" && idb_id !== "" ) &&
+		( Array.isArray(idb_stations) && idb_stations.length > 0 ) &&
+		( typeof idb_name === "string" && idb_name !== "" )
+	;
 
-		for ( let m = 0; m < del_btn_array.length; m++ ) {
-			del_btn_array[m].style.opacity = null;
-			del_btn_array[m].style.pointerEvents = null;
-		}
+	// 条件 2
 
-		list_audio_play = false;
-		um_output.innerHTML = "スケジュール再生に使用する音声ファイルをここで登録可能です。";
+	const conditions_b = ( Number(idb_time) + (7 * 24 * 60 * 60 * 1000) ) > Date.now();
 
-	}
+	// 取得した情報と条件を比較
 
-	// 端末を再起動
+	if ( conditions_a || conditions_b ) {
 
-	const system_reboot = document.getElementById("system_reboot");
+		console.log("チャンネル情報が保存されています。");
 
-	system_reboot.addEventListener("click", async function() {
+		// 地域ID を保存 (メンテナンス情報取得用)
 
-		modules.fnc.device_started = false;// 端末停止フラグ
-		let stop_playing = false;// 再生停止フラグ
+		mod.var.v.region = idb_id;
 
-		if ( confirm("端末の再起動を行います。") ) {
+		// チャンネル情報を変数に代入
 
-			// 再生中なら停止処理
+		mod.var.v.channels = idb_stations;
 
-			const result = await stop_request();
+		// 保存された情報からリスト生成と出力
 
-			// 停止出来たら再起動を実行
+		mod.var.e.area_name.innerHTML = idb_name;
+		mod.var.e.station_list.innerHTML = mod.fnc.generate_channels_html(mod.var.v.channels);
+		//document.getElementById("area_name").innerHTML = idb_name;
+		//document.getElementById("station_list").innerHTML = mod.fnc.generate_channels_html(mod.var.v.channels);
 
-			if (result) {
+		// チャンネル情報が保存されている場合はスケジュール管理UIも表示
 
-				const message = await modules.tol.fetch_template("./php/pow_reboot.php", "");
+		update_schedule_audio_html();
 
-				modules.fnc.msg_fade_in(message);
+	} else {
 
-				// 少し待機してから...
+		mod.fnc.msg_fade_in("チャンネル情報の取得中です。");
 
-				//await modules.fnc.js_sleep(2000);
+		// エリアID からラジオ局一覧を取得する
+		// チャンネル情報を一緒に取得する
 
-				// 待機中のカウントメッセージを表示
+		const stations_object = await mod.fnc.fetch_template("./php/get_list_stations.php", "");
 
-				await standby_time_display();
+		//console.log(stations_object);
 
-				// 更に少し待機してから...
+		// 失敗した場合は stations_object.stations が空の配列
 
-				//await modules.fnc.js_sleep(2300);
+		if ( stations_object.stations.length !== 0 ) {
 
-				// 端末の起動確認
-				// Raspberry Pi Zero 2 W は、OS のシャットダウンから再起動後
-				// wifi のネットワークが安定するまでの時間を含めると、約30秒は必要と言われている。
-				// 段階的にメッセージを表示させてもいいかもしれない
+			mod.fnc.msg_fade_in("取得成功");
 
-				const alive = await check_server_alive(15);// 引数は試行回数
+			// IdexedDB へ各値を保存する
 
-				console.log(alive);
-
-				if ( alive ) {
-
-					console.log("再起動完了 reboot.addEventListener");
-					//modules.fnc.msg_fade_out();
-					modules.fnc.msg_fade_in("再起動が完了しました。");
-
-					await modules.fnc.js_sleep(3000);
-
-					modules.fnc.msg_fade_out();
-
-				} else {
-
-					console.log("再起動後のコールバックに失敗");
-					modules.fnc.msg_fade_in("起動チェックエラー<br />サーバーが起動していない可能性があります。");
-
-				}
-
-			}
-
-		}
-
-	});
-
-	// 音声ファイルの再生状況を監視する関数
-	// 戻り値で player_state.state === true なら再生中
-	// player_state.state === false なら停止
-
-	let si_array = new Array();
-
-	async function check_audio() {
-
-		const player_state = await modules.tol.fetch_template("./php/audio_check.php", "");
-
-		//console.log(player_state);
-
-		const play_btn_array = document.getElementsByClassName("audio_play");
-		const del_btn_array = document.getElementsByClassName("audio_del");
-
-		if ( player_state.state === true ) {// 再生中だった場合は停止
-			audio_play_button_control(player_state.file);
-		} else if ( player_state.state === false ) {// 停止中だった場合は再生
-			audio_stop_button_control();
-		}
-
-	}
-
-	// 端末をシャットダウン
-
-	const system_power_off = document.getElementById("system_power_off");
-
-	system_power_off.addEventListener("click", async function() {
-
-		if ( confirm("端末のシャットダウンを行います。") ) {
-
-			// 再生中なら停止処理
-
-			const result = await stop_request();
-
-			// 停止出来たらシャットダウンを実行
-
-			if (result) {
-
-				const message = await modules.tol.fetch_template("./php/pow_off.php", "");
-
-				modules.fnc.msg_fade_in(message);
-
-			}
-
-		}
-
-	});
-
-	// キャッシュバスター
-	// css ファイルを ***.css?v=*** の様にパラメータ付きの形式に置き換える
-	// 複数回実行すると ***.css?v=123?v=123?v=123 の様にパラメータが増え続けるので
-	// オリジナルのファイルに整形を行ってから再度パラメータを付与している
-
-	function css_js_cachebuster(version, location = "Unknown") {
-
-		const cb_elements = document.getElementsByClassName("cachebuster");
-
-		//console.log( "class: cachebuster ... " + cb_elements.length );
-		//console.log("+ version: " + version);
-
-		for ( let n = 0; n < cb_elements.length; n++ ) {
-
-			const old_link = cb_elements[n];
-
-			// 元のhrefを取得
-			// ここでは css のみの更新とする
-			// js ファイルをここでキャッシュバスターするとエラーの原因となるので modules へインポートすること
-
-			const old_link_href = old_link.href;
-			const old_link_split = old_link_href.split("?");
-			const original_href = old_link_split[0];
-
-			// 新しいlink要素を作成
-
-			const new_link = document.createElement("link");
-
-			new_link.rel = "stylesheet";
-			new_link.className = "cachebuster";
-			new_link.type = "text/css";
-
-			new_link.onload = function() {
-				console.log("- [" + location + "] Cache Buster (CSS): " + new_link.href);
-			};
-
-			new_link.href = original_href + "?v=" + version;
-
-			// 古いlink要素へ置き換え
-
-			old_link.parentNode.replaceChild(new_link, old_link);
-
-		}
-
-	}
-
-	// 受け取った URL で fetch を実行し、文字列を返す。
-	// オフラインモードの場合、またはタイムアウトした場合等は相応の文字列を返す
-
-	async function fetch_get_value(url, options = {}, timeout = 5000) {
-
-		//console.log("- fetch_get_value() 2: " + url);
-
-		const controller = new AbortController();
-		const id = setTimeout(() => controller.abort(), timeout);
-
-		options.signal = controller.signal;
-
-		try {
-
-			const response = await fetch(url, options);
-
-			//console.log(response);
-
-			clearTimeout(id);
-
-			if ( ! response.ok ) {
-
-				// Service Worker が返す "Offline and not cached" を確認
-
-				if ( response.status === 503 ) {
-
-					const text = await response.text();
-
-					if (text === "Offline and not cached") {
-						return "offline";
-					}
-
-				}
-
-				return "http-error: " + response.status;
-
-			}
-
-			const response_text = await response.text();
-
-			return response_text;
-
-		} catch (error) {
-
-			clearTimeout(id);
-
-			if (error.name === "AbortError") {
-				return "timeout";
-			} else {
-				return "network-error";
-			}
-
-		}
-
-	}
-
-	// 読み込み時に実行する関数
-	// 現在のキャッシュ値を indexedDB から取得する関数
-	// ここで取得した値を使用して import の JS ファイルをキャッシュバスターする
-	// 取得のみなの事と、細かく書くと共有部分のコードがもったいないので
-	// ここでは簡素な内容で取得させている
-
-	async function load_idb_cache_version() {
-
-		const object = await new Promise( function(resolve, reject) {
-
-			const idb_open = indexedDB.open("radiko_info", 1);
-
-			// 成功時に実行
-
-			idb_open.onsuccess = function(event) {
-
-				const db = event.target.result;
-				const transaction = db.transaction("radiko", "readonly");
-				const db_store = transaction.objectStore("radiko");
-				const value_get_request = db_store.get("version");
-
-				value_get_request.onsuccess = function(event) {
-					resolve(event);
-				}
-
-				value_get_request.onerror = function(event) {
-					resolve(event);
-				}
-
-			};
-
-			idb_open.onerror = function(error) {
-				resolve(error);
-			};
-
-			// indexedDB のバージョンが変更された場合に実行 (新規作成時含む)
-			// このタイミングで必要な情報を保存する
-
-			idb_open.onupgradeneeded = function(error) {
-
-				let db = event.target.result;
-				let table_object = db.createObjectStore("radiko", { keyPath: "name" });
-
-				let value_get_request = table_object.getAll();
-
-				value_get_request.onsuccess = function(event) {
-					resolve(event);
-				}
-
-				value_get_request.onerror = function(event) {
-					resolve(event);
-				}
-
-				db.close();// 接続を解除する
-
-			};
-
-		});
-
-		//console.log(object);
-
-		// バージョン情報が保存されていない場合は 1 とする
-
-		if ( object?.target?.result?.value !== undefined ) {
-			return object.target.result.value;
-		} else {
-			return 1;
-		}
-
-	}
-
-	// 読み込むモジュールをキャッシュバスターで import()
-
-	async function load_import_module(location = "Unknown") {
-
-		let cv = await load_idb_cache_version();
-
-		console.log("- [" + location + "] load_import_module(): " + cv);
-
-		// js の import
-
-		const import_up = await import("./js/tool.js?v=" + cv);
-		const import_fnc = await import("./js/function_set.js?v=" + cv);
-		const import_idb = await import("./js/indexeddb.js?v=" + cv);
-
-		const return_object = {
-			"tol": import_up,// tool.js
-			"fnc": import_fnc,// function_set.js
-			"idb": import_idb,// indexeddb.js
-			"cv": cv// キャッシュバージョン
-		};
-
-		//console.log(return_object);
-
-		//return_object.fnc.test_func();
-
-		return return_object;
-
-	}
-
-	// -------------------------------------------------------
-	// ページ読込時に実行
-	// 1. IndexedDB の読み込み
-	// 2-1. サービスワーカーの起動
-	// 2-2. バージョン（キャッシュ）の更新があった場合は再起動通知
-	// 3. 端末の生存確認
-	// 4. 地域IDとチャンネル情報の取得・更新
-	// 5. 音量状態の取得
-	// 6. チャンネル再生状況の取得
-	// 7. 地域IDからお知らせ情報を取得
-	// -------------------------------------------------------
-
-	window.onload = async function() {
-
-		console.log("* * * Load setup start * * *");
-
-		// [処理1]
-		// indexedDB から現在のキャッシュバージョンを取得
-
-		// 使用するモジュールをインポートする (仮インポートのシチュエーションあり)
-
-		modules = await load_import_module("load 1");
-
-		// 端末の生存確認 1 ( PHP からサーバーの IP を確認 )
-
-		const server_ip_json = await fetch_get_value("./php/server.php", {cache: "no-store"}, 3000);
-
-		let server_access = false;
-
-		try {
-
-			JSON.parse(server_ip_json);
-
-			// json を受け取れた場合 -> IP 表示
-
-			const server_ip_res = JSON.parse(server_ip_json);
-
-			//console.log(server_ip_res);
-
-			document.getElementById("this_ip").innerText = server_ip_res.ip;
-
-			server_access = true;// サーバーにアクセスできた
-
-		} catch (error) {
-
-			// json ではなく文字列だった -> オフラインです
-
-			console.log(error);
-
-			// サーバーにアクセスできない状態の場合はオフラインメッセージを表示
-
-			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view("error1");
-
-			return;// サーバーに繋がってないので終了
-
-		}
-
-		// 端末の生存確認 2
-
-		const idb_cv = modules.cv;// キャッシュ値も含まれている
-
-		// 読込時のバージョンを保存しておく
-		// サービスワーカー更新時にバージョンが変わったことを
-		// 判断させるために使用する
-
-		const starting_version = idb_cv;
-
-		// 静的リンクの CSS ファイルと JS ファイルについて
-		// キャッシュ値を使用してキャッシュバスターを実施 (静的にリンクしている部分)
-		// キャッシュ値を取得できなかった場合はそのまま
-
-		// キャッシュバスター実行 (css, js)
-
-		css_js_cachebuster(idb_cv, "load 1");
-
-		// fetch でサービスワーカーの最新バージョンを確認
-		// オフラインや例外的エラーが出た場合は indexedDB で保存された値を使用
-		// バージョンが受け取れた場合はその値を使用する
-		// 疑似オフラインの設定を有効にしていても
-		// それはサービスワーカーがまだ有効になっていない状態であれば
-		// インターネットに繋がっている状態であればバージョンは取得可能（のはず）
-
-		const fetch_cv_value = await fetch_get_value("./cv.txt", {cache: "no-store"}, 4000);
-
-		let latest_version;
-
-		console.log("* fetch_cv_value: " + fetch_cv_value);
-
-		if ( fetch_cv_value == "offline" || fetch_cv_value == "timeout" || fetch_cv_value == "network-error" ) {
-
-			// オフラインなら indecedDB の値を使用する
-
-			latest_version = idb_cv;// indexedDB
-
-			// だけどオフライン状態である表示に切り替える
-
-			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view("error2");
-
-			clearInterval( si_array.shift() );// 音声ファイル監視を停止
-
-		} else {
-
-			// キャッシュバージョン値を取得できたなら、その値を使用する。
-
-			latest_version = fetch_cv_value;// fetch value
-
-		}
-
-		// 使用するモジュールを再度インポートする
-
-		// 少し上で indexedDB にのバージョン値に更新が入り
-		// キャッシュバージョンが明確になったため
-		// 存在する（であろう）パラメータ付きで再度読み込みして上書き
-
-		modules = await load_import_module("load 2");
-
-		// 再度取得したバージョンで再度キャッシュバスター実行
-
-		console.log("* latest_version: " + latest_version);
-
-		css_js_cachebuster(latest_version, "load 2");
-
-		// IndexedDB から保存情報の確認
-
-		const idb_object = await modules.idb.get_idb_object();
-
-		//console.log(idb_object);
-
-		const idb_id = modules.idb.idb_finding_Values(idb_object, "id");
-		const idb_stations = modules.idb.idb_finding_Values(idb_object, "stations");
-		const idb_name = modules.idb.idb_finding_Values(idb_object, "name");
-		const idb_time = modules.idb.idb_finding_Values(idb_object, "time");
-
-		// キャッシュバスターでキャッシュ内のファイルを使用させる
-
-		css_js_cachebuster(latest_version, "Window onLoad");
-
-		// サービスワーカーインストールでキャッシュを保存
-		// ?cv= でサービスワーカーへバージョンを渡す
-
-		if ("serviceWorker" in navigator) {
-
-			// サービスワーカーから受信するメッセージ用イベントの登録
-
-			navigator.serviceWorker.addEventListener("message", function (event) {
-				serviceworker_Message_processing(event);
-			});
-
-			// サービスワーカーの登録開始
-
-			navigator.serviceWorker.register(
-				"./sw.js?cv=" + latest_version,
-				{scope: "./", type: "module"}
-			).then(function(registration) {
-				console.log("ServiceWorker を登録しました: [scope] ", registration.scope);
-			}).catch(function(error) {
-				console.log("ServiceWorker の登録に失敗しました: ", error);
-			});
-
-		}
-
-		//modules.fnc.msg_fade_in("端末を確認中");
-
-		//const alive = check_server_alive(1);
-
-		//console.log(alive);
-
-/*		if ( alive ) {
-
-			//console.log("サーバーは起動しています");
-			modules.fnc.msg_fade_out();
-
-		} else {
-
-			modules.fnc.msg_fade_in("起動チェックエラー<br />端末の電源を確認してください。");
-
-			return;// ここで終わり
-
-			// このページが表示されるなら本来端末は起動しているが、念のための処理になる。
-			// PWA化させてキャッシュ保存をさせたら、ここの処理は有効になると思う。
-
-		}*/
-
-		let region = false;
-
-		// id と charray と name 各値の有無で判断
-		// 上記項目が無い場合は radiko api からエリアIDとチャンネル情報を取得
-		// その後に各 IndexedDB のキーへ保存を行う
-		// id: エリアID , charray: チャンネル情報配列 , name: エリア名
-		// また IndexedDB に保存させる期限が過ぎた場合も再取得を行う
-
-		// 条件 1
-
-		const conditions_a = ( typeof idb_id === "string" && idb_id !== "" ) &&
-			( Array.isArray(idb_stations) && idb_stations.length > 0 ) &&
-			( typeof idb_name === "string" && idb_name !== "" )
-		;
-
-		// 条件 2
-
-		const conditions_b = ( Number(idb_time) + (7 * 24 * 60 * 60 * 1000) ) > Date.now();
-
-		// 取得した情報と条件を比較
-
-		if ( conditions_a || conditions_b ) {
-
-			console.log("チャンネル情報が保存されています。");
+			await mod.idb.update_indexeddb("id", stations_object.id);
+			await mod.idb.update_indexeddb("stations", stations_object.stations);
+			await mod.idb.update_indexeddb("name", stations_object.area_b);
+			await mod.idb.update_indexeddb("time", Date.now());
 
 			// チャンネル情報 stations に代入
 
-			stations = idb_stations;
+			mod.var.v.channels = stations_object.stations;
 
 			// 地域ID を保存 (メンテナンス情報取得用)
 
-			region = idb_id;
+			region = stations_object.id;
 
-			// 保存された情報からリスト生成と出力
+			// 取得した情報からリスト生成と出力
 
-			document.getElementById("area_name").innerHTML = idb_name;
-			document.getElementById("station_list").innerHTML = modules.fnc.generate_channels_html(stations);
+			mod.var.e.area_name.innerHTML = stations_object.area_b;
+			mod.var.e.station_list.innerHTML = mod.fnc.generate_channels_html(stations);
 
-			// チャンネル情報が保存されている場合はスケジュール管理UIも表示
+			// チャンネル情報が保存されたのでスケジュール管理UIも表示
 
 			update_schedule_audio_html();
 
 		} else {
 
-			modules.fnc.msg_fade_in("チャンネル情報の取得中です。");
+			//console.log("取得失敗");
+			mod.fnc.msg_fade_in("チャンネル情報の取得に失敗しました。");
 
-			// エリアID からラジオ局一覧を取得する
-			// チャンネル情報を一緒に取得する
+			// チャンネル情報が無いとスケジュールは組めない
 
-			const stations_object = await modules.tol.fetch_template("./php/get_list_stations.php", "");
-
-			//console.log(stations_object);
-
-			// 失敗した場合は stations_object.stations が空の配列
-
-			if ( stations_object.stations.length !== 0 ) {
-
-				modules.fnc.msg_fade_in("取得成功");
-
-				// IdexedDB へ各値を保存する
-
-				await modules.idb.update_indexeddb("id", stations_object.id);
-				await modules.idb.update_indexeddb("stations", stations_object.stations);
-				await modules.idb.update_indexeddb("name", stations_object.area_b);
-				await modules.idb.update_indexeddb("time", Date.now());
-
-				// チャンネル情報 stations に代入
-
-				stations = stations_object.stations;
-
-				// 地域ID を保存 (メンテナンス情報取得用)
-
-				region = stations_object.id;
-
-				// 取得した情報からリスト生成と出力
-
-				document.getElementById("area_name").innerHTML = stations_object.area_b;
-				document.getElementById("station_list").innerHTML = modules.fnc.generate_channels_html(stations);
-
-				// チャンネル情報が保存されたのでスケジュール管理UIも表示
-
-				update_schedule_audio_html();
-
-			} else {
-
-				//console.log("取得失敗");
-				modules.fnc.msg_fade_in("チャンネル情報の取得に失敗しました。");
-
-				// チャンネル情報が無いとスケジュールは組めない
-
-				schedule_list.innerHTML = "<p>チャンネル情報を取得する必要があります。</p>";
-
-			}
+			mov.var.e.sche_list.innerHTML = "<p>チャンネル情報を取得する必要があります。</p>";
 
 		}
 
-		// 音量取得 PHP 経由でコマンドを実行して取得
+	}
 
-		const current_volume = await modules.tol.fetch_template("./php/volume_get.php", "");
+	// 音量取得 PHP 経由でコマンドを実行して取得
 
-		//console.log(current_volume);
+	const current_volume = await mod.fnc.fetch_template("./php/volume_get.php", "");
 
-		f_volume_display(current_volume);
-		volume_range.value = current_volume;
+	//console.log(current_volume);
 
-		// 現在再生中か・どの局を再生中かを確認する
+	f_volume_display(current_volume);
+	volume_range.value = current_volume;
 
-		await modules.fnc.radiko_status_check(stations);
+	// 現在再生中か・どの局を再生中かを確認する
 
-		// 音声ファイルが再生中か監視開始
+	await mod.fnc.radiko_status_check(mod.var);
 
-		si_array.push( setInterval(check_audio, 2000) );
+	// 音声ファイルが再生中か監視開始
 
-		// 地域ID からお知らせ情報を取得する
+	mod.var.v.set_interval.push( setInterval(check_audio, 2000) );
 
-		//console.log("地域ID: " + region);
+	// 地域ID からお知らせ情報を取得する
 
-		const maintenance_params = new URLSearchParams({
-			area: region
-		});
+	//console.log("地域ID: " + region);
 
-		const maintenance_string = new URLSearchParams(maintenance_params).toString();
-		const maintenance_object = await modules.tol.fetch_template("./php/maintenance_xml_analysis.php", maintenance_string);
+	const maintenance_params = new URLSearchParams({
+		area: region
+	});
 
-		//console.log(maintenance_object);
+	const maintenance_string = new URLSearchParams(maintenance_params).toString();
+	const maintenance_object = await mod.fnc.fetch_template("./php/maintenance_xml_analysis.php", maintenance_string);
 
-		let xml_info_html = "";
+	//console.log(maintenance_object);
 
-		if ( maintenance_object.info.length > 0 ) {
+	let xml_info_html = "";
 
-			const info_object = maintenance_object.info;
+	if ( maintenance_object.info.length > 0 ) {
 
-			for ( let n = 0; n < info_object.length; n++ ) {
+		const info_object = maintenance_object.info;
 
-				xml_info_html += '<div class="info_set">';
-				xml_info_html += '<p class="info_title">' + info_object[n]["title"] + '</p>';
-				xml_info_html += '<p class="info_body">' + info_object[n]["body"] + '</p>';
-				xml_info_html += '</div>';
+		for ( let n = 0; n < info_object.length; n++ ) {
 
-			}
+			xml_info_html += '<div class="info_set">';
+			xml_info_html += '<p class="info_title">' + info_object[n]["title"] + '</p>';
+			xml_info_html += '<p class="info_body">' + info_object[n]["body"] + '</p>';
+			xml_info_html += '</div>';
 
 		}
 
-		// 整形したお知らせ情報を表示
+	}
 
-		document.getElementById("xml_info").innerHTML = xml_info_html;
+	// 整形したお知らせ情報を表示
 
-		// クリックでお知らせ項目を開閉
+	mod.var.e.xml_info.innerHTML = xml_info_html;
 
-		document.addEventListener("click", async function(event) {
+	// クリックでお知らせ項目を開閉
 
-			//console.log(event);
+	document.addEventListener("click", async function(event) {
 
-			if ( event.target.classList.contains("info_set") ) {
+		//console.log(event);
 
-				// クリック .info_set の子要素を取得
+		if ( event.target.classList.contains("info_set") ) {
 
-				const child_nodes = event.target.children;
+			// クリック .info_set の子要素を取得
 
-				// 子要素の .info_body を探す
+			const child_nodes = event.target.children;
 
-				for ( let n = 0; n < child_nodes.length; n++ ) {
+			// 子要素の .info_body を探す
 
-					const child_node = child_nodes[n];
+			for ( let n = 0; n < child_nodes.length; n++ ) {
 
-					if ( child_node.classList.contains("info_body") ) {
-						child_node.classList.toggle("is_open");
-					}
+				const child_node = child_nodes[n];
 
+				if ( child_node.classList.contains("info_body") ) {
+					child_node.classList.toggle("is_open");
 				}
 
 			}
 
-		});
+		}
 
-	};
+	});
 
 	// オプションメニューの開閉
 
-	const option_open_btn = document.getElementById("option_open_btn");
-	const option_nemu_box = document.getElementById("option_nemu_box");
-
-	option_open_btn.addEventListener("click", async function(event) {
-		option_nemu_box.classList.toggle("is_open");
+	mod.var.e.option_open.addEventListener("click", async function(event) {
+		mod.var.e.option_box.classList.toggle("is_open");
 	});
 
 	// スケジュール管理用 UI と音声ファイル関係の html を更新する関数
@@ -1292,17 +1124,19 @@
 
 		// 保存されているスケジュール情報を取得
 
-		const schedule_object = await modules.tol.fetch_template("./php/schedule_get.php", "");
+		//console.log(mod);
+
+		const schedule_object = await mod.fnc.fetch_template("./php/schedule_get.php", "");
 
 		//console.log(schedule_object);
 
 		// 保存されている音声ファイルを変数に保存し、一覧用の html も表示させる
 
-		available_audio = await modules.tol.get_audio_list(list_output);
+		mod.var.v.audio_files = await mod.fnc.get_audio_list(mod.var.e.audio_list);
 
 		// スケジュール関係の html を更新
 
-		schedule_list.innerHTML = modules.tol.generate_schedule_list_html(schedule_object, stations, available_audio);
+		schedule_list.innerHTML = mod.fnc.generate_schedule_list_html(schedule_object, mod.var.v.channels, mod.var.v.audio_files);
 
 		// デフォルトでは repeat は false のため week_set は非表示にしておく
 
@@ -1364,7 +1198,7 @@
 
 	// スケジュール関係ボタンの挙動: class によって挙動分岐
 
-	schedule_list.addEventListener("click", async function(event) {
+	mod.var.e.sche_list.addEventListener("click", async function(event) {
 
 		//console.log(event.target.id);
 
@@ -1393,7 +1227,10 @@
 			// チャンネルは1番目に移動
 
 			const channel_selector = document.querySelectorAll('input[name="channel"]');
-			channel_selector[0].checked = true;
+
+			if ( channel_selector.lenth > 0 ) {
+				channel_selector[0].checked = true;
+			}
 
 			// チャンネル項目を表示
 
@@ -1421,7 +1258,6 @@
 
 			// UI 表示・追加ボタン非表示
 
-			//document.getElementById("schedule_ui").style.display = "block";
 			document.getElementById("schedule_ui").classList.add("schedule_ui_visible");
 			document.getElementById("add_button_box").style.display = "none";
 
@@ -1460,7 +1296,7 @@
 
 			let action_value = "";
 
-			for (let i = 0; i < action_value_object.length; i++) {
+			for ( let i = 0; i < action_value_object.length; i++ ) {
 				if ( action_value_object[i].checked ) {
 					action_value = action_value_object[i].value;
 				}
@@ -1543,14 +1379,14 @@
 
 			const query_string = new URLSearchParams(send_params).toString();
 
-			const schedule_set_result = await modules.tol.fetch_template("./php/schedule_set.php", query_string);
+			const schedule_set_result = await mod.fnc.fetch_template("./php/schedule_set.php", query_string);
 
 			// 書込みに成功したら書き込んだバイト数が、失敗なら 0 が返って来る。
 
 			if ( schedule_set_result !== 0 ) {
 				update_schedule_audio_html();
 			} else {
-				modules.fnc.msg_fade_in("スケジュールの保存に失敗しました。");
+				mod.fnc.msg_fade_in("スケジュールの保存に失敗しました。");
 			}
 
 		}
@@ -1566,7 +1402,7 @@
 
 			const this_index = Number(event.target.dataset.index);
 
-			const schedule_object = await modules.tol.fetch_template("./php/schedule_get.php", "");
+			const schedule_object = await mod.fnc.fetch_template("./php/schedule_get.php", "");
 
 			// オブジェクトの中から対象IDの情報を取り出す
 
@@ -1669,12 +1505,12 @@
 				};
 
 				const query_string = new URLSearchParams(send_params).toString();
-				const schedule_delete_result = await modules.tol.fetch_template("./php/schedule_delete.php", query_string);
+				const schedule_delete_result = await mod.fnc.fetch_template("./php/schedule_delete.php", query_string);
 
 				if ( schedule_delete_result !== 0 ) {
 					update_schedule_audio_html();
 				} else {
-					modules.fnc.msg_fade_in("スケジュールの削除に失敗しました。");
+					mod.fnc.msg_fade_in("スケジュールの削除に失敗しました。");
 				}
 
 			}
@@ -1715,12 +1551,12 @@
 				};
 
 				const query_string = new URLSearchParams(send_params).toString();
-				const schedule_enabled_result = await modules.tol.fetch_template("./php/schedule_enabled.php", query_string);
+				const schedule_enabled_result = await mod.fnc.fetch_template("./php/schedule_enabled.php", query_string);
 
 				if ( schedule_enabled_result !== 0 ) {
 					update_schedule_audio_html();
 				} else {
-					modules.fnc.msg_fade_in("スケジュールの更新に失敗しました。");
+					mod.fnc.msg_fade_in("スケジュールの更新に失敗しました。");
 				}
 
 			}
@@ -1731,7 +1567,7 @@
 
 	// 音声ファイル関係ボタンの挙動: class によって挙動分岐
 
-	list_output.addEventListener("click", async function(event) {
+	mod.var.e.audio_list.addEventListener("click", async function(event) {
 
 		// アップロードした音声ファイルの削除
 
@@ -1746,14 +1582,14 @@
 				};
 
 				const query_string = new URLSearchParams(send_params).toString();
-				const del_result = await modules.tol.fetch_template("./php/delete_audio_file.php", query_string);
+				const del_result = await mod.fnc.fetch_template("./php/delete_audio_file.php", query_string);
 
-				um_output.innerHTML = del_result[1];
+				mod.var.e.up_msg.innerHTML = del_result[1];
 
 				if ( del_result[0] === "success" ) {
 					update_schedule_audio_html();
 				} else {
-					um_output.innerHTML = del_result[1];
+					mod.var.e.up_msg.innerHTML = del_result[1];
 				}
 
 			}
@@ -1767,7 +1603,7 @@
 			const play_btn_array = document.getElementsByClassName("audio_play");
 			const del_btn_array = document.getElementsByClassName("audio_del");
 
-			if ( list_audio_play === false ) {
+			if ( mod.var.v.audio_play === false ) {
 
 				let this_name = event.target.dataset.name;
 
@@ -1776,28 +1612,30 @@
 				};
 
 				const play_string = new URLSearchParams(send_params).toString();
-				const play_result = await modules.tol.fetch_template("./php/player_audio_play.php", play_string);
+				const play_result = await mod.fnc.fetch_template("./php/player_audio_play.php", play_string);
 
 				if ( play_result === "playing" ) {
 
 					audio_play_button_control(this_name);// 再生開始: ボタンスタイル調整
 
-					modules.fnc.init_play_info();// radiko 情報初期化
+					console.log(mod);
+
+					mod.fnc.init_play_info(mod.var);// ラジオ情報初期化
 
 					// 音声ファイル再生状況監視開始
 
 					check_audio();
-					si_array.push( setInterval(check_audio, 2000) );
+					mod.var.v.set_interval.push( setInterval(check_audio, 2000) );
 
 				} else {
 
-					um_output.innerHTML = "[再生失敗] " + this_name;
+					mod.var.e.up_msg.innerHTML = "[再生失敗] " + this_name;
 
 				}
 
 			} else {
 
-				const result = await modules.tol.fetch_template("./php/player_stop.php", "");
+				const result = await mod.fnc.fetch_template("./php/player_stop.php", "");
 
 				//console.log(result);
 
@@ -1806,7 +1644,7 @@
 				if ( result == "stopped" ) {
 					audio_stop_button_control();
 				} else {
-					um_output.innerHTML = "*** 再生停止できませんでした ***";
+					mod.var.e.up_msg.innerHTML = "*** 再生停止できませんでした ***";
 				}
 
 			}
@@ -1824,34 +1662,34 @@
 	// ファイルドラッグアンドドロップの制御
 	// http://iwb.jp/return-false-preventdefault-stoppropagation/
 
-	drop_zone_element.addEventListener("dragover", function(event) {
+	mod.var.e.up_zone.addEventListener("dragover", function(event) {
 
 		event.stopPropagation();
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "copy";// 明示的にこれは copy であることを示します。
 
-		drop_zone_element.classList.add("drag_and_drop");// クラス追加
+		mod.var.e.up_zone.classList.add("drag_and_drop");// クラス追加
 
 	}, false);
 
-	drop_zone_element.addEventListener("dragleave", function(event) {
+	mod.var.e.up_zone.addEventListener("dragleave", function(event) {
 
-		drop_zone_element.classList.remove("drag_and_drop");// クラス削除
+		mod.var.e.up_zone.classList.remove("drag_and_drop");// クラス削除
 
 	}, false);
 
-	drop_zone_element.addEventListener("drop", async function(event) {
+	mod.var.e.up_zone.addEventListener("drop", async function(event) {
 
 		event.stopPropagation();// イベントの伝搬を止める
 		event.preventDefault();// イベント本来の一般的動作止める
 
 		const target_files = event.dataTransfer.files;// ファイルリストオブジェクト
 
-		drop_zone_element.classList.remove("drag_and_drop");// クラス削除
+		mod.var.e.up_zone.classList.remove("drag_and_drop");// クラス削除
 
 		// 複数ファイル ajax アップロード処理
 
-		const upload_result = await modules.tol.fetch_upload(target_files, um_output);
+		const upload_result = await mod.fnc.fetch_upload(target_files, mod.var.e.up_msg);
 
 		// 処理が終わったらスケジュールと音声ファイル関係の表示を更新
 
@@ -1863,9 +1701,11 @@
 
 	// スーパーリロード
 
-	document.getElementById("super_reload").addEventListener("click", function() {
+	mod.var.e.s_reload.addEventListener("click", function() {
 		location.reload(true);
 	}, false);
+
+};
 
 </script>
 
