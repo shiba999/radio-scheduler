@@ -357,7 +357,7 @@
 
 	// PWA から端末にアクセスできなかった場合に表示させる html
 
-	export function change_to_offline_view() {
+	export function change_to_offline_view(string) {
 
 		const html = `
 <header>
@@ -365,7 +365,7 @@
 </header>
 
 <section class="timeout">
-	<h2>TIMEOUT</h2>
+	<h2>TIMEOUT (` + string + `)</h2>
 	<p>サーバーへ接続できませんでした</p>
 </section>
 

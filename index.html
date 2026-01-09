@@ -207,14 +207,14 @@
 
 	// ページ読み込み時や電源操作時に実行する
 	// 端末が起動しているかの確認と復帰までの待機
-	// 端末が完全に終了する前に実行すると fetch が反応してしまい貯め
-	// 電源操作後30秒ほど待機してから実行する事
 
 	async function check_server_alive(retries = 5) {
 
 		console.log("### サーバー生存確認中: " + retries);
 
 		for ( let i = 0; i < retries; i++ ) {
+
+			console.log(device_started);
 
 			try {
 
@@ -227,8 +227,12 @@
 					{ method: "HEAD", cache: "no-store" }
 				);
 
-				if ( response.ok ) {
-					device_started = true;// サーバー起動フラグ
+				console.log(response);
+				console.log(response.ok);
+
+				if ( response.ok === true ) {
+					modules.fnc.device_started = true;// サーバー起動フラグ
+					console.log(device_started);
 					return true;// サーバ応答あり
 				}
 
@@ -242,7 +246,7 @@
 
 		// サーバーにアクセスできない状態の場合はオフラインメッセージを表示
 
-		document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view();
+		document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view("error3");
 
 		clearInterval( si_array.shift() );// 音声ファイル監視を停止
 
@@ -256,7 +260,7 @@
 
 	// 再生中の背景を一括でクリアにする
 
-	function stations_bg_initialization() {
+/*	function stations_bg_initialization() {
 
 		// 再生中のアニメーションアイコンの非表示
 
@@ -282,7 +286,7 @@
 			play_btn_e_array[n].removeAttribute("style");
 		}
 
-	}
+	}*/
 
 	// 局のIDから諸情報を検索して表示を行う関数
 	// 一覧から再生中の局の領域への変更も行ってみる
@@ -290,7 +294,7 @@
 
 	const radiko_stop = document.getElementById("radiko_stop");
 
-	function show_playing_info(station_id) {
+/*	function show_playing_info(station_id) {
 
 		//console.log(playback_status_object.channel);
 
@@ -322,7 +326,7 @@
 
 			// チャンネル一覧で再生済みとなっている要素の背景を初期化
 
-			stations_bg_initialization();
+			modules.fnc.stations_bg_initialization();
 
 			// 再生中のチャンネル要素の背景を変更
 
@@ -367,7 +371,7 @@
 
 		// チャンネル一覧で再生済みとなっている要素の背景を初期化
 
-		stations_bg_initialization();
+		modules.fnc.stations_bg_initialization();
 
 		// 停止中という表示
 
@@ -385,7 +389,6 @@
 
 	async function radiko_status_check() {
 
-		//const playback_status_object = await modules.tol.fetch_template("./php/radiko_playback_status.php", "");
 		const playback_status_json = await fetch("./php/radiko_playback_status.php");
 		const playback_status_object = await playback_status_json.json();
 
@@ -393,12 +396,12 @@
 
 		if ( playback_status_object.status === "playing" ) {
 			const this_id = playback_status_object.channel;
-			show_playing_info(this_id);
+			modules.fnc.show_playing_info(this_id, stations);
 		} else {
-			init_play_info();
+			modules.fnc.init_play_info();
 		}
 
-	}
+	}*/
 
 	// radiko 停止関数
 
@@ -408,7 +411,7 @@
 		// 厳密に考えると停止のコールバックを受け取ってから
 		// 初期化を行った方が良いが可能なのかな？
 
-		init_play_info();
+		//modules.fnc.init_play_info();
 
 		const result = await modules.tol.fetch_template("./php/player_stop.php", "");
 
@@ -416,7 +419,7 @@
 
 		if ( result == "stopped" ) {
 
-			init_play_info();// 停止に伴う表示の初期化
+			modules.fnc.init_play_info();// 停止に伴う表示の初期化
 
 			console.log("Stopped successfully");
 
@@ -478,7 +481,7 @@
 
 				// 再生情報をフッターや一覧にも反映
 
-				show_playing_info(this_ch_id);
+				modules.fnc.show_playing_info(this_ch_id, stations);
 
 				// 再生しているメッセージを表示し、少し待ってからメッセージ非表示させる。
 
@@ -599,7 +602,7 @@
 
 	system_reboot.addEventListener("click", async function() {
 
-		device_started = false;// 端末停止フラグ
+		modules.fnc.device_started = false;// 端末停止フラグ
 		let stop_playing = false;// 再生停止フラグ
 
 		if ( confirm("端末の再起動を行います。") ) {
@@ -634,6 +637,8 @@
 				// 段階的にメッセージを表示させてもいいかもしれない
 
 				const alive = await check_server_alive(15);// 引数は試行回数
+
+				console.log(alive);
 
 				if ( alive ) {
 
@@ -960,7 +965,7 @@
 
 			// サーバーにアクセスできない状態の場合はオフラインメッセージを表示
 
-			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view();
+			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view("error1");
 
 			return;// サーバーに繋がってないので終了
 
@@ -1005,7 +1010,7 @@
 
 			// だけどオフライン状態である表示に切り替える
 
-			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view();
+			document.getElementById("controller").innerHTML = modules.tol.change_to_offline_view("error2");
 
 			clearInterval( si_array.shift() );// 音声ファイル監視を停止
 
@@ -1064,52 +1069,19 @@
 				{scope: "./", type: "module"}
 			).then(function(registration) {
 				console.log("ServiceWorker を登録しました: [scope] ", registration.scope);
-				//console.log("ServiceWorker registration successful with scope: ", registration);
 			}).catch(function(error) {
 				console.log("ServiceWorker の登録に失敗しました: ", error);
 			});
 
-			// サービスワーカーの controller 切り替えを明示的に待ってリロードを促す
-			// iOS ではサービスワーカー更新時に statechange イベントの installed 判定で
-			// リロードを促すとリロードの案内がループする可能性がある
-
-/*			navigator.serviceWorker.addEventListener("controllerchange", async function(event) {
-
-				//let modules = await load_import_module("controllerchange");// 使用するモジュールをインポートする
-
-				console.log("* controllerchange *");
-				//console.log(event);
-
-				// indexedDB内のバージョンと比較
-				// バージョンが異なる場合は更新とみなしてリロードを促す
-
-				const change_idb_object = await modules.idb.get_idb_object();
-				const change_cache_version = modules.idb.idb_finding_Values(change_idb_object, "version");
-
-				console.log("change_cache_version: " + change_cache_version);
-				console.log("starting_version: " + starting_version);
-
-				if ( Number(starting_version) != Number(change_cache_version) ) {
-
-					// キャッシュバスターを実行
-
-					css_js_cachebuster(change_cache_version, "Change Cache Version");
-
-					// リロードのメッセージ
-
-					//modules.fnc.msg_fade_in('サービスワーカーが更新されました。<br />反映を行うためにページのリロードを行ってください。<br /><input type="button" value="リロード" onclick="window.location.reload();" />');
-
-				}
-
-			});*/
-
 		}
 
-		modules.fnc.msg_fade_in("端末を確認中");
+		//modules.fnc.msg_fade_in("端末を確認中");
 
-		const alive = check_server_alive(1);
+		//const alive = check_server_alive(1);
 
-		if ( alive ) {
+		//console.log(alive);
+
+/*		if ( alive ) {
 
 			//console.log("サーバーは起動しています");
 			modules.fnc.msg_fade_out();
@@ -1123,7 +1095,7 @@
 			// このページが表示されるなら本来端末は起動しているが、念のための処理になる。
 			// PWA化させてキャッシュ保存をさせたら、ここの処理は有効になると思う。
 
-		}
+		}*/
 
 		let region = false;
 
@@ -1232,7 +1204,7 @@
 
 		// 現在再生中か・どの局を再生中かを確認する
 
-		await radiko_status_check();
+		await modules.fnc.radiko_status_check(stations);
 
 		// 音声ファイルが再生中か監視開始
 
@@ -1810,7 +1782,7 @@
 
 					audio_play_button_control(this_name);// 再生開始: ボタンスタイル調整
 
-					init_play_info();// radiko 情報初期化
+					modules.fnc.init_play_info();// radiko 情報初期化
 
 					// 音声ファイル再生状況監視開始
 
