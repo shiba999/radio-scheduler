@@ -1,5 +1,4 @@
 
-
 	// 使用する要素群
 
 	export const e = {
@@ -18,9 +17,16 @@
 		xml_info: document.getElementById("xml_info"),
 		option_open: document.getElementById("option_open_btn"),
 		option_box: document.getElementById("option_nemu_box"),
-		s_reload: document.getElementById("super_reload")
+		s_reload: document.getElementById("super_reload"),
+		s_reboot: document.getElementById("system_reboot"),
+		s_power_off: document.getElementById("system_power_off"),
+		svg_volume: document.getElementById("svg_volume"),
+		svg_setting: document.getElementById("svg_setting"),
+		svg_reload: document.getElementById("svg_reload"),
+		svg_reboot: document.getElementById("svg_reboot"),
+		svg_power_off: document.getElementById("svg_power_off"),
+		server_ip: document.getElementById("this_ip")
 	}
-
 
 	// 使用する変数群
 
@@ -29,6 +35,8 @@
 		channels: [],
 		audio_files: [],
 		audio_play: false,
-		set_interval: []
+		set_interval: [],
+		region_name: "",
+		region_time: 0
 	}
 
