@@ -15,7 +15,7 @@ function get_settings() {
 
 // チャンネルIDを受け取り radiko を再生する関数
 
-function radiko_play($channel, $length = 0) {
+function radiko_play($channel, $volume = false, $length = 0) {
 
 	// 設定読み込み
 
@@ -23,6 +23,7 @@ function radiko_play($channel, $length = 0) {
 	$streamlink = $settings_object["streamlink_path"];
 	$player = $settings_object["player"];
 	$player_path = $settings_object["player_path"];
+	$amixer_path = $settings_object["amixer_path"];
 
 	// 監視用ログ
 
@@ -32,7 +33,13 @@ function radiko_play($channel, $length = 0) {
 
 	shell_exec("pkill " . $player);
 
-	// 2. streamlink + mpv のコマンドをPHP側で組み立てる
+	// 2. $volume に値が送られた場合 (cron) は音量変更
+
+	if ( $volume !== false ) {
+		shell_exec($amixer_path . " sset PCM " . $volume . "%");
+	}
+
+	// 3. streamlink + mpv のコマンドをPHP側で組み立てる
 
 	$exec_command = sprintf(
 		//"sudo -u www-data %s -p %s",
@@ -41,7 +48,7 @@ function radiko_play($channel, $length = 0) {
 		escapeshellarg($player_path)
 	);
 
-	// 再生する時間が設定されている場合
+	// 4. 再生する時間が設定されている場合
 
 	if ( (int) $length > 0 ) {
 		$exec_command .= " --player-args=" . escapeshellarg("--length=" . $length);
@@ -56,11 +63,11 @@ function radiko_play($channel, $length = 0) {
 
 	$exec_command .= " > " . escapeshellarg($log_file) . " 2>&1 &";
 
-	// 実行
+	// 5. 実行
 
 	exec($exec_command);
 
-	// ログファイルの確認 (再生成功か失敗かを確認)
+	// 6. ログファイルの確認 (再生成功か失敗かを確認)
 
 	$max_retries = 30;// 最大待機回数
 	$retry = 0;
@@ -103,24 +110,31 @@ function radiko_play($channel, $length = 0) {
 
 // 音声ファイルをファイル名を受け取って再生する関数
 
-function audio_play($file) {
+function audio_play($file, $volume = false) {
 
 	// 設定読み込み
 
 	$settings_object = get_settings();
 	$player = $settings_object["player"];
 	$player_path = $settings_object["player_path"];
-
-	// 1. 再生中だった場合はプレイヤーを停止
-
-	shell_exec("pkill " . $player);
+	$amixer_path = $settings_object["amixer_path"];
 
 	// 監視用ログ
 
 	$log_file = PROJECT_ROOT . "/log/player.log";
 	$audio_log_file = PROJECT_ROOT . "/log/audio.log";
 
-	// ファイル名の抽出
+	// 1. 再生中だった場合はプレイヤーを停止
+
+	shell_exec("pkill " . $player);
+
+	// 2. $volume に値が送られた場合 (cron) は音量変更
+
+	if ( $volume !== false ) {
+		shell_exec($amixer_path . " sset PCM " . $volume . "%");
+	}
+
+	// 3. ファイル名の抽出
 
 	$file_array = explode("/", $file);
 	$file_array_count = count($file_array);
@@ -130,7 +144,7 @@ function audio_play($file) {
 	// 最後の & を取ると戻り値を受け取れるが、再生終了まで処理中になる。
 	// --no-video は mpv 固有のオプションかもしれないね
 
-	// 2. 再生開始
+	// 4. 再生開始
 
 	exec(
 		$player_path . " --no-video --log-file=" . escapeshellarg($log_file)
@@ -139,7 +153,7 @@ function audio_play($file) {
 		. escapeshellarg($audio_log_file)
 	);
 
-	// 3. 待機しながら起動確認
+	// 5. 待機しながら起動確認
 
 	$situation = "stopped";
 	$max_attempts = 25;// 最大試行回数
@@ -170,7 +184,7 @@ function audio_play($file) {
 
 	}
 
-	// 4. 最大回数まで試しても止まらなければ stopped のまま
+	// 6. 最大回数まで試しても止まらなければ stopped のまま
 
 	if ( $status !== "playing" ) {
 		$status = "error";// プロセスが立ち上がらなかった場合

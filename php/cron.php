@@ -80,6 +80,7 @@ foreach ( $schedule_object as $schedule ) {
 	$this_minute = (int) $this_time_array[1];// 実行時間 (時) 数値に変換
 	$this_action = $schedule["action"];
 	$this_channel = $schedule["channel"];
+	$this_volume = $schedule["volume"];
 
 	// 有効なら次へ 無効ならストップ
 
@@ -130,7 +131,7 @@ foreach ( $schedule_object as $schedule ) {
 
 		include_once PROJECT_ROOT . "/php/player_control.php";
 
-		radiko_play($this_channel);
+		radiko_play($this_channel, $this_volume);
 
 	} else if ( $this_action === "audio" ) {
 
@@ -140,7 +141,7 @@ foreach ( $schedule_object as $schedule ) {
 
 		$file = PROJECT_ROOT . "/upload/" . $this_channel;
 
-		audio_play($file);
+		audio_play($file, $this_volume);
 
 	} else if ( $this_action === "stop" ) {
 

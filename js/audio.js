@@ -66,12 +66,14 @@
 
 			const this_filename = play_btn_array[n].dataset.name;
 
+			// PHP から返されるファイル名は URL エンコードされているので戻す。
+
 			if ( this_filename === filename ) {
 				//console.log( filename + "\n" + this_filename );
 				play_btn_array[n].style.backgroundColor = "#fff";
 				play_btn_array[n].style.opacity = "1";
 				arg_var.v.audio_play = true;
-				arg_var.e.up_msg.innerHTML = '<spam class="playing"></spam>' + this_filename + " (再度 Play ボタンで停止)";
+				arg_var.e.up_msg.innerHTML = '<spam class="playing"></spam>' + decodeURI(this_filename) + " (再度 Play ボタンで停止)";
 			}
 
 		}

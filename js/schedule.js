@@ -134,7 +134,7 @@
 
 		// volume
 
-		html += '<span class="edit partition"><input type="range" id="set_volume" name="set_volume" min="0" max="100" value="80" /><label for="set_volume">Volume</label></span>';
+		html += '<span id="volume_set" class="edit partition"><input type="range" id="set_volume" name="set_volume" min="0" max="100" value="80" /><label for="set_volume">Volume</label></span>';
 
 		// repeat
 
@@ -195,12 +195,15 @@
 		if ( event.target.value === "play" ) {
 			document.getElementById("channel_set").style.display = "block";
 			document.getElementById("audio_set").style.display = "none";
+			document.getElementById("volume_set").style.display = "block";
 		} else if ( event.target.value === "audio" ) {
 			document.getElementById("channel_set").style.display = "none";
 			document.getElementById("audio_set").style.display = "block";
+			document.getElementById("volume_set").style.display = "block";
 		} else {
 			document.getElementById("channel_set").style.display = "none";
 			document.getElementById("audio_set").style.display = "none";
+			document.getElementById("volume_set").style.display = "none";
 		}
 
 	}
@@ -352,6 +355,10 @@
 				}
 			}
 
+			// 音量
+
+			let volume_value = document.getElementById("set_volume").value;
+
 			// リピート
 
 			let repeat_value = document.getElementById("set_repeat").checked;
@@ -371,9 +378,11 @@
 			// 送信情報の整理
 
 			// アクションが stop または reboot の場合はチャンネル情報は不要
+			// 音量も不要
 
 			if ( action_value === "stop" || action_value === "reboot" ) {
 				channel_value = "";
+				volume_value = "";
 			}
 
 			// アクションが audio の場合はチャンネル情報へ音声ファイル情報を入れる
@@ -396,6 +405,7 @@
 				time: set_time_value,
 				action: action_value, 
 				channel: channel_value,
+				volume: volume_value,
 				repeat: repeat_value,
 				week: JSON.stringify(week_value_array),
 				enabled: true
@@ -457,19 +467,26 @@
 				document.getElementById(index_object["channel"]).checked = true;
 			}
 
-			// action が play の場合は channel_set は表示 audio_set は非表示
-			// action が audio の場合は channel_set は非表示 audio_set は表示
-			// action が stop の場合は channel_set audio_set 両方非表示
+			// 音量値割り当て
+
+			document.getElementById("set_volume").value = index_object["volume"];
+
+			// action が play の場合は channel_set は表示 audio_set は非表示 set_volume は表示
+			// action が audio の場合は channel_set は非表示 audio_set は表示 set_volume は表示
+			// action が stop or reboot の場合は channel_set audio_set 両方非表示 set_volume も非表示
 
 			if ( index_object["action"] === "play" ) {
 				document.getElementById("channel_set").style.display = "block";
 				document.getElementById("audio_set").style.display = "none";
+				document.getElementById("volume_set").style.display = "block";
 			} else if ( index_object["action"] === "audio" ) {
 				document.getElementById("channel_set").style.display = "none";
 				document.getElementById("audio_set").style.display = "block";
+				document.getElementById("volume_set").style.display = "block";
 			} else {
 				document.getElementById("channel_set").style.display = "none";
 				document.getElementById("audio_set").style.display = "none";
+				document.getElementById("volume_set").style.display = "none";
 			}
 
 			// repeat

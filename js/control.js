@@ -309,6 +309,7 @@
 
 	export function f_volume_display(value, arg_val) {
 		arg_val.e.vol_range.style.background = "linear-gradient(to right, #eee 0%, #eee " + value + "%, #666 " + value + "%, #666 100%)";
+		arg_val.e.vol_range.value = value;
 	}
 
 	// イベントのセットアップ

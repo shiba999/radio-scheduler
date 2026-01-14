@@ -46,6 +46,7 @@ if ( flock($fp, LOCK_EX) ) {
 		"time" => $_POST["time"],
 		"channel" => $_POST["channel"],
 		"action" => $_POST["action"],
+		"volume" => $_POST["volume"],
 		"repeat" => filter_var($_POST["repeat"] ?? "", FILTER_VALIDATE_BOOLEAN),
 		"week" => json_decode($_POST["week"]),
 		"enabled" => filter_var($_POST["enabled"] ?? "", FILTER_VALIDATE_BOOLEAN)
