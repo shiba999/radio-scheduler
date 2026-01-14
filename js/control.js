@@ -339,6 +339,7 @@
 			//console.log(volume);
 
 			f_volume_display(volume, arg_val);
+			arg_val.e.vol_value.innerText = volume;
 
 		});
 

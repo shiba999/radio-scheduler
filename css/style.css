@@ -276,7 +276,7 @@ button, .station a {
 	width: 30px;
 	min-width: 30px;
 	height: 30px;
-	margin: 8px 20px 0 0;
+	margin: 8px 10px 0 0;
 }
 
 .volume_ui button {
@@ -314,6 +314,18 @@ button, .station a {
 */
 
 /* UI の高さは 46px */
+
+#volume_value {
+	display: inline-block;
+	background-color: #777;
+	color: #eee;
+	font-size: 76%;
+	line-height: 22px;
+	height: 22px;
+	padding: 0 5px;
+	border-radius: 3px;
+	margin: 13px 13px 0 0;
+}
 
 #volume_range {
 	appearance: none;
@@ -835,10 +847,16 @@ input[type="button"] {
 /* チェックボックスの容姿変更 */
 
 #schedule_ui .check,
-#schedule_ui label {
+#schedule_ui label,
+#schedule_ui input[type=range] {
 	display: inline-block;
 	vertical-align: middle;
 	line-height: 32px;
+}
+
+#schedule_ui input[type=range] {
+	margin-right: 10px;
+	accent-color: #ddd;
 }
 
 #schedule_ui label {

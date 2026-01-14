@@ -12,6 +12,7 @@
 		html += '<th class="column_time">Time</th>';
 		html += '<th class="column_action">Action</th>';
 		html += '<th class="column_channel">Channel</th>';
+		html += '<th class="column_volume">Volume</th>';
 		html += '<th class="column_repeat">Repeat</th>';
 		html += '<th class="column_week">Week</th>';
 		html += '<th class="column_enabled">Enabled</th>';
@@ -33,6 +34,7 @@
 				html += "<td>" + schedule[n]["time"] + "</td>";
 				html += "<td>" + schedule[n]["action"] + "</td>";
 				html += "<td>" + schedule[n]["channel"] + "</td>";
+				html += "<td>" + schedule[n]["volume"] + "</td>";
 				html += "<td>" + schedule[n]["repeat"] + "</td>";
 				html += "<td>" + schedule[n]["week"] + "</td>";
 				html += '<td><button data-index="' + schedule_index + '" data-enabled="' + schedule[n]["enabled"] + '" class="favorite styled schedule_enab" type="button">▶</button></td>';
@@ -48,7 +50,7 @@
 		} else {
 
 			html += "<tr>";
-			html += '<td colspan="9" style="padding: 1.5em;">スケジュールが登録されていません。</td>';
+			html += '<td colspan="10" style="padding: 1.5em;">スケジュールが登録されていません。</td>';
 			html += "</tr>";
 
 		}
@@ -129,6 +131,10 @@
 		}
 
 		html += '</span>';
+
+		// volume
+
+		html += '<span class="edit partition"><input type="range" id="set_volume" name="set_volume" min="0" max="100" value="80" /><label for="set_volume">Volume</label></span>';
 
 		// repeat
 

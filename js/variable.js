@@ -9,6 +9,7 @@
 		up_msg: document.getElementById("upload_message"),
 		radio_info: document.getElementById("play_info"),
 		radio_stop: document.getElementById("radio_stop"),
+		vol_value: document.getElementById("volume_value"),
 		vol_range: document.getElementById("volume_range"),
 		reboot: document.getElementById("system_reboot"),
 		shutdown: document.getElementById("system_power_off"),
