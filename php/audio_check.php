@@ -39,7 +39,8 @@ $file_name = trim($audio_log_explode[1], "'");
 
 $return_array = array(
 	"state" => false,
-	"file" => $file_name
+	//"file" => $file_name
+	"file" => rawurlencode($file_name)
 );
 
 if ( in_array($this_pid, $pgrep_output) ) {

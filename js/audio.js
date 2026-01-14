@@ -35,8 +35,6 @@
 		const player_state = await arg_fnc.fetch_template("./php/audio_check.php", "");
 
 		//console.log( JSON.stringify(player_state) );
-		//console.log(arg_var);
-		//console.log(arg_fnc);
 
 		if ( player_state.state === true ) {// 再生中だった場合は停止
 			audio_play_button_control(arg_var, player_state.file);
@@ -69,7 +67,7 @@
 			const this_filename = play_btn_array[n].dataset.name;
 
 			if ( this_filename === filename ) {
-				console.log( filename + "\n" + this_filename );
+				//console.log( filename + "\n" + this_filename );
 				play_btn_array[n].style.backgroundColor = "#fff";
 				play_btn_array[n].style.opacity = "1";
 				arg_var.v.audio_play = true;

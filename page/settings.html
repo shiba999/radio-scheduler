@@ -30,28 +30,32 @@
 
 	<p>インストールしたソフトウェア情報を入力してください。</p>
 
-	<p><label for="streamlink_path" class="check">Path to streamlink<span>[例] /var/www/.local/bin/streamlink</span></label><input type="text" id="streamlink_path" name="streamlink_path" value="" /></p>
-	<p class="comment"><b>which streamlink</b> で表示されたパスを設定してください。<br />※仮想環境にインストールした場合は、その中で確認してください。</p>
+	<div id="set_form">
 
-	<p><label for="player" class="check">Player<span>[例] mpv</span></label><input type="text" id="player" name="player" value="" /></p>
-	<p class="comment">ラジオや音声ファイルの再生に使用するソフト名を入力してください。</p>
+		<p><label for="streamlink_path" class="check">Path to streamlink<span>[例] /var/www/.local/bin/streamlink</span></label><input type="text" id="streamlink_path" name="streamlink_path" value="" /></p>
+		<p class="comment"><b>which streamlink</b> で表示されたパスを設定してください。<br />※仮想環境にインストールした場合は、その中で確認してください。</p>
 
-	<p><label for="player_path" class="check">Path to player<span>[例] /usr/bin/mpv</span></label><input type="text" id="player_path" name="player_path" value="" /></p>
-	<p class="comment"><b>which mpv</b> で表示されたパスを設定してください。<br />※仮想環境にインストールした場合は、その中で確認してください。</p>
+		<p><label for="player" class="check">Player<span>[例] mpv</span></label><input type="text" id="player" name="player" value="" /></p>
+		<p class="comment">ラジオや音声ファイルの再生に使用するソフト名を入力してください。</p>
 
-	<p><label for="amixer_path" class="check">Path to amixer<span>[例] /usr/bin/amixer</span></label><input type="text" id="amixer_path" name="amixer_path" value="" /></p>
-	<p class="comment"><b>which amixer</b> で表示されたパスを設定してください。</p>
+		<p><label for="player_path" class="check">Path to player<span>[例] /usr/bin/mpv</span></label><input type="text" id="player_path" name="player_path" value="" /></p>
+		<p class="comment"><b>which mpv</b> で表示されたパスを設定してください。<br />※仮想環境にインストールした場合は、その中で確認してください。</p>
 
-	<p><label for="reboot_path" class="check">Path to reboot<span>[例] /usr/sbin/reboot</span></label><input type="text" id="reboot_path" name="reboot_path" value="" /></p>
-	<p class="comment">cron スケジュールやコントロールパネルから再起動を行う場合は <b>which reboot</b> で表示されたパスを設定し、<b>sudo visudo</b> から <b>www-data ALL=(root) NOPASSWD: {reboot path}</b> を追加してください。</p>
+		<p><label for="amixer_path" class="check">Path to amixer<span>[例] /usr/bin/amixer</span></label><input type="text" id="amixer_path" name="amixer_path" value="" /></p>
+		<p class="comment"><b>which amixer</b> で表示されたパスを設定してください。</p>
 
-	<p><label for="shutdown_path" class="check">Path to shutdown<span>[例] /usr/sbin/shutdown</span></label><input type="text" id="shutdown_path" name="shutdown_path" value="" /></p>
-	<p class="comment">コントロールパネルからシャットダウンを行う場合は <b>which shutdown</b> で表示されたパスを設定し、<b>sudo visudo</b> から <b>www-data ALL=(root) NOPASSWD: {shutdown path}</b> を追加してください。</p>
+		<p><label for="reboot_path" class="check">Path to reboot<span>[例] /usr/sbin/reboot</span></label><input type="text" id="reboot_path" name="reboot_path" value="" /></p>
+		<p class="comment">cron スケジュールやコントロールパネルから再起動を行う場合は <b>which reboot</b> で表示されたパスを設定し、<b>sudo visudo</b> から <b>www-data ALL=(root) NOPASSWD: {reboot path}</b> を追加してください。</p>
 
-	<p><label for="timezone" class="check">timezone<span>[例] Asia/Tokyo</span></label><input type="text" id="timezone" name="timezone" value="" /></p>
-	<p class="comment"><b>Asia/Tokyo</b> 以外のタイムゾーンで利用する場合は変更してください。</p>
+		<p><label for="shutdown_path" class="check">Path to shutdown<span>[例] /usr/sbin/shutdown</span></label><input type="text" id="shutdown_path" name="shutdown_path" value="" /></p>
+		<p class="comment">コントロールパネルからシャットダウンを行う場合は <b>which shutdown</b> で表示されたパスを設定し、<b>sudo visudo</b> から <b>www-data ALL=(root) NOPASSWD: {shutdown path}</b> を追加してください。</p>
 
-	<p><span id="setting_message">各設定情報を入力してください。</span><br /><button id="setting_set" type="submit">Submit</button></p>
+		<p><label for="timezone" class="check">timezone<span>[例] Asia/Tokyo</span></label><input type="text" id="timezone" name="timezone" value="" /></p>
+		<p class="comment"><b>Asia/Tokyo</b> 以外のタイムゾーンで利用する場合は変更してください。</p>
+
+		<p><span id="setting_message">各設定情報を入力してください。</span><br /><button id="setting_set" type="submit">Submit</button></p>
+
+	</div>
 
 	<h2>Last reboot time</h2>
 
@@ -114,9 +118,14 @@
 	<p class="copy">らぢ助 - Radio Scheduler -<br />&copy; 2025 <a href="https://weblabyrinth.net" target="_blank">WebLabyrinth</a></p>
 </footer>
 
+<div id="message_box" class="fade">
+	<div id="message_bg"></div>
+	<div id="message_display">* message *</div>
+</div>
+
 <script type="module">
 
-	import * as tol from "../js/tool.js";
+	import * as fnc from "../js/function.js";
 
 	//console.log(window.location);
 
@@ -143,6 +152,7 @@
 
 	}
 
+	const set_form = document.getElementById("set_form");
 	const streamlink_path = document.getElementById("streamlink_path");
 	const player = document.getElementById("player");
 	const player_path = document.getElementById("player_path");
@@ -159,11 +169,16 @@
 	const app_check_msg = document.getElementById("app_check_output");
 	const test_btn_msg = document.getElementById("test_btn_output");
 
+	// ↓の情報取得までフォームを触れないようにする
+
+	set_form.style.pointerEvents = "none";
+	set_form.style.opacity = "0.38";
+
 	// 現在保存中の設定情報を取得してフォーム項目に反映
 
 	async function get_setting_values() {
 
-		const setting_object = await tol.fetch_template("../php/setting_get.php", "");
+		const setting_object = await fnc.fetch_template("../php/setting_get.php", "");
 
 		//console.log(setting_object);
 
@@ -194,6 +209,11 @@
 		if (setting_object.timezone) {
 			timezone.value = setting_object.timezone;
 		}
+
+		// 情報取得完了したらフォームを触れるように復旧
+
+		set_form.style.pointerEvents = null;
+		set_form.style.opacity = null;
 
 	}
 
@@ -249,7 +269,7 @@
 				};
 
 				const query_string = new URLSearchParams(send_params).toString();
-				const save_result = await tol.fetch_template( "../php/setting_set.php", query_string );
+				const save_result = await fnc.fetch_template( "../php/setting_set.php", query_string );
 
 				//console.log(save_result);
 
@@ -278,11 +298,9 @@
 
 	async function check_permissions() {
 
-		const permissions_object = await tol.fetch_template("../php/setting_check_permissions.php", "");
+		const permissions_object = await fnc.fetch_template("../php/setting_check_permissions.php", "");
 
 		//console.log(permissions_object);
-
-		// permissions_msg
 
 		let pms_msg_html = "";
 
@@ -310,7 +328,7 @@
 
 		sl_check_msg.innerHTML = "Streamlink 確認中です。";
 
-		const res = await tol.fetch_template("../php/streamlink_check.php", "");
+		const res = await fnc.fetch_template("../php/streamlink_check.php", "");
 
 		sl_check_msg.innerHTML = "<b>" + res + "</b>";
 
@@ -322,7 +340,7 @@
 
 		app_check_msg.innerHTML = "音声再生権限 確認中です。";
 
-		const res = await tol.fetch_template("../php/audio_permission_check.php", "");
+		const res = await fnc.fetch_template("../php/audio_permission_check.php", "");
 
 		if ( res.success === true ) {
 			app_check_msg.innerHTML = "音声再生権限が<b>有効</b>です。";
@@ -350,7 +368,7 @@
 		});
 
 		const query_string = new URLSearchParams(params).toString();
-		const res = await tol.fetch_template("../php/player_radiko_play.php", query_string);
+		const res = await fnc.fetch_template("../php/player_radiko_play.php", query_string);
 
 		console.log(res);
 
@@ -377,7 +395,7 @@
 		});
 
 		const query_string = new URLSearchParams(params).toString();
-		const res = await tol.fetch_template("../php/player_audio_play.php", query_string);
+		const res = await fnc.fetch_template("../php/player_audio_play.php", query_string);
 
 		//console.log(res);
 
@@ -391,7 +409,7 @@
 
 	document.getElementById("stop").addEventListener("click", async function(event) {
 
-		const res = await tol.fetch_template("../php/player_stop.php", "");
+		const res = await fnc.fetch_template("../php/player_stop.php", "");
 
 		//console.log(res);
 
@@ -467,7 +485,7 @@
 
 	// サーバー情報を取得して cron の案内で使用する
 
-	const definition = await tol.fetch_template("../php/server.php", "");
+	const definition = await fnc.fetch_template("../php/server.php", "");
 
 	//console.log(definition);
 
@@ -502,7 +520,7 @@
 	});
 
 	const query_string = new URLSearchParams(params).toString();
-	const reboot_log = await tol.fetch_template("../log/reboot.log", query_string);
+	const reboot_log = await fnc.fetch_template("../log/reboot.log", query_string);
 
 	document.getElementById("last_reboot").innerHTML = reboot_log.trim();
 
