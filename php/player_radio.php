@@ -7,7 +7,7 @@
 	include_once PROJECT_ROOT . "/php/player_control.php";
 
 	$channel = $_POST["channel"];
-	$result = radiko_play($channel);
+	$result = radio_play($channel);
 
 	echo $result;
 

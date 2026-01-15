@@ -127,11 +127,11 @@ foreach ( $schedule_object as $schedule ) {
 
 	if ( $this_action === "play" ) {
 
-		// radiko 再生
+		// ラジオ再生
 
 		include_once PROJECT_ROOT . "/php/player_control.php";
 
-		radiko_play($this_channel, $this_volume);
+		radio_play($this_channel, $this_volume);
 
 	} else if ( $this_action === "audio" ) {
 

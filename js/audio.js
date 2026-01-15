@@ -128,7 +128,7 @@
 				};
 
 				const play_string = new URLSearchParams(send_params).toString();
-				const play_result = await ctx.fnc.fetch_template("./php/player_audio_play.php", play_string);
+				const play_result = await ctx.fnc.fetch_template("./php/player_audio.php", play_string);
 
 				if ( play_result === "playing" ) {
 

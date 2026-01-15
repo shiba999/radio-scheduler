@@ -36,7 +36,7 @@ if ( $action === "play" ) {
 	echo print_r("play >>> " . $channel, true);
 	echo "</pre>";
 
-	$result = radiko_play($channel);
+	$result = radio_play($channel);
 
 } else if ( $action === "audio" ) {
 

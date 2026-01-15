@@ -2,7 +2,7 @@
 
 header("Content-Type: application/json; charset=UTF-8");// json を受け取る場合は明示的にJSONと宣言
 
-$log_file = "../log/radiko_play.log";
+$log_file = "../log/radio.log";
 
 $return_object = array(
 	"status" => "stop",

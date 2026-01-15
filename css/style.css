@@ -290,7 +290,7 @@ button, .station a {
 	text-align: center;
 }
 
-#radiko_stop {
+#radio_stop {
 	display: none;/* 初期は非表示 */
 	cursor: pointer;
 }
@@ -359,25 +359,6 @@ button, .station a {
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: center;
-}
-
-.logos img {
-	vertical-align: middle;
-}
-
-.logos .logo_raspberry_pi {
-	width: 75px;
-	height: auto;
-}
-
-.logos .logo_debian {
-	width: 50px;
-	height: auto;
-}
-
-.logos .logo_radiko {
-	width: 75px;
-	height: auto;
 }
 
 .links {

@@ -7,9 +7,9 @@
 	// IndexedDB 諸設定 inddb
 
 	let inddb = {
-		"name": "radiko_info",
+		"name": "radio_info",
 		"version": 1,
-		"table": "radiko",
+		"table": "radio",
 		"db_open": false
 	};
 

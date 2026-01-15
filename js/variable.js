@@ -38,6 +38,7 @@
 		audio_play: false,
 		set_interval: [],
 		region_name: "",
-		region_time: 0
+		region_time: 0,
+		volume: 0
 	}
 

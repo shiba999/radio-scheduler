@@ -13,9 +13,9 @@ function get_settings() {
 }
 
 
-// チャンネルIDを受け取り radiko を再生する関数
+// チャンネルIDを受け取りラジオを再生する関数
 
-function radiko_play($channel, $volume = false, $length = 0) {
+function radio_play($channel, $volume = false, $length = 0) {
 
 	// 設定読み込み
 
@@ -27,7 +27,7 @@ function radiko_play($channel, $volume = false, $length = 0) {
 
 	// 監視用ログ
 
-	$log_file = PROJECT_ROOT . "/log/radiko_play.log";
+	$log_file = PROJECT_ROOT . "/log/radio.log";
 
 	// 1. 再生中だった場合はプレイヤーを停止
 
@@ -203,7 +203,7 @@ function player_kill($echo = true) {
 
 	// 監視用ログ
 
-	$log_file = PROJECT_ROOT . "/log/radiko_play.log";
+	$log_file = PROJECT_ROOT . "/log/radio.log";
 	$audio_log_file = PROJECT_ROOT . "/log/audio.log";
 
 	// 1. プレイヤーを停止
@@ -238,7 +238,7 @@ function player_kill($echo = true) {
 
 		if ( empty($pgrep_output) ) {
 
-			file_put_contents($log_file, "");// ログを空にするのは radiko 用
+			file_put_contents($log_file, "");// ログを空にするのはラジオ用
 			file_put_contents($audio_log_file, "");// 音声ファイル用のログも空にする
 			$situation = "stopped";
 

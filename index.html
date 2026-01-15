@@ -192,15 +192,15 @@ async function load_idb_cache_version() {
 
 	const object = await new Promise( function(resolve, reject) {
 
-		const idb_open = indexedDB.open("radiko_info", 1);
+		const idb_open = indexedDB.open("radio_info", 1);
 
 		// 成功時に実行
 
 		idb_open.onsuccess = function(event) {
 
 			const db = event.target.result;
-			const transaction = db.transaction("radiko", "readonly");
-			const db_store = transaction.objectStore("radiko");
+			const transaction = db.transaction("radio", "readonly");
+			const db_store = transaction.objectStore("radio");
 			const value_get_request = db_store.get("version");
 
 			value_get_request.onsuccess = function(event) {
@@ -223,7 +223,7 @@ async function load_idb_cache_version() {
 		idb_open.onupgradeneeded = function(error) {
 
 			let db = event.target.result;
-			let table_object = db.createObjectStore("radiko", { keyPath: "name" });
+			let table_object = db.createObjectStore("radio", { keyPath: "name" });
 
 			let value_get_request = table_object.getAll();
 
@@ -504,18 +504,14 @@ window.onload = async function() {
 
 	// 処理 5 * * * * * * * * * * * * * * * * * * * *
 	// 音量取得 PHP 経由でコマンドを実行して取得
+	// まずは端末の音量をそのまま取得
 
-	const current_volume = await mod.fnc.fetch_template("./php/volume_get.php", "");
-	mod.var.e.vol_value.innerText = current_volume;
-
-	//console.log(current_volume);
-
-	mod.con.f_volume_display(current_volume, mod.var);
+	mod.con.get_volume(mod.var, mod.fnc);
 
 	// 処理 6 * * * * * * * * * * * * * * * * * * * *
 	// 現在再生中か・どの局を再生中かを確認する
 
-	await mod.con.radiko_status_check(mod.var, mod.fnc);
+	await mod.con.radio_status_check(mod.var, mod.fnc);
 
 	// 処理 7 * * * * * * * * * * * * * * * * * * * *
 	// 音声ファイルが再生中か監視開始
@@ -553,11 +549,21 @@ window.onload = async function() {
 
 	// 再起動・シャットダウン・リロード系関係のイベントセットアップを実行
 
-	mod.con.control_event_setup(mod.var, mod.fnc, get_cache_version);
+	mod.con.control_event_setup(mod.var, mod.fnc, mod.idb, get_cache_version);
 
 	// 嵩張る svg ファイルの表示
 
 	mod.con.svg_file_display(mod.var);
+
+	// IndexedDB に保存された音量値を呼び出して設定する
+
+	let idb_volume = mod.idb.idb_finding_Values(idb_object, "volume");
+
+	if ( idb_volume == "" ) {
+		idb_volume = 75;
+	}
+
+	mod.con.set_volume(idb_volume, mod.var, mod.fnc, mod.idb);// 音量変更
 
 	// サーバーのIPを取得して表示
 
@@ -570,12 +576,9 @@ window.onload = async function() {
 
 	window.addEventListener("pageshow", async function(event) {
 
-		mod.aud.check_audio(mod.var, mod.fnc);
-		mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );
-
-		const current_volume = await mod.fnc.fetch_template("./php/volume_get.php", "");
-		mod.var.e.vol_value.innerText = current_volume;
-		mod.con.f_volume_display(current_volume, mod.var);
+		mod.con.get_volume(mod.var, mod.fnc);// 音量取得
+		mod.aud.check_audio(mod.var, mod.fnc);// 音声ファイル監視
+		mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );// 音声ファイル監視
 
 	});
 

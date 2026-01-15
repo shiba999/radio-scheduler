@@ -82,7 +82,7 @@
 
 	<p>Software 設定が完了したら、各ボタンで音声が再生可能か確認してみましょう。<br />再生されない場合は、ソフト名やパスを間違えているか、音声再生権限が無い可能性があります。</p>
 
-	<p class="test_btn"><button id="radiko" data-value="RN1" type="button">ラジオ再生 (RN1)</button><button id="audio" data-value="awakening.mp3" type="button">音声ファイル再生</button><button id="stop" type="button">プレイヤー停止</button></p>
+	<p class="test_btn"><button id="radio" data-value="RN1" type="button">ラジオ再生 (RN1)</button><button id="audio" data-value="awakening.mp3" type="button">音声ファイル再生</button><button id="stop" type="button">プレイヤー停止</button></p>
 
 	<p id="test_btn_output">ラジオ及び音声ファイルの再生ボタンを押してください。</p>
 
@@ -352,7 +352,7 @@
 
 	// 再生テストボタン
 
-	document.getElementById("radiko").addEventListener("click", async function(event) {
+	document.getElementById("radio").addEventListener("click", async function(event) {
 
 		test_btn_msg.innerHTML = "ラジオ再生のリクエスト中です... (再生まで数秒要します)";
 
@@ -368,9 +368,9 @@
 		});
 
 		const query_string = new URLSearchParams(params).toString();
-		const res = await fnc.fetch_template("../php/player_radiko_play.php", query_string);
+		const res = await fnc.fetch_template("../php/player_radio.php", query_string);
 
-		console.log(res);
+		//console.log(res);
 
 		if ( res === "timeout" ) {
 			test_btn_msg.innerHTML = "タイムアウトしました。Streamlink へアクセスできていない可能性があります。<b>Path to streamlink</b> パスに至るディレクトリのパーミッションは <b>751</b> 以上である必要があります。";
@@ -395,7 +395,7 @@
 		});
 
 		const query_string = new URLSearchParams(params).toString();
-		const res = await fnc.fetch_template("../php/player_audio_play.php", query_string);
+		const res = await fnc.fetch_template("../php/player_audio.php", query_string);
 
 		//console.log(res);
 
@@ -503,11 +503,6 @@
 	const current_parent_url = current_url_object.protocol + "//" + current_url_object.hostname + parent_path;
 
 	const parent_url_html = '<b><a href="' + parent_url + '">' + parent_url + '</a></b> でアクセス ( 現在の protocol は ' + current_url_object.protocol + ' )';
-
-	//console.log(current_url_object);
-	//console.log(path_parts);
-	//console.log(parent_url);
-	//console.log(parent_url_html);
 
 	document.getElementById("https_href").innerHTML = parent_url_html;
 

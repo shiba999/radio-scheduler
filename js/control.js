@@ -38,7 +38,7 @@
 
 		// ボタンのスタイル削除
 
-		const play_btn_e_array = document.getElementsByClassName("radiko_ch");
+		const play_btn_e_array = document.getElementsByClassName("radio_ch");
 
 		for ( let n = 0; n < play_btn_e_array.length; n++ ) {
 			play_btn_e_array[n].removeAttribute("style");
@@ -152,10 +152,10 @@
 			const this_process = this_box.querySelector(".in_process");// 親要素内の .in_process を取得
 			this_process.style.display = "flex";// .in_process 表示
 
-			// 該当チャンネルのボタン class="radiko_ch" をクリック不可に変更
+			// 該当チャンネルのボタン class="radio_ch" をクリック不可に変更
 			// 色なども変更
 
-			const this_play_btn = this_box.getElementsByClassName("radiko_ch");
+			const this_play_btn = this_box.getElementsByClassName("radio_ch");
 			this_play_btn[0].style.pointerEvents = "none";
 			this_play_btn[0].style.opacity = "0.15";
 			this_play_btn[0].style.background = "#fff";
@@ -183,9 +183,9 @@
 		//console.log(event);
 
 		// ラジオ再生 > パラメータで局のIDを送る
-		// class="radiko_ch" をクリックで php へ id を送信
+		// class="radio_ch" をクリックで php へ id を送信
 
-		if ( event.target.classList.contains("radiko_ch") ) {
+		if ( event.target.classList.contains("radio_ch") ) {
 
 			// クリックした再生ボタン要素と兄弟要素である in_process を非表示から表示へ切り替える
 
@@ -206,7 +206,7 @@
 			});
 
 			const query_string = new URLSearchParams(params).toString();
-			const object = await arg_fnc.fetch_template("./php/player_radiko_play.php", query_string);
+			const object = await arg_fnc.fetch_template("./php/player_radio.php", query_string);
 
 			// object.result > success なら再生成功
 
@@ -259,7 +259,7 @@
 
 			html += '<div class="station" id="' + this_id + '_box">';
 			html += '<span class="logo"><img src="' + this_logo + '" title="' + this_name + '" alt="' + this_name + '" /></span>';
-			html += '<button class="radiko_ch" data-ch="' + this_id + '">Play</button>';
+			html += '<button class="radio_ch" data-ch="' + this_id + '">Play</button>';
 			html += '<a href="' + this_site + '" target="_blank">Website</a>';
 			html += '<span class="in_process" style="display: none;"><img src="./image/standby.gif" alt="in process" /></span>';
 			html += '</div>';
@@ -284,11 +284,11 @@
 
 	}
 
-	// radiko 現在再生中か・どの局を再生中かを確認する
+	// ラジオが現在再生中か・どの局を再生中かを確認する
 
-	export async function radiko_status_check(arg_val, arg_fnc) {
+	export async function radio_status_check(arg_val, arg_fnc) {
 
-		const playback_status_object = await arg_fnc.fetch_template("./php/radiko_playback_status.php", "");
+		const playback_status_object = await arg_fnc.fetch_template("./php/radio_playback_status.php", "");
 		//const playback_status_object = await playback_status_json.json();
 
 		//console.log(playback_status_object);
@@ -305,18 +305,39 @@
 	}
 
 	// フッターの音量調整バーで音量表示処理
-	// control.js へ移設すること
 
-	export function f_volume_display(value, arg_val) {
-		arg_val.e.vol_range.style.background = "linear-gradient(to right, #eee 0%, #eee " + value + "%, #666 " + value + "%, #666 100%)";
-		arg_val.e.vol_range.value = value;
+	function f_volume_display(volume, arg_val) {
+		arg_val.e.vol_value.innerText = volume;
+		arg_val.e.vol_range.value = volume;
+		arg_val.e.vol_range.style.background = "linear-gradient(to right, #eee 0%, #eee " + volume + "%, #666 " + volume + "%, #666 100%)";
+	}
+
+	export async function get_volume(arg_val, arg_fnc) {
+		const volume = await arg_fnc.fetch_template("./php/volume_get.php", "");
+		f_volume_display(volume, arg_val);
+	}
+
+	export async function set_volume(value, arg_val, arg_fnc, arg_idb) {
+
+		const params = new URLSearchParams({
+			v: value
+		});
+
+		const query_string = new URLSearchParams(params).toString();
+		const volume = await arg_fnc.fetch_template("./php/volume_set.php", query_string);
+
+		f_volume_display(volume, arg_val);
+
+		arg_val.v.volume = volume;
+		await arg_idb.update_indexeddb("volume", volume);
+
 	}
 
 	// イベントのセットアップ
 	// 再起動・シャットダウン・リロード・ボリューム調整・画面下部にあるラジオ停止ボタン
 	// このイベントは index.html に記載された要素からのイベントなので index.html からイベント登録
 
-	export async function control_event_setup(arg_val, arg_fnc, callback) {
+	export async function control_event_setup(arg_val, arg_fnc, arg_idb, callback) {
 
 		// ラジオ停止 ( 画面最下部の停止ボタン ■ )
 
@@ -324,24 +345,10 @@
 			const result = await stop_request(arg_val, arg_fnc);
 		});
 
-		// 音量バー変更時に値を取得
+		// 音量バー変更時に実行
 
 		arg_val.e.vol_range.addEventListener("change",  async function(event) {
-
-			//console.log("Current value:", event.target.value);
-
-			const params = new URLSearchParams({
-				v: event.target.value
-			});
-
-			const query_string = new URLSearchParams(params).toString();
-			const volume = await arg_fnc.fetch_template("./php/volume_set.php", query_string);
-
-			//console.log(volume);
-
-			f_volume_display(volume, arg_val);
-			arg_val.e.vol_value.innerText = volume;
-
+			await set_volume(event.target.value, arg_val, arg_fnc, arg_idb);
 		});
 
 		// オプションメニューの開閉
