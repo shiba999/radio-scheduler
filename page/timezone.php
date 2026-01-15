@@ -16,19 +16,16 @@
 
 </header>
 
-<section class="card settings">
+<section class="card tool">
 
 	<h2>サーバーデフォルト timezone</h2>
 
-	<h3>date_default_timezone_get()</h3>
-	<p><b><?php echo date_default_timezone_get(); ?></b></p>
-	<h3>date("Y/m/d (D) G:i:s")</h3>
-	<p><b><?php echo date("Y/m/d (D) G:i:s"); ?></b></p>
+	<p>date_default_timezone_get(): <b><?php echo date_default_timezone_get(); ?></b></p>
+	<p>date("Y/m/d (D) G:i:s"): <b><?php echo date("Y/m/d (D) G:i:s"); ?></b></p>
 
 	<h2>設定した timezone</h2>
 
-	<h3>date_default_timezone_get()</h3>
-	<p><b><?php
+	<p>date_default_timezone_get(): <b><?php
 
 	$schedule_file = "../json/settings.json";
 	$schedule_json = file_get_contents($schedule_file);
@@ -47,8 +44,7 @@
 	echo $timezone_text;
 
 ?></b></p>
-	<h3>date("Y/m/d (D) G:i:s")</h3>
-	<p><b><?php echo date("Y/m/d (D) G:i:s"); ?></b></p>
+	<p>date("Y/m/d (D) G:i:s"): <b><?php echo date("Y/m/d (D) G:i:s"); ?></b></p>
 
 </section>
 

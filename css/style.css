@@ -1097,6 +1097,21 @@ input[type="button"] {
 	margin: 0 7px 3px 0;
 }
 
+/* tool */
+
+.tool {
+	padding-bottom: 3.5em !important;
+}
+
+.tool h2 {
+	font-size: 110%;
+	padding: 1.10em;
+}
+
+.tool p {
+	font-size: 96%;
+}
+
 /* レスポンシブに関する記載 */
 
 /* 860px 以上に適用 */

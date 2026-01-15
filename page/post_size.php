@@ -16,21 +16,11 @@
 
 </header>
 
-<section class="card settings">
+<section class="card tool">
 
-	<h2>post_max_size 確認</h2>
+	<h2>post_max_size</h2>
 
-	<h3>ini_get("post_max_size")</h3>
-	<p><b><?php
-
-	$pms = ini_get("post_max_size");
-	//$pms = "1K";
-
-	echo $pms;
-
-?></b></p>
-	<h3>バイト数変換</h3>
-	<p><b><?php
+	<p>ini_get("post_max_size"): <b><?php
 
 	function parse_ini_size($size_str) {
 
@@ -48,9 +38,15 @@
 
 	}
 
-	echo parse_ini_size($pms);
+	$pms = ini_get("post_max_size");
 
-?></b></p>
+	echo $pms;
+
+?></b> ( <b><?php
+
+	echo parse_ini_size($pms);// バイトになおすと？
+
+?></b> byte )</p>
 
 </section>
 
