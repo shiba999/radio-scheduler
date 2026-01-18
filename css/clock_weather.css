@@ -1,0 +1,473 @@
+@charset "utf-8";
+
+#clock_weather_box {
+	/*font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans", Meiryo, sans-serif;*/
+	background-color: #000;
+	position: fixed;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	z-index: 1000;
+	box-sizing: border-box;
+	padding: 5vh;
+	color: #eee;
+	line-height: 1;
+}
+
+#cw_reiwa,
+.month_day_set .slash,
+.colon,
+.celsius_big,
+.celsius,
+.speed {
+	color: #999;
+}
+
+/* 日付関係 */
+
+.cw_date {
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
+	position: relative;
+}
+
+/* 位置調整 */
+
+.cw_date span {
+	flex: 1;
+}
+
+/* 月日曜日 (左) */
+
+.month_day_set {
+	text-align: left;
+}
+
+/* 年 (強制的に中央) */
+
+.year_set {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	text-align: center;
+	white-space: nowrap;
+}
+
+/* アイコン (右) */
+
+#to_radio {
+	text-align: right;
+}
+
+/* 月 / 日 */
+
+.month_day_box {
+	background-color: #ddd;
+	color: #333;
+	text-align: center;
+	padding: 2vh 2.5vh 1.5vh 2.5vh;
+	border-radius: 1vh;
+	overflow: hidden;
+	display: inline-block;
+}
+
+.month_day_box span {
+	display: block;
+	font-weight: bold;
+}
+
+#cw_month {
+	font-size: 3vh;
+	font-weight: bold;
+	letter-spacing: -0.1vh;
+}
+
+#cw_day {
+	font-size: 12vh;
+	font-weight: bold;
+	letter-spacing: -0.25vh;
+	vertical-align: bottom;
+}
+
+#cw_youbi {
+	font-size: 4vh;
+	margin-top: -0.5vh;
+	letter-spacing: 0.25vh;
+}
+
+/*.month_day_box .slash {
+	font-size: 16vh;
+	margin: 0;
+	vertical-align: middle;
+}*/
+
+/* 年 / 年号 */
+
+.year_set span {
+	display: block;
+	text-align: center;
+}
+
+#cw_reiwa {
+	font-size: 4vh;
+}
+
+#cw_year {
+	font-size: 8vh;
+	font-weight: bold;
+	margin-top: 1vh;
+}
+
+#radio_icon {
+	width: 6vh;
+	display: inline-block;
+}
+
+#radio_icon svg {
+	width: 6vh;
+	height: 6vh;
+	display: inline-block;
+	fill: #555;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+/* 時計 */
+
+.cw_clock {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#cw_hour,
+#cw_minute,
+#cw_second,
+.colon {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+#cw_hour,
+#cw_minute,
+#cw_second {
+	font-size: 30vh;
+	font-weight: bold;
+	letter-spacing: 0;
+}
+
+.colon {
+	font-size: 24vh;
+	margin: 0 2vh 3vh 2vh;
+}
+
+/* 天気予報一式 */
+
+.cw_weather {
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
+	position: relative;
+}
+
+/* 位置調整 */
+
+.cw_weather span {
+	flex: 1;
+}
+
+/* 気温 (左) */
+
+.temp_set {
+	text-align: left;
+}
+
+/* 天気情報 (強制的に中央) */
+
+.weather_set {
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	transform: translateX(-50%);
+	text-align: center;
+	white-space: nowrap;
+}
+
+/* 風力 (右) */
+
+.wind_set {
+	text-align: right;
+}
+
+/* 気温 */
+
+.wind_set {
+/*	display: flex;
+	align-items: center;
+	flex-wrap: wrap;*/
+}
+
+.temp_set {
+	display: inline-block;
+	text-align: left;
+	align-self: flex-end;
+}
+
+#cw_temp {
+	font-size: 16vh;
+	font-weight: bold;
+}
+
+.cw_temp_m {
+}
+
+#cw_temp_max {
+	font-size: 8vh;
+	font-weight: bold;
+	color: #ef6109;
+}
+
+#cw_temp_min {
+	font-size: 8vh;
+	font-weight: bold;
+	color: #10bcf0;
+}
+
+.celsius_big {
+	font-size: 8vh;
+	font-weight: bold;
+	margin: 0 1vh;
+}
+
+.celsius {
+	font-size: 4vh;
+	font-weight: bold;
+	margin: 0 1vh;
+}
+
+/* 天気予報 */
+
+.weather_set {
+	display: inline-block;
+}
+
+#cw_icon,
+#cw_description {
+	display: block;
+}
+
+#cw_icon {
+	height: 28vh;
+	width: 28vh;
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 135%;
+}
+
+#cw_description {
+	font-size: 4vh;
+	font-weight: bold;
+}
+
+/* 風速関係 */
+
+.wind_set {
+	align-self: flex-end;
+}
+
+#cw_position {
+	display: inline-block;
+	width: 100%;
+	margin-bottom: 1vh;
+	font-size: 6vh;
+	font-weight: bold;
+	color: #666;
+}
+
+#cw_wind_deg {
+	display: inline-block;
+	font-size: 12vh;
+	font-weight: bold;
+	color: #328805;
+}
+
+#cw_wind_speed {
+	font-size: 12vh;
+	font-weight: bold;
+	margin-left: 2vh;
+}
+
+.speed {
+	font-size: 8vh;
+	font-weight: bold;
+	margin-left: 1vh;
+}
+
+/*
+	申し訳程度のレスポンシブ
+	画面が縦長だった場合
+*/
+
+@media (orientation: portrait) {
+
+	#clock_weather_box {
+		/*background-color: #333;*/
+		padding: 5vw;
+	}
+
+	.portrait {
+		display: none !important;
+	}
+
+	.month_day_box {
+		padding: 2vw 2.5vw 1.5vw 2.5vw;
+	}
+
+	#cw_month {
+		font-size: 3.5vw;
+	}
+
+	#cw_day {
+		font-size: 12.5vw;
+	}
+
+	#cw_youbi {
+		font-size: 5vw;
+	}
+
+	/*.month_day_set .slash {
+		font-size: 14vw;
+	}*/
+
+	#cw_reiwa {
+		font-size: 4vw;
+	}
+
+	#cw_year {
+		font-size: 8vw;
+		margin-top: 1vw;
+	}
+
+	#cw_hour,
+	#cw_minute {
+		font-size: 32vw;
+	}
+
+	.colon {
+		font-size: 24vw;
+		margin: 0 2vw 3vw 2vw;
+	}
+
+	.cw_weather {
+		display: initial;
+		justify-content: initial;
+		align-items: initial;
+		/*padding-bottom: 18vw;*/
+	}
+
+	.temp_set,
+	.weather_set {
+		display: block;
+		text-align: initial;
+		align-self: initial;
+		text-align: center;
+	}
+
+	.weather_set {
+		position: relative;
+		left: initial;
+		bottom: initial;
+		transform: initial;
+	}
+
+	.temp_set {
+		margin-bottom: 2vw;
+	}
+
+	#cw_temp {
+		font-size: 14vw;
+	}
+
+	#cw_temp_max,
+	#cw_temp_min {
+		font-size: 8vw;
+	}
+
+	#cw_temp_max{
+		margin-left: 2vw;
+	}
+
+	.celsius_big {
+		font-size: 8vw;
+	}
+
+	.celsius {
+		font-size: 4vw;
+	}
+
+	#cw_icon,
+	#cw_description {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	#cw_icon {
+		height: 22vw;
+		width: 22vw;
+	}
+
+	#cw_description {
+		font-size: 6vw;
+	}
+
+	#cw_wind_deg,
+	#cw_wind_speed {
+		vertical-align: initial;
+	}
+
+	#cw_wind_deg,
+	#cw_wind_speed {
+		font-size: 12vw;
+	}
+
+	#cw_position {
+		white-space: inherit;
+		display: initial;
+		margin-bottom: initial;
+		font-size: 6vw;
+	}
+
+	#cw_wind_deg {
+		margin-left: 2vw;
+	}
+
+	#cw_description {
+		margin-left: 2vw;
+	}
+
+	#cw_wind_speed {
+		margin-left: 2vw;
+	}
+
+	.speed {
+		font-size: 5vw;
+		margin: 0 2vw 0 2vw;
+	}
+
+	#radio_icon {
+		bottom: 10vw;
+		height: 10vw;
+	}
+
+	#radio_icon svg {
+		width: 6vw;
+		height: 6vw;
+	}
+
+}

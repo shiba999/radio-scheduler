@@ -15,7 +15,13 @@ $player_path = $_POST["player_path"];
 $amixer_path = $_POST["amixer_path"];
 $reboot_path = $_POST["reboot_path"];
 $shutdown_path = $_POST["shutdown_path"];
+$openweather_api = $_POST["openweather_api"];
+$latitude = $_POST["latitude"];
+$longitude = $_POST["longitude"];
+$clock_display = $_POST["clock_display"];
 $timezone = $_POST["timezone"];
+
+// openweather_api latitude longitude clock_display はおまけ機能なので必須ではない
 
 if ( $streamlink_path && $player && $player_path && $amixer_path && $reboot_path && $shutdown_path ) {
 
@@ -26,6 +32,10 @@ if ( $streamlink_path && $player && $player_path && $amixer_path && $reboot_path
 		"amixer_path" => $amixer_path,
 		"reboot_path" => $reboot_path,
 		"shutdown_path" => $shutdown_path,
+		"openweather_api" => $openweather_api,
+		"latitude" => $latitude,
+		"longitude" => $longitude,
+		"clock_display" => $clock_display,
 		"timezone" => $timezone
 	);
 

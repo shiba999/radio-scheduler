@@ -14,6 +14,7 @@
 		"./js/schedule.js?v=" + CACHE_VERSION,
 		"./js/notice.js?v=" + CACHE_VERSION,
 		"./js/control.js?v=" + CACHE_VERSION,
+		"./js/openweather.js?v=" + CACHE_VERSION,
 		"./image/standby.gif",
 		"./image/playing.gif",
 		"./page/settings.html",

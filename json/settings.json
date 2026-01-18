@@ -1,1 +1,1 @@
-{"streamlink_path":"","player":"","player_path":"","amixer_path":"","reboot_path":"","shutdown_path":"","timezone":"Asia\/Tokyo"}
+{"streamlink_path":"\/home\/shiba\/myenv\/bin\/streamlink","player":"mpv","player_path":"\/usr\/bin\/mpv","amixer_path":"\/usr\/bin\/amixer","reboot_path":"\/usr\/sbin\/reboot","shutdown_path":"\/usr\/sbin\/shutdown","openweather_api":"","latitude":"","longitude":"","clock_display":"false","timezone":"Asia\/Tokyo"}

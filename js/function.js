@@ -87,11 +87,12 @@
 				console.error("fetch_template(): The process timed out.");
 				result = "timeout";
 			} else {
-				console.error("fetch_template(): ", error);
+				//console.error("fetch_template(): ", error);
+				console.error("fetch_template(): error");
 				result = "error";
 			}
 
-			throw error;// エラーも投げる
+			//throw error;// エラーも投げる
 			return result;
 
 		}

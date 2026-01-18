@@ -26,7 +26,27 @@
 		svg_reload: document.getElementById("svg_reload"),
 		svg_reboot: document.getElementById("svg_reboot"),
 		svg_power_off: document.getElementById("svg_power_off"),
-		server_ip: document.getElementById("this_ip")
+		server_ip: document.getElementById("this_ip"),
+		watch_open: document.getElementById("watch_open"),
+		cw_box: document.getElementById("clock_weather_box"),
+		cw_reiwa: document.getElementById("cw_reiwa"),
+		cw_year: document.getElementById("cw_year"),
+		cw_month: document.getElementById("cw_month"),
+		cw_day: document.getElementById("cw_day"),
+		cw_youbi: document.getElementById("cw_youbi"),
+		cw_hour: document.getElementById("cw_hour"),
+		cw_minute: document.getElementById("cw_minute"),
+		cw_second: document.getElementById("cw_second"),
+		cw_temp: document.getElementById("cw_temp"),
+		cw_temp_max: document.getElementById("cw_temp_max"),
+		cw_temp_min: document.getElementById("cw_temp_min"),
+		cw_icon: document.getElementById("cw_icon"),
+		cw_description: document.getElementById("cw_description"),
+		cw_position: document.getElementById("cw_position"),
+		cw_wind_speed: document.getElementById("cw_wind_speed"),
+		cw_wind_deg: document.getElementById("cw_wind_deg"),
+		to_radio: document.getElementById("to_radio"),
+		radio_icon: document.getElementById("radio_icon")
 	}
 
 	// 使用する変数群
@@ -39,6 +59,7 @@
 		set_interval: [],
 		region_name: "",
 		region_time: 0,
-		volume: 0
+		volume: 0,
+		clock_interval: []
 	}
 

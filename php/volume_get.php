@@ -17,7 +17,7 @@ if ( preg_match('/\[(\d+)%\]/', $output, $matches) ) {
 
 } else {
 
-	echo "Volume acquisition error.";
+	echo "error";
 
 }
 

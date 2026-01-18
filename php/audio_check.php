@@ -24,15 +24,6 @@ exec(
 	$pgrep_return
 );
 
-// ログファイル確認
-
-$log_file = "../log/audio.log";
-$audio_log = file_get_contents($log_file);
-$audio_log_explode = explode( " ",  trim($audio_log) );// ID 'filename.mp3'
-
-$this_pid = trim($audio_log_explode[0]);
-$file_name = trim($audio_log_explode[1], "'");
-
 // $pgrep_output の中にプロセスIDが含まれているか確認
 // 存在する場合は音声ファイルは再生中
 // 存在しなければ音声ファイルは停止中
@@ -40,11 +31,26 @@ $file_name = trim($audio_log_explode[1], "'");
 $return_array = array(
 	"state" => false,
 	//"file" => $file_name
-	"file" => rawurlencode($file_name)
+	"file" => ""
 );
 
-if ( in_array($this_pid, $pgrep_output) ) {
-	$return_array["state"] = true;
+// ログファイル確認
+
+$log_file = "../log/audio.log";
+$audio_log = file_get_contents($log_file);
+
+if ( $audio_log != "" ) {
+
+	$audio_log_explode = explode( " ",  trim($audio_log) );// ID 'filename.mp3'
+	$this_pid = trim($audio_log_explode[0]);
+	$file_name = trim($audio_log_explode[1], "'");
+
+	$return_array["file"] = rawurlencode($file_name);
+
+	if ( in_array($this_pid, $pgrep_output) ) {
+		$return_array["state"] = true;
+	}
+
 }
 
 echo json_encode($return_array);

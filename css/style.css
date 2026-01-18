@@ -1033,8 +1033,10 @@ input[type="button"] {
 	background-color: #ddd;
 }
 
-.settings input[type="text"]:focus {
-	background-color: #eee;
+.settings input[type="checkbox"] {
+	width: 2em;
+	height: 2em;
+	vertical-align: middle;
 }
 
 .settings .comment {
@@ -1043,6 +1045,10 @@ input[type="button"] {
 	font-size: 90%;
 	line-height: 1.35em;
 	margin: 0 1.20em 1.0em 1.20em;
+}
+
+.settings input[type="text"]:hover {
+	background-color: #ddd;
 }
 
 .settings button {
@@ -1236,6 +1242,40 @@ input[type="button"] {
 		display: none;
 	}
 
+}
+
+/* 時計を開く */
+
+/*.volume_ui svg {
+	display: inline-block;
+	fill: #eee;
+	vertical-align: middle;
+}*/
+
+#watch_open {
+	position: fixed;
+	top: 36px;
+	right: 36px;
+	display: inline-block;
+	background-color: #222;
+	box-sizing: border-box;
+	width: 48px;
+	height: 48px;
+	padding: 6px;
+	border-radius: 24px;
+	cursor: pointer;
+}
+
+#watch_open svg {
+	display: inline-block;
+	width: 36px;
+	height: 36px;
+	fill: #777;
+	vertical-align: middle;
+}
+
+#watch_open:hover svg {
+	fill: #aaa;
 }
 
 /* timeout */

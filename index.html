@@ -5,6 +5,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
 	<link rel="stylesheet" class="cachebuster" href="./css/style.css" type="text/css" />
+	<link rel="stylesheet" class="cachebuster" href="./css/clock_weather.css" type="text/css" />
 	<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
 	<title>らぢ助 - Radio Scheduler -</title>
 	<link rel="manifest" href="./manifest.json" />
@@ -44,25 +45,6 @@
 
 </section>
 
-<section class="control_panel">
-
-	<div class="control_panel_set">
-
-		<span id="play_info"></span>
-
-		<span class="volume_ui">
-			<span id="svg_volume"></span>
-			<span id="volume_value">100</span>
-			<input type="range" id="volume_range" name="volume" min="0" max="100" />
-			<button id="radio_stop">
-				<svg viewBox="0 0 100 100" class="icon_stop"><rect width="100%" height="100%" rx="2" ry="2"/></svg>
-			</button>
-		</span>
-
-	</div>
-
-</section>
-
 <section class="card">
 
 	<h3>メンテナンス情報</h3>
@@ -86,6 +68,23 @@
 	<div id="audio_file_list">ファイルはまだ登録されていません。</div>
 	<p id="upload_message">スケジュール再生に使用する音声ファイルをここで登録可能です。</p>
 	<div id="upload">再生に使用したいファイルをこちらへドラッグアンドドロップしてください。(mp3ファイル限定)</div>
+
+</section>
+
+<section class="card">
+
+	<h3>ここで訂正したファイル</h3>
+
+	<ul>
+		<li>/index.html</li>
+		<li>/css/style.css</li>
+		<li>/js/function.js</li>
+		<li>/js/control.js</li>
+		<li>/js/audio.js</li>
+		<li>/php/audio_check.php</li>
+		<li>/php/volume_get.php</li>
+		<li>/php/volume_set.php</li>
+	</ul>
 
 </section>
 
@@ -114,9 +113,62 @@
 
 </section>
 
+<section class="control_panel">
+
+	<div class="control_panel_set">
+
+		<span id="play_info"></span>
+
+		<span class="volume_ui">
+			<span id="svg_volume"></span>
+			<span id="volume_value">100</span>
+			<input type="range" id="volume_range" name="volume" min="0" max="100" />
+			<button id="radio_stop">
+				<svg viewBox="0 0 100 100" class="icon_stop"><rect width="100%" height="100%" rx="2" ry="2"/></svg>
+			</button>
+		</span>
+
+	</div>
+
+</section>
+
+<div id="watch_open"></div>
+
 <footer>
 	<p class="copy">らぢ助 - Radio Scheduler -<br />&copy; 2025 <a href="https://weblabyrinth.net" target="_blank">WebLabyrinth</a></p>
 </footer>
+
+<div id="clock_weather_box" style="display: none;"><!-- 初期では非表示 -->
+	<span class="cw_date">
+		<span class="month_day_set">
+			<span class="month_day_box">
+				<span id="cw_month">--</span><span id="cw_day">--</span><span id="cw_youbi">---</span>
+			</span>
+		</span>
+		<span class="year_set">
+			<span id="cw_reiwa">Reiwa.-</span><span id="cw_year">----</span>
+		</span>
+		<span id="to_radio"><span id="radio_icon"></span></span>
+	</span>
+	<span class="cw_clock">
+		<span id="cw_hour">--</span><span class="colon">:</span><span id="cw_minute">--</span><span class="colon portrait">:</span><span id="cw_second" class="portrait">--</span></span>
+	<span class="cw_weather">
+		<span class="temp_set">
+			<span id="cw_temp">---</span><span class="celsius_big">&#8451;</span>
+			<span class="portrait"><br /></span>
+			<span id="cw_temp_max">---</span><span class="celsius">&#8451;</span>
+			<span id="cw_temp_min">---</span><span class="celsius">&#8451;</span>
+		</span>
+		<span class="weather_set">
+			<span id="cw_icon" style="background-image: url(https://openweathermap.org/img/wn/01d@4x.png);"></span>
+			<span id="cw_description">天気</span>
+		</span>
+		<span class="wind_set">
+			<span id="cw_position">地域名</span>
+			<span id="cw_wind_deg">↑</span><span id="cw_wind_speed">1</span><span class="speed">m/s</span>
+		</span>
+	</span>
+</div>
 
 <div id="message_box" class="fade">
 	<div id="message_bg"></div>
@@ -328,6 +380,7 @@ async function load_import_module(version, location = "Unknown") {
 	mod.sch = await import("./js/schedule.js?v=" + version);
 	mod.not = await import("./js/notice.js?v=" + version);
 	mod.con = await import("./js/control.js?v=" + version);
+	mod.opw = await import("./js/openweather.js?v=" + version);
 
 }
 
@@ -406,7 +459,7 @@ window.onload = async function() {
 	// サービスワーカーインストールでキャッシュを保存
 	// ?cv= でサービスワーカーへバージョンを渡す
 
-	if ("serviceWorker" in navigator) {
+/*	if ("serviceWorker" in navigator) {
 
 		// サービスワーカーから受信するメッセージ用イベントの登録
 
@@ -425,7 +478,7 @@ window.onload = async function() {
 			console.log("ServiceWorker の登録に失敗しました: ", error);
 		});
 
-	}
+	}*/
 
 	// 処理 4 * * * * * * * * * * * * * * * * * * * *
 	// 地域IDとチャンネル情報の取得・更新
@@ -569,6 +622,31 @@ window.onload = async function() {
 
 	const server_object = await mod.fnc.fetch_template("./php/server.php", "");
 	mod.var.e.server_ip.innerHTML = server_object.ip;
+
+	// 時計・天気予報の実行 > この先で天気情報も取得
+	// 初期非表示であっても開始しておく
+
+	mod.var.v.clock_interval.push( setInterval(mod.opw.time_and_date, 1000, mod.var, mod.fnc) );
+
+	// 時計 UI の開閉
+
+	mod.var.e.radio_icon.addEventListener("click", async function() {
+		mod.var.e.cw_box.style.display = "none";
+	});
+
+	mod.var.e.watch_open.addEventListener("click", async function() {
+		mod.var.e.cw_box.style.display = "flex";
+	});
+
+	// 設定情報で時計が初期表示の場合は時計を開く
+
+	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php", "");
+
+	//console.log(setting_object);
+
+	if ( setting_object.clock_display !== "false" ) {
+		mod.var.e.cw_box.style.display = "flex";
+	}
 
 	// ***** 処理終了 *****
 
