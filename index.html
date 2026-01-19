@@ -71,23 +71,6 @@
 
 </section>
 
-<section class="card">
-
-	<h3>ここで訂正したファイル</h3>
-
-	<ul>
-		<li>/index.html</li>
-		<li>/css/style.css</li>
-		<li>/js/function.js</li>
-		<li>/js/control.js</li>
-		<li>/js/audio.js</li>
-		<li>/php/audio_check.php</li>
-		<li>/php/volume_get.php</li>
-		<li>/php/volume_set.php</li>
-	</ul>
-
-</section>
-
 <div id="option_open"><span id="option_open_btn">・・・</span></div>
 
 <section id="option_nemu_box">
@@ -459,7 +442,7 @@ window.onload = async function() {
 	// サービスワーカーインストールでキャッシュを保存
 	// ?cv= でサービスワーカーへバージョンを渡す
 
-/*	if ("serviceWorker" in navigator) {
+	if ("serviceWorker" in navigator) {
 
 		// サービスワーカーから受信するメッセージ用イベントの登録
 
@@ -478,7 +461,7 @@ window.onload = async function() {
 			console.log("ServiceWorker の登録に失敗しました: ", error);
 		});
 
-	}*/
+	}
 
 	// 処理 4 * * * * * * * * * * * * * * * * * * * *
 	// 地域IDとチャンネル情報の取得・更新
