@@ -1,5 +1,4 @@
 
-	//const CACHE_NAME = "49";// 更新があった場合はこの値を変更する事
 	// キャッシュのバージョンを更新する場合は cv.txt の値を変更する事
 
 	const CACHE_VERSION = new URL(location).searchParams.get("cv");
@@ -70,8 +69,6 @@
 				}
 			}) );
 
-			//console.log("古いキャッシュ削除完了");
-
 			// クライアント通知（削除完了後）
 
 			const clients = await self.clients.matchAll({
@@ -87,19 +84,11 @@
 				});
 			} );
 
-			//console.log("クライアント通知完了");
-
 		})() );
 
 		self.clients.claim();
 
 	});
-
-	// 2026-01-03 修正
-	// 端末に到達できない状態の場合は html ファイルへアクセスできなかった場合
-	// offlile.html を表示させる予定だったが、サービスワーカーで行う場合は
-	// リクエストの判断が曖昧な場合の判断が難しいため
-	// index.html 内の JavaScript で表示を切り替える様に変更した
 
 	self.addEventListener("fetch", function(event) {
 
@@ -127,11 +116,7 @@
 
 				// 2. キャッシュになければネットワークから取得
 
-				//try {
-
-					return await fetch(request);
-
-				//}
+				return await fetch(request);
 
 			})() );
 
