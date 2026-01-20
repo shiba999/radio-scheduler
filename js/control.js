@@ -79,7 +79,7 @@
 		// 厳密に考えると停止のコールバックを受け取ってから
 		// 初期化を行った方が良いが可能なのかな？
 
-		const result = await arg_fnc.fetch_template("./php/player_stop.php", "");
+		const result = await arg_fnc.fetch_template("./php/player_stop.php");
 
 		let result_value = false;
 
@@ -296,7 +296,7 @@
 
 	export async function radio_status_check(arg_val, arg_fnc) {
 
-		const playback_status_object = await arg_fnc.fetch_template("./php/radio_playback_status.php", "");
+		const playback_status_object = await arg_fnc.fetch_template("./php/radio_playback_status.php");
 		//const playback_status_object = await playback_status_json.json();
 
 		//console.log(playback_status_object);
@@ -321,7 +321,7 @@
 	}
 
 	export async function get_volume(arg_val, arg_fnc) {
-		const volume = await arg_fnc.fetch_template("./php/volume_get.php", "");
+		const volume = await arg_fnc.fetch_template("./php/volume_get.php");
 		f_volume_display(volume, arg_val);
 	}
 
@@ -395,7 +395,7 @@
 
 					// サーバー再起動実行
 
-					const message = await arg_fnc.fetch_template("./php/pow_reboot.php", "");
+					const message = await arg_fnc.fetch_template("./php/pow_reboot.php");
 
 					arg_fnc.msg_fade_in(message);
 
@@ -457,7 +457,7 @@
 
 				if (result) {
 
-					const message = await arg_fnc.fetch_template("./php/pow_off.php", "");
+					const message = await arg_fnc.fetch_template("./php/pow_off.php");
 
 					arg_fnc.msg_fade_in(message);
 

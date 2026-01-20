@@ -436,7 +436,7 @@
 
 			const this_index = Number(event.target.dataset.index);
 
-			const schedule_object = await ctx.fnc.fetch_template("./php/schedule_get.php", "");
+			const schedule_object = await ctx.fnc.fetch_template("./php/schedule_get.php");
 
 			// オブジェクトの中から対象IDの情報を取り出す
 
@@ -617,7 +617,7 @@
 
 		// 保存されているスケジュール情報を取得
 
-		const schedule_object = await ctx.fnc.fetch_template("./php/schedule_get.php", "");
+		const schedule_object = await ctx.fnc.fetch_template("./php/schedule_get.php");
 
 		// 保存されている音声ファイルを変数に保存
 

@@ -125,13 +125,15 @@
 }
 
 #radio_icon {
-	width: 6vh;
+	width: 8vh;
+	height: 8vh;
 	display: inline-block;
 }
 
 #radio_icon svg {
 	width: 6vh;
 	height: 6vh;
+	margin: 1vh;
 	display: inline-block;
 	fill: #555;
 	vertical-align: middle;

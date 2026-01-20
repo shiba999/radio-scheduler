@@ -13,10 +13,17 @@ $file_array = glob( $audio_directory . "*" );
 
 $file_name_array = array_map("basename", $file_array);
 
-//foreach ( $file_name_array as $file ) {
-//	echo "<p>" . $file . "</p>";
-//}
+// 音声ファイルのみ抽出
 
-echo json_encode($file_name_array);
+$audio_array = array();
+
+foreach ( $file_name_array as $file ) {
+	$file_type = pathinfo($file, PATHINFO_EXTENSION);
+	if ( $file_type == "mp3" ) {
+		array_push($audio_array, $file);
+	}
+}
+
+echo json_encode($audio_array);
 
 ?>

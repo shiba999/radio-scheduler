@@ -21,9 +21,21 @@
 
 	export async function get_openweather(arg_var, arg_fnc) {
 
-		const ow_object = await arg_fnc.fetch_template("./php/get_openweather_json.php", "");
+		const ow_object = await arg_fnc.fetch_template("./php/get_openweather_json.php");
 
 		//console.log(ow_object);
+
+		if ( ow_object.update === "error" ) {
+
+			// 設定で key や座標が設定されていない場合は error が返ってくる
+			// その場合は天気予報要素を非表示させて微調整
+
+			document.getElementsByClassName("cw_weather")[0].style.display = "none";
+			arg_var.e.cw_box.style.paddingBottom = "15%";
+
+			return;// そしてここで終わり
+
+		}
 
 		const temp_set = ow_object.main;
 		const weather = ow_object.weather[0];
@@ -136,7 +148,4 @@
 		time_storage = hour_num;
 
 	}
-
-	//time_and_date();// まず実行 > その後一定時間毎に実行
-	//setInterval("time_and_date()", 1000);// 1000ms > 1秒
 
