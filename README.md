@@ -53,14 +53,15 @@
 - ブラウザから音声再生を実行するため、audio グループに、ユーザー www-data の追加を行ってください。  
 ※ [コマンド例] sudo usermod -aG audio www-data  
 ※ ユーザー www-data は OS によって異なる場合があります。
-- 当ソフトウェア経由でシャットダウンや再起動を行う場合は sudo visudo より、シャットダウン・再起動のパスを追加してください。 
+- 当ソフトウェア経由でシャットダウンや再起動を行う場合は sudo visudo より、シャットダウン・再起動のパスを追加してください。  
 ※ [コマンド例] www-data ALL=(root) NOPASSWD: /sbin/reboot, /sbin/shutdown  
 ※ コマンドパスは OS によって異なる場合があるため which {コマンド名} で確認してください。
 
 ## スケジュール登録について
 
-- スケジュール機能を利用する場合は cron に以下のコマンドを追加してください。 
-※ [コマンド例] sudo crontab -u www-data -e  */1 * * * * php /{設置位置のパス}/php/cron.php
+- スケジュール機能を利用する場合は cron に以下のコマンドを追加してください。  
+※ [コマンド例] sudo crontab -u www-data -e  
+*/1 * * * * php /{設置位置のパス}/php/cron.php
 - cron パスは設定画面で確認可能です。
 
 ## 注意事項
