@@ -63,14 +63,17 @@ sudo usermod -aG audio www-data
 ```
 # コマンド例
 www-data ALL=(root) NOPASSWD: /sbin/reboot, /sbin/shutdown  
-#  コマンドパスは OS によって異なる場合があるため which {コマンド名} で確認してください。
+# コマンドパスは OS によって異なる場合があるため which {コマンド名} で確認してください。
 ```
 
 ## スケジュール登録について
 
-- スケジュール機能を利用する場合は cron に以下のコマンドを追加してください。  
-※ [コマンド例] sudo crontab -u www-data -e  
+- スケジュール機能を利用する場合は cron に以下のコマンドを追加してください。
+```
+# コマンド例
+sudo crontab -u www-data -e
 */1 * * * * php /{設置位置のパス}/php/cron.php
+```
 - cron パスは設定画面で確認可能です。
 
 ## 注意事項
