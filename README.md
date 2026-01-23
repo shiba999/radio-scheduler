@@ -1,6 +1,6 @@
 # らぢ助 - Radio Scheduler -
 
-シングルボードコンピュータ―向けラジオ再生ソフトウェア「*らぢ助* - Radio Scheduler -」です。
+シングルボードコンピュータ―向けラジオ再生ソフトウェア「**らぢ助 - Radio Scheduler -**」です。
 スピーカー付き端末にインストールしてラジオを楽しみましょう。
 
 ![Radio Scheduler](docs/screenshots/radio_scheduler.jpg)
