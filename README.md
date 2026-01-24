@@ -38,7 +38,11 @@
 
 ## 時計機能
 
-時計表示のおまけ機能付きで、OpenWeather api を使用して天気予報も表示可能です。  
+<div style="display: flex; justify-content: center;">
+<img src="docs/screenshots/clock_weather.png" width="49%">
+</div>
+
+おまけ機能の時計表示です。時計表記以外に OpenWeather api を使用してお天気情報も取得可能です。  
 ブラウザのキオスク機能を活用してサイネージ的表示も行えます。  
 ※ 起動時に時計表示かコントロールパネルかを選択可能です。
 
