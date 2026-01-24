@@ -20,7 +20,7 @@
 
 ## コントロールパネル
 
-![コントロールパネル1](docs/screenshots/control_panel.jpg)![コントロールパネル2](docs/screenshots/control_panel2.jpg)
+![コントロールパネル1](docs/screenshots/control_panel.png)![コントロールパネル2](docs/screenshots/control_panel2.png)
 
 以下の操作が可能です。
 
