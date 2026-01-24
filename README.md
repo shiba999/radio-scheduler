@@ -20,7 +20,10 @@
 
 ## コントロールパネル
 
-![コントロールパネル1](docs/screenshots/control_panel.png)![コントロールパネル2](docs/screenshots/control_panel2.png)
+<div style="display: flex;">
+<img src="docs/screenshots/control_panel.png" width="50%">
+<img src="docs/screenshots/control_panel2.png" width="50%">
+</div>
 
 以下の操作が可能です。
 
