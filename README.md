@@ -21,8 +21,8 @@
 ## コントロールパネル
 
 <div style="display: flex;">
-<img src="docs/screenshots/control_panel.png" width="50%">
-<img src="docs/screenshots/control_panel2.png" width="50%">
+<img src="docs/screenshots/control_panel.png" width="45%">
+<img src="docs/screenshots/control_panel2.png" width="45%">
 </div>
 
 以下の操作が可能です。
