@@ -20,9 +20,9 @@
 
 ## コントロールパネル
 
-<div style="display: flex; justify-content: space-between;">
-<img src="docs/screenshots/control_panel.png" width="45%">
-<img src="docs/screenshots/control_panel2.png" width="45%">
+<div style="display: flex; justify-content: center;">
+<img src="docs/screenshots/control_panel.png" width="49%">
+<img src="docs/screenshots/control_panel2.png" width="49%">
 </div>
 
 以下の操作が可能です。
