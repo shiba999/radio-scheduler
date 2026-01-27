@@ -3,9 +3,9 @@
 
 header("Content-Type: application/json; charset=UTF-8");// json を受け取る場合は明示的にJSONと宣言
 
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
 // エリアID を取得する関数
