@@ -32,7 +32,7 @@
 
 	export async function check_audio(arg_var, arg_fnc) {
 
-		const player_state = await arg_fnc.fetch_template("./php/audio_check.php");
+		const player_state = await arg_fnc.fetch_template("./php/audio_check.php", "");
 
 		//console.log( JSON.stringify(player_state) );
 
@@ -149,7 +149,7 @@
 
 			} else {
 
-				const result = await ctx.fnc.fetch_template("./php/player_stop.php");
+				const result = await ctx.fnc.fetch_template("./php/player_stop.php", "");
 
 				//console.log(result);
 
@@ -173,7 +173,7 @@
 
 	export async function get_audio_list(ctx) {
 
-		const upload_result = await ctx.fnc.fetch_template( "./php/get_list_audio.php");
+		const upload_result = await ctx.fnc.fetch_template( "./php/get_list_audio.php", "");
 
 		//console.log(upload_result);
 

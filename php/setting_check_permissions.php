@@ -10,12 +10,15 @@ $check_array = array(
 	"../log/settings.log",
 	"../log/radio.log",
 	"../log/player.log",
+	"../log/volume.log",
 	"../log/audio.log",
 	"../log/reboot.log",
 	"../log/cron.log",
 	"../json/schedule.json",
+	"../socket",
 	"../upload_tmp",
-	"../upload"
+	"../upload",
+	"../json/openweather.json"
 );
 $result_array = array();
 

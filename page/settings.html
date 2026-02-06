@@ -50,6 +50,12 @@
 		<p><label for="shutdown_path" class="check">Path to shutdown<span>[例] /usr/sbin/shutdown</span></label><input type="text" id="shutdown_path" name="shutdown_path" value="" /></p>
 		<p class="comment">コントロールパネルからシャットダウンを行う場合は <b>which shutdown</b> で表示されたパスを設定し、<b>sudo visudo</b> から <b>www-data ALL=(root) NOPASSWD: {shutdown path}</b> を追加してください。</p>
 
+		<p><label for="playback_devices" class="check">Playback Devices</label><select id="playback_devices" name="playback_devices"></select></p>
+		<p class="comment">音声再生に使用するデバイスを指定してください。音声を出力したいスピーカー機器から音が出ない場合は調整を行ってください。</p>
+
+		<p><label for="playback_options" class="check">Playback options<span>[例] --no-video</span></label><input type="text" id="playback_options" name="playback_options" value="" /></p>
+		<p class="comment">プレイヤー実行時に使用したいオプションがある場合は使用してください。</p>
+
 		<p><label for="openweather_api" class="check">OpenWeather API Key</label><input type="text" id="openweather_api" name="openweather_api" value="" /></p>
 		<p class="comment">天気予報情報を取得したい場合は <b><a href="https://openweathermap.org/" target="_blank">OpenWeather</a></b> に登録して、取得した <b>API Key</b> を入力してください。※APIへのアクセスは、30分以内は保存されたキャッシュから再利用しています。自動更新は1時間に一回行われます。</p>
 
@@ -67,6 +73,12 @@
 
 		<p><span id="setting_message">各設定情報を入力してください。</span><br /><button id="setting_set" type="submit">Submit</button></p>
 
+	</div>
+
+	<h2>Audio Mixer</h2>
+
+	<div id="mixer_box">
+		<p>端末内の音量調整をここで行ないます。</p>
 	</div>
 
 	<h2>Last reboot time</h2>
@@ -171,6 +183,8 @@
 	const amixer_path = document.getElementById("amixer_path");
 	const reboot_path = document.getElementById("reboot_path");
 	const shutdown_path = document.getElementById("shutdown_path");
+	const playback_device = document.getElementById("playback_devices");
+	const playback_options = document.getElementById("playback_options");
 	const openweather_api = document.getElementById("openweather_api");
 	const latitude = document.getElementById("latitude");
 	const longitude = document.getElementById("longitude");
@@ -190,13 +204,29 @@
 	set_form.style.pointerEvents = "none";
 	set_form.style.opacity = "0.38";
 
+	// 再生に利用可能なデバイスを取得
+
+	const audio_device_object = await fnc.fetch_template("../php/get_audio_devices.php");
+
+	//console.log(audio_device_object);
+
+	// デバイス用 html を生成
+
+	let audio_device_select = '<option value="">音声再生に使用したいデバイスを選択してください</option>';
+
+	for ( let n = 0; n < audio_device_object.length; n++ ) {
+		audio_device_select += '<option value="' + audio_device_object[n]["value"] + '">' + audio_device_object[n]["label"] + '</option>';
+	}
+
+	playback_device.innerHTML = audio_device_select;
+
 	// 現在保存中の設定情報を取得してフォーム項目に反映
 
 	async function get_setting_values() {
 
 		const setting_object = await fnc.fetch_template("../php/setting_get.php", "");
 
-		//console.log(setting_object);
+		console.log(setting_object);
 
 		if (setting_object.streamlink_path) {
 			streamlink_path.value = setting_object.streamlink_path;
@@ -220,6 +250,14 @@
 
 		if (setting_object.shutdown_path) {
 			shutdown_path.value = setting_object.shutdown_path;
+		}
+
+		if (setting_object.playback_device) {
+			playback_device.value = setting_object.playback_device;// e.value で select を選択状態にできるのか...
+		}
+
+		if (setting_object.playback_options) {
+			playback_options.value = setting_object.playback_options;
 		}
 
 		if (setting_object.openweather_api) {
@@ -261,76 +299,72 @@
 		const amixer_path_value = amixer_path.value;
 		const reboot_path_value = reboot_path.value;
 		const shutdown_path_value = shutdown_path.value;
+		const playback_device_value = playback_device.value;
+		const playback_options_value = playback_options.value;
 		const openweather_api_value = openweather_api.value;
 		const latitude_value = latitude.value;
 		const longitude_value = longitude.value;
 		const clock_display_value = clock_display.checked;
 		const timezone_value = timezone.value;
 
-		if ( sl_path_value && player_value && p_path_value && amixer_path_value && reboot_path_value && shutdown_path_value && timezone_value ) {
+		const value_array = new Array(sl_path_value, player_value, p_path_value, amixer_path_value, reboot_path_value, shutdown_path_value, playback_options_value, openweather_api_value, latitude_value, longitude_value, timezone_value);
 
-			const value_array = new Array(sl_path_value, player_value, p_path_value, amixer_path_value, reboot_path_value, shutdown_path_value, openweather_api_value, latitude_value, longitude_value, timezone_value);
+		//console.log(value_array);
 
-			//console.log(value_array);
+		let false_count = 0
+		let false_value_array = new Array();
 
-			let false_count = 0
-			let false_value_array = new Array();
+		for ( let n = 0; n < value_array.length; n++ ) {
 
-			for ( let n = 0; n < value_array.length; n++ ) {
+			const this_result = validate_input(value_array[n]);
 
-				const this_result = validate_input(value_array[n]);
+			//console.log(this_result);
 
-				//console.log(this_result);
-
-				if ( this_result.result === false ) {
-					//console.log(value_array[n]);
-					false_value_array.push(value_array[n]);
-					false_count++;
-				}
-
+			if ( this_result.result === false ) {
+				//console.log(value_array[n]);
+				false_value_array.push(value_array[n]);
+				false_count++;
 			}
 
-			if ( false_count === 0 ) {
+		}
 
-				// 保存処理へ
+		if ( false_count === 0 ) {
 
-				const send_params = {
-					streamlink_path: sl_path_value,
-					player: player_value,
-					player_path: p_path_value,
-					amixer_path: amixer_path_value,
-					reboot_path: reboot_path_value,
-					shutdown_path: shutdown_path_value,
-					openweather_api: openweather_api_value,
-					latitude: latitude_value,
-					longitude: longitude_value,
-					clock_display: clock_display_value,
-					timezone: timezone_value
-				};
+			// 保存処理へ
 
-				//console.log(send_params);
+			const send_params = {
+				streamlink_path: sl_path_value,
+				player: player_value,
+				player_path: p_path_value,
+				amixer_path: amixer_path_value,
+				reboot_path: reboot_path_value,
+				shutdown_path: shutdown_path_value,
+				playback_device: playback_device_value,
+				playback_options: playback_options_value,
+				openweather_api: openweather_api_value,
+				latitude: latitude_value,
+				longitude: longitude_value,
+				clock_display: clock_display_value,
+				timezone: timezone_value
+			};
 
-				const query_string = new URLSearchParams(send_params).toString();
-				const save_result = await fnc.fetch_template( "../php/setting_set.php", query_string );
+			//console.log(send_params);
 
-				//console.log(save_result);
+			const query_string = new URLSearchParams(send_params).toString();
+			const save_result = await fnc.fetch_template( "../php/setting_set.php", query_string );
 
-				if ( save_result > 0 ) {
-					set_msg.innerHTML = "設定を保存しました。";
-					get_setting_values();
-				} else {
-					set_msg.innerHTML = "設定の保存に失敗しました。";
-				}
+			//console.log(save_result);
 
+			if ( save_result > 0 ) {
+				set_msg.innerHTML = "設定を保存しました。";
+				get_setting_values();
 			} else {
-
-				set_msg.innerHTML = "不正な文字列が含まれています。" + false_value_array.join(", ");
-
+				set_msg.innerHTML = "設定の保存に失敗しました。";
 			}
 
 		} else {
 
-			set_msg.innerHTML = "設定項目をすべて入力してください。";
+			set_msg.innerHTML = "不正な文字列が含まれています。" + false_value_array.join(", ");
 
 		}
 
@@ -560,6 +594,122 @@
 	const reboot_log = await fnc.fetch_template("../log/reboot.log", query_string);
 
 	document.getElementById("last_reboot").innerHTML = reboot_log.trim();
+
+	// ミキサー情報の取得
+
+	const mixer_box = document.getElementById("mixer_box");
+	const mixer_object = await fnc.fetch_template("../php/mixer_get.php");
+
+	//console.log(mixer_object);
+
+	let mixer_html = "";
+
+	for ( let key in mixer_object ) {
+
+		//console.log(key);
+		//console.log(mixer_object[key]);
+
+		const device_name = '<span class="device_name">' + key + '</span>';
+		let device_volume = "";
+		let device_mute = "";
+
+		// ミュートボタン
+
+		if ( "mute" in mixer_object[key] ) {
+
+			const this_id = key + "_m";
+
+			let mute_html = '<input type="checkbox" id="' + this_id + '" class="mx_mute" data-name="' + key + '" ';
+
+			if ( mixer_object[key]["mute"] == "on" ) {
+				mute_html += ' checked';
+			}
+
+			mute_html += ' />';
+			mute_html += '<label for="' + this_id + '">Audio Enabled</label>';
+
+			device_mute = '<span class="device_mute">' + mute_html + '</span>';
+
+		}
+
+		// 音量バー
+
+		if ( "volume" in mixer_object[key] ) {
+
+			const this_value = mixer_object[key]["volume"];
+
+			let volume_html = '<input type="range" id="' + key + '_v" min="0" max="100" value="' + this_value + '" class="mx_volume" data-name="' + key + '" style="background: linear-gradient(to right, rgb(238, 238, 238) 0%, rgb(238, 238, 238) ' + this_value + '%, rgb(102, 102, 102) ' + this_value + '%, rgb(102, 102, 102) 100%);" />';
+
+			device_volume = '<span class="device_volume">' + volume_html + '</span>';
+
+		}
+
+		mixer_html += '<div class="device_box">';
+		mixer_html += device_name;
+		mixer_html += device_mute;
+		mixer_html += device_volume;
+		mixer_html += '</div>';
+
+	}
+
+	mixer_box.innerHTML = mixer_html;
+
+	// ミキサー内のデバイス操作
+
+	mixer_box.addEventListener("click", async function(event) {
+
+		//console.log(event);
+
+		if ( event.target.classList.contains("mx_mute") ) {
+
+			//console.log("mx_mute");
+			//console.log(event.target.checked);
+			//console.log(event.target.dataset.name);
+
+			let mute_value = "off";
+
+			if ( event.target.checked === true ) {
+				mute_value = "on";
+			}
+
+			const params = new URLSearchParams({
+				name: event.target.dataset.name,
+				value: mute_value,
+				type: "mute"
+			});
+
+			const query_string = new URLSearchParams(params).toString();
+			const set_result = await fnc.fetch_template("../php/mixer_set.php", query_string);
+
+			//console.log(set_result);
+
+		}
+
+		if ( event.target.classList.contains("mx_volume") ) {
+
+			//console.log("mx_volume");
+			//console.log(event.target.value);
+			//console.log(event.target.dataset.name);
+
+			const params = new URLSearchParams({
+				name: event.target.dataset.name,
+				value: event.target.value,
+				type: "volume"
+			});
+
+			const query_string = new URLSearchParams(params).toString();
+			const set_result = await fnc.fetch_template("../php/mixer_set.php", query_string);
+
+			//console.log(set_result);
+
+			if ( set_result.result === "success" ) {
+				const result_volume = set_result.volume;
+				event.target.style.background = "linear-gradient(to right, #eee 0%, #eee " + result_volume + "%, #666 " + result_volume + "%, #666 100%)";
+			}
+
+		}
+
+	});
 
 </script>
 

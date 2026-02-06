@@ -24,6 +24,8 @@ function radio_play($channel, $volume = false, $length = 0) {
 	$player = $settings_object["player"];
 	$player_path = $settings_object["player_path"];
 	$amixer_path = $settings_object["amixer_path"];
+	$playback_device = $settings_object["playback_device"];
+	$playback_options = $settings_object["playback_options"];
 
 	// 監視用ログ
 
@@ -33,13 +35,7 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	shell_exec("pkill " . $player);
 
-	// 2. $volume に値が送られた場合 (cron) は音量変更
-
-	if ( $volume !== false ) {
-		shell_exec($amixer_path . " sset PCM " . $volume . "%");
-	}
-
-	// 3. streamlink + mpv のコマンドをPHP側で組み立てる
+	// 2. streamlink + mpv のコマンドをPHP側で組み立てる
 
 	$exec_command = sprintf(
 		//"sudo -u www-data %s -p %s",
@@ -48,26 +44,64 @@ function radio_play($channel, $volume = false, $length = 0) {
 		escapeshellarg($player_path)
 	);
 
-	// 4. 再生する時間が設定されている場合
+	$args_array = array();
 
-	if ( (int) $length > 0 ) {
-		$exec_command .= " --player-args=" . escapeshellarg("--length=" . $length);
+	// 3-1. プレイヤーの音量調整に必要な socat
+
+	array_push($args_array, "--input-ipc-server=" . PROJECT_ROOT . "/socket/player");
+
+	// 3-2. 再生デバイス
+
+	if ( $playback_device != "" ) {
+		array_push($args_array, "--audio-device='" . $playback_device . "'");
 	}
 
-	// URL + クオリティ
+	// 3-3. $volume に値が送られた場合 (cron) は音量変更
+	// それ以外は保存された音量で再生
+
+	if ( $volume !== false ) {
+		array_push($args_array, "--volume=" . $volume);
+	} else {
+		$saved_volume = file_get_contents(PROJECT_ROOT . "/log/volume.log");// 保存中の音量
+		if ( ! ctype_digit( (string) $val ) ) { $saved_volume = 65; }
+		array_push($args_array, "--volume=" . $saved_volume);
+	}
+
+	// 3-4. 再生オプション
+
+	if ( $playback_options != "" ) {
+		array_push($args_array, trim($playback_options));
+	}
+
+	// 3-5. 再生する時間が設定されている場合
+
+	if ( (int) $length > 0 ) {
+		array_push($args_array, "--length=" . $length);
+	}
+
+	// $args_array 結合
+
+	$args_string = implode(" ", $args_array);
+
+	$exec_command .= " --player-args=\"" . $args_string . "\"";
+
+	// 4. ラジオ局URL
 
 	$url = "http://radiko.jp/#!/live/" . $channel;
+
 	$exec_command .= " " . escapeshellarg($url) . " best";
 
-	// ログ出力 & バックグラウンド
+	// 5. ログ出力 & バックグラウンド
 
 	$exec_command .= " > " . escapeshellarg($log_file) . " 2>&1 &";
 
-	// 5. 実行
+	// 6. 実行
+
+	//echo $exec_command;
 
 	exec($exec_command);
 
-	// 6. ログファイルの確認 (再生成功か失敗かを確認)
+	// 7. ログファイルの確認 (再生成功か失敗かを確認)
 
 	$max_retries = 30;// 最大待機回数
 	$retry = 0;
@@ -82,7 +116,6 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 		$log_content = file_get_contents($log_file);
 
-		//if ( $log_content !== false && stripos($log_content, "waiting") !== false ) {
 		if ($log_content !== false) {
 
 			// Waiting以外のログ確認
@@ -118,6 +151,8 @@ function audio_play($file, $volume = false) {
 	$player = $settings_object["player"];
 	$player_path = $settings_object["player_path"];
 	$amixer_path = $settings_object["amixer_path"];
+	$playback_device = $settings_object["playback_device"];
+	$playback_options = $settings_object["playback_options"];
 
 	// 監視用ログ
 
@@ -127,12 +162,6 @@ function audio_play($file, $volume = false) {
 	// 1. 再生中だった場合はプレイヤーを停止
 
 	shell_exec("pkill " . $player);
-
-	// 2. $volume に値が送られた場合 (cron) は音量変更
-
-	if ( $volume !== false ) {
-		shell_exec($amixer_path . " sset PCM " . $volume . "%");
-	}
 
 	// 3. ファイル名の抽出
 
@@ -144,14 +173,51 @@ function audio_play($file, $volume = false) {
 	// 最後の & を取ると戻り値を受け取れるが、再生終了まで処理中になる。
 	// --no-video は mpv 固有のオプションかもしれないね
 
-	// 4. 再生開始
+	// 4. 再生処理
 
-	exec(
-		$player_path . " --no-video --log-file=" . escapeshellarg($log_file)
-		. " " . escapeshellarg($file)
+	$exec_command = $player_path;
+
+	// ソケット
+
+	$exec_command .= " --input-ipc-server='" . PROJECT_ROOT . "/socket/player'";
+
+	// 再生デバイス
+
+	if ( $playback_device != "" ) {
+		$exec_command .= " --audio-device='" . $playback_device . "'";
+	}
+
+	// 音量: $volume に値が送られた場合 (cron) は音量変更
+	// それ以外は保存された音量で再生
+
+	if ( $volume !== false ) {
+		//shell_exec($amixer_path . " -c 0 -M sset PCM " . $volume . "%");
+		$exec_command .= " --volume='" . $volume . "'";
+	} else {
+		$saved_volume = file_get_contents(PROJECT_ROOT . "/log/volume.log");// 保存中の音量
+		if ( ! ctype_digit( (string) $val ) ) { $saved_volume = 65; }
+		//array_push($args_array, "--volume=" . $saved_volume);
+		$exec_command .= " --volume='" . $saved_volume . "'";
+	}
+
+	// 再生オプション
+
+	if ( $playback_options != "" ) {
+		$exec_command .= " " . trim($playback_options);
+	}
+
+	// ログファイル
+
+	$exec_command .= " --log-file=" . escapeshellarg($log_file) . " " . escapeshellarg($file)
 		. " > /dev/null 2>&1 & echo \"\$! " . escapeshellarg($file_name) . "\" > "
 		. escapeshellarg($audio_log_file)
-	);
+	;
+
+	//echo $exec_command;
+
+	// 再生実行
+
+	exec($exec_command);
 
 	// 5. 待機しながら起動確認
 

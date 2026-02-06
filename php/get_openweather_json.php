@@ -12,23 +12,9 @@
 	$get_json = file_get_contents($get_file);
 	$get_object = json_decode($get_json, true);
 
-	$api_key = "";
-
-	if ( isset($get_object["openweather_api"]) ) {
-		$api_key = $get_object["openweather_api"];
-	}
-
-	$latitude = "";
-
-	if ( isset($get_object["latitude"]) ) {
-		$latitude = $get_object["latitude"];
-	}
-
-	$longitude = "";
-
-	if ( isset($get_object["longitude"]) ) {
-		$longitude = $get_object["longitude"];
-	}
+	$api_key = $get_object["openweather_api"];
+	$latitude = $get_object["latitude"];
+	$longitude = $get_object["longitude"];
 
 	$output = "";// ajaxで返す情報はここへ
 

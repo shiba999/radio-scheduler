@@ -299,7 +299,7 @@
 		const playback_status_object = await arg_fnc.fetch_template("./php/radio_playback_status.php");
 		//const playback_status_object = await playback_status_json.json();
 
-		//console.log(playback_status_object);
+		console.log(playback_status_object);
 
 		// 再生している時としていない場合の表示切替
 

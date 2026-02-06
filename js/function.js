@@ -36,7 +36,7 @@
 
 	// fetch のテンプレート function() の手前に async を付けること
 
-	export async function fetch_template(source, send = "", timeout = 10000) {
+	export async function fetch_template(source, send, timeout = 10000) {
 
 		let result = "";
 
@@ -87,6 +87,7 @@
 				console.error("fetch_template(): The process timed out.");
 				result = "timeout";
 			} else {
+				//console.error("fetch_template(): ", error);
 				console.error("fetch_template(): error");
 				result = "error";
 			}

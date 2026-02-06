@@ -22,10 +22,7 @@
 <body id="controller">
 
 <header>
-
 	<h1>Radio Scheduler</h1>
-	<p>Server IP: <span id="this_ip">***.***.***.***</span></p>
-
 </header>
 
 <section class="card">
@@ -70,6 +67,8 @@
 	<div id="upload">再生に使用したいファイルをこちらへドラッグアンドドロップしてください。(mp3ファイル限定)</div>
 
 </section>
+
+<p class="server_ip">Server IP<br /><span id="this_ip">***.***.***.***</span></p>
 
 <div id="option_open"><span id="option_open_btn">・・・</span></div>
 
@@ -156,6 +155,11 @@
 <div id="message_box" class="fade">
 	<div id="message_bg"></div>
 	<div id="message_display">* message *</div>
+</div>
+
+<div id="audio_box" class="fade">
+	<div id="audio_bg"></div>
+	<div id="audio_display">* audio *</div>
 </div>
 
 <script type="module">
@@ -495,7 +499,7 @@ window.onload = async function() {
 		// エリアID からラジオ局一覧を取得する
 		// チャンネル情報を一緒に取得する
 
-		const stations_object = await mod.fnc.fetch_template("./php/get_list_stations.php");
+		const stations_object = await mod.fnc.fetch_template("./php/get_list_stations.php", "");
 
 		//console.log(stations_object);
 
@@ -591,20 +595,10 @@ window.onload = async function() {
 
 	mod.con.svg_file_display(mod.var);
 
-	// IndexedDB に保存された音量値を呼び出して設定する
-
-	let idb_volume = mod.idb.idb_finding_Values(idb_object, "volume");
-
-	if ( idb_volume == "" ) {
-		idb_volume = 75;
-	}
-
-	mod.con.set_volume(idb_volume, mod.var, mod.fnc, mod.idb);// 音量変更
-
 	// サーバーのIPを取得して表示
 
-	const server_object = await mod.fnc.fetch_template("./php/server.php");
-	mod.var.e.server_ip.innerHTML = server_object.ip;
+	const server_object = await mod.fnc.fetch_template("./php/server.php", "");
+	mod.var.e.server_ip.innerHTML = server_object.ip.replace(" ", "<br />");
 
 	// 時計・天気予報の実行 > この先で天気情報も取得
 	// 初期非表示であっても開始しておく
@@ -614,29 +608,21 @@ window.onload = async function() {
 	// 時計 UI の開閉
 
 	mod.var.e.radio_icon.addEventListener("click", async function() {
-		mod.var.e.cw_box.style.display = "none";// 時計非表示
-		document.body.style.overflow = null;// スクロールバー有効
+		mod.var.e.cw_box.style.display = "none";
 	});
 
 	mod.var.e.watch_open.addEventListener("click", async function() {
-		mod.var.e.cw_box.style.display = "flex";// 時計表示
-		document.body.style.overflow = "hidden";// スクロールバー無効
+		mod.var.e.cw_box.style.display = "flex";
 	});
 
 	// 設定情報で時計が初期表示の場合は時計を開く
 
-	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php");
+	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php", "");
+
+	//console.log(setting_object);
 
 	if ( setting_object.clock_display !== "false" ) {
 		mod.var.e.cw_box.style.display = "flex";
-		document.body.style.overflow = "hidden";// スクロールバー無効
-	}
-
-	// 天気予報関係の情報が揃っていない場合は時計のみの表示に
-
-	if ( setting_object.clock_display !== "false" ) {
-		mod.var.e.cw_box.style.display = "flex";
-		document.body.style.overflow = "hidden";// スクロールバー無効
 	}
 
 	// ***** 処理終了 *****

@@ -1,24 +1,42 @@
 <?php
 
-$settings_json = file_get_contents("../json/settings.json");
-$settings_object = json_decode($settings_json, true);
-$amixer_path = $settings_object["amixer_path"];
+//$socket_path = "unix:///var/www/html/mpvsocket";
+$socket_path = "unix://../socket/player";
 
-if ( $_POST["v"] ) {
-	//$cmd = "amixer sset PCM " . $_POST["v"] . "%";
-	$cmd = $amixer_path . " sset PCM " . $_POST["v"] . "%";
-}
+$saved_volume = (int) $_POST["v"];
+file_put_contents("../log/volume.log", $saved_volume);
 
-$output = shell_exec($cmd);
+$fp = @ stream_socket_client($socket_path, $errno, $errstr, 1); // タイムアウト1秒
 
-if ( preg_match('/\[(\d+)%\]/', $output, $matches) ) {
+if ( $fp && $saved_volume ) {
 
-	$current_volume = $matches[1];// 取得した音量 (0-100)
-	echo $current_volume;
+	$cmd_array = array(
+		"command" => array(
+			"set_property",
+			"volume",
+			$saved_volume
+		)
+	);
+
+	//fwrite($fp, "{\"command\": [\"set_property\", \"volume\", " . $vol . "]}\n");
+	fwrite($fp, json_encode($cmd_array) . "\n");// 音量を取得する命令を送信（最後に必ず \n）
+
+	$response = fgets($fp);// mpv からの返答を 1 行読み込む
+
+	fclose($fp);
+
+	// {"request_id":0,"error":"success"} こんな形式で帰ってくる
+
+	//echo $response;
+	$response_array = json_decode($response, true);
+
+	echo $saved_volume;
 
 } else {
 
-	echo "error";
+	//echo "fp: 接続失敗";
+	//echo "stopped";
+	echo $saved_volume;
 
 }
 

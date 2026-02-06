@@ -1,23 +1,46 @@
 <?php
 
-$settings_json = file_get_contents("../json/settings.json");
-$settings_object = json_decode($settings_json, true);
-$amixer_path = $settings_object["amixer_path"];
+//$socket_path = "unix:///var/www/html/mpvsocket";
+$socket_path = "unix://../socket/player";
 
-// PCM は端末に接続した USB スピーカーの出力先
+$saved_volume = file_get_contents("../log/volume.log");
 
-//$output = shell_exec("amixer -c 0 get PCM 2>&1");
-$output = shell_exec( $amixer_path . " -c 0 get PCM 2>&1" );
-//$user = shell_exec("whoami");
+if ( ! ctype_digit( (string) $val ) ) {
+	$saved_volume = 65;
+}
 
-if ( preg_match('/\[(\d+)%\]/', $output, $matches) ) {
+$fp = @ stream_socket_client($socket_path, $errno, $errstr, 1); // タイムアウト1秒
 
-	$current_volume = $matches[1];// 取得した音量 (0-100)
-	echo $current_volume;
+// プレイヤーが起動していないと音量が取得できないので
+// プレイヤーが動作していない場合は保存された音量を返す
+
+if ($fp) {
+
+	$cmd_array = array(
+		"command" => array("get_property", "volume")
+	);
+
+	fwrite($fp, json_encode($cmd_array) . "\n");// 音量を取得する命令を送信（最後に必ず \n）
+
+	$response = fgets($fp);// mpv からの返答を 1 行読み込む
+	fclose($fp);
+
+	$result = json_decode($response, true);// JSONをパース
+
+	if ( isset($result["data"]) ) {
+		//echo "現在の音量: " . $result["data"] . "%";
+		echo $result["data"];
+	} else {
+		//echo "取得失敗: " . ($result["error"] ?? "unknown error");
+		//echo "failure";
+		echo $saved_volume;
+	}
 
 } else {
 
-	echo "error";
+	//echo "fp: 接続失敗";
+	//echo "stopped";
+	echo $saved_volume;
 
 }
 
