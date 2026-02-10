@@ -37,6 +37,7 @@
 		cw_hour: document.getElementById("cw_hour"),
 		cw_minute: document.getElementById("cw_minute"),
 		cw_second: document.getElementById("cw_second"),
+		cw_weather: document.getElementById("cw_weather"),
 		cw_temp: document.getElementById("cw_temp"),
 		cw_temp_max: document.getElementById("cw_temp_max"),
 		cw_temp_min: document.getElementById("cw_temp_min"),

@@ -134,7 +134,7 @@
 	</span>
 	<span class="cw_clock">
 		<span id="cw_hour">--</span><span class="colon">:</span><span id="cw_minute">--</span><span class="colon portrait">:</span><span id="cw_second" class="portrait">--</span></span>
-	<span class="cw_weather">
+	<span id="cw_weather" style="display: none;"><!-- 未設定なら非表示 -->
 		<span class="temp_set">
 			<span id="cw_temp">---</span><span class="celsius_big">&#8451;</span>
 			<span class="portrait"><br /></span>
@@ -499,7 +499,7 @@ window.onload = async function() {
 		// エリアID からラジオ局一覧を取得する
 		// チャンネル情報を一緒に取得する
 
-		const stations_object = await mod.fnc.fetch_template("./php/get_list_stations.php", "");
+		const stations_object = await mod.fnc.fetch_template("./php/get_list_stations.php");
 
 		//console.log(stations_object);
 
@@ -597,7 +597,7 @@ window.onload = async function() {
 
 	// サーバーのIPを取得して表示
 
-	const server_object = await mod.fnc.fetch_template("./php/server.php", "");
+	const server_object = await mod.fnc.fetch_template("./php/server.php");
 	mod.var.e.server_ip.innerHTML = server_object.ip.replace(" ", "<br />");
 
 	// 時計・天気予報の実行 > この先で天気情報も取得
@@ -616,12 +616,17 @@ window.onload = async function() {
 	});
 
 	// 設定情報で時計が初期表示の場合は時計を開く
+	// openweathermap 関連の情報が設定されているなら該当領域を表示
 
-	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php", "");
+	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php");
 
 	//console.log(setting_object);
 
-	if ( setting_object.clock_display !== "false" ) {
+	if ( setting_object.openweather_api && setting_object.latitude && setting_object.longitude ) {
+		mod.var.e.cw_weather.style.display = "block";
+	}
+
+	if ( setting_object.length > 0 && setting_object.clock_display !== "false" ) {
 		mod.var.e.cw_box.style.display = "flex";
 	}
 

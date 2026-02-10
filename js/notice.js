@@ -43,7 +43,7 @@
 
 			if ( event.target.classList.contains("info_set") ) {
 
-				console.log("info_set");
+				//console.log("info_set");
 
 				// クリック .info_set の子要素を取得
 

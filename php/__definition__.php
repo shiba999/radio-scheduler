@@ -22,6 +22,29 @@
 
 		define( "PROJECT_ROOT", dirname( dirname(__FILE__) ) );
 
+		// WSL専用: 有効な WSLg ソケットを探す関数
+
+		function get_wsl_pulse_server() {
+
+			$default_path = "/mnt/wslg/PulseServer";
+
+			// もしファイルが存在し、書き込み（通信）可能であればそのパスを返す
+
+			if ( file_exists($default_path) ) {
+				return "unix:" . $default_path;
+			}
+
+			// 将来的に他の場所（例：ユーザーごとのランタイムディレクトリ）に変わった場合への備え
+			// glob('/run/user/*/pulse/native') などで検索するロジックも追加可能
+
+			return null;
+
+		}
+
+		$pulse_path = get_wsl_pulse_server();
+
+		define( "AUDIO_ENV", $pulse_path ? "PULSE_SERVER=" . $pulse_path . " " : "" );
+
 	}
 
 ?>

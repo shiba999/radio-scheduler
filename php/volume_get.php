@@ -5,7 +5,7 @@ $socket_path = "unix://../socket/player";
 
 $saved_volume = file_get_contents("../log/volume.log");
 
-if ( ! ctype_digit( (string) $val ) ) {
+if ( ! ctype_digit( (string) $saved_volume ) ) {
 	$saved_volume = 65;
 }
 

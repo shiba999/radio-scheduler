@@ -8,6 +8,10 @@ header("Content-Type: application/json; charset=UTF-8");// json を受け取る�
 $setting_file = "../json/settings.json";
 $setting_json = file_get_contents($setting_file);
 
+if ( $setting_json == "" ) {
+	$setting_json = json_encode(array());
+}
+
 echo $setting_json;
 
 ?>

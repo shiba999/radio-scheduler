@@ -21,46 +21,50 @@
 
 	export async function get_openweather(arg_var, arg_fnc) {
 
-		const ow_object = await arg_fnc.fetch_template("./php/get_openweather_json.php", "");
+		const ow_object = await arg_fnc.fetch_template("./php/get_openweather_json.php");
 
 		//console.log(ow_object);
 
-		const temp_set = ow_object.main;
-		const weather = ow_object.weather[0];
-		const wind = ow_object.wind;
+		if ( ow_object.update != "error" )	{
 
-		const temp = kelvin_to_celsius(temp_set.temp);// 気温
-		const temp_max = kelvin_to_celsius(temp_set.temp_max);// 最高気温
-		const temp_min = kelvin_to_celsius(temp_set.temp_min);// 最低気温
-		const humidity = temp.humidity;// 「外気」の湿度 (%)
-		//const pop = owm.pop;// 降水確率 (%)
-		const weather_name = ow_object.name;// 取得位置
-		const wind_speed = wind.speed;// 風速 (m/s)
-		const wind_deg = wind.deg;// 風向 (度)
+			const temp_set = ow_object.main;
+			const weather = ow_object.weather[0];
+			const wind = ow_object.wind;
 
-		let weather_html = "";
+			const temp = kelvin_to_celsius(temp_set.temp);// 気温
+			const temp_max = kelvin_to_celsius(temp_set.temp_max);// 最高気温
+			const temp_min = kelvin_to_celsius(temp_set.temp_min);// 最低気温
+			const humidity = temp.humidity;// 「外気」の湿度 (%)
+			//const pop = owm.pop;// 降水確率 (%)
+			const weather_name = ow_object.name;// 取得位置
+			const wind_speed = wind.speed;// 風速 (m/s)
+			const wind_deg = wind.deg;// 風向 (度)
 
-		// 風速: 小数点一位でラウンド
+			let weather_html = "";
 
-		const wind_speed_fix = Math.round( wind.speed * 10 ) / 10;
+			// 風速: 小数点一位でラウンド
 
-		//console.log(ow_object);
-		console.log(
-			"[openweather] " + ow_object.datetime + ": " + weather.description
-			+ " (" + ow_object.cod + ") " + ow_object.update
-		);
+			const wind_speed_fix = Math.round( wind.speed * 10 ) / 10;
 
-		// 各値を表示
+			//console.log(ow_object);
+			console.log(
+				"[openweather] " + ow_object.datetime + ": " + weather.description
+				+ " (" + ow_object.cod + ") " + ow_object.update
+			);
 
-		arg_var.e.cw_temp.innerHTML = temp;
-		arg_var.e.cw_temp_max.innerHTML = temp_max;
-		arg_var.e.cw_temp_min.innerHTML = temp_min;
-		arg_var.e.cw_icon.style.backgroundImage = "url(https://openweathermap.org/img/wn/" + weather.icon + "@4x.png)";
-		arg_var.e.cw_description.innerHTML = weather.description;
-		arg_var.e.cw_position.innerHTML = weather_name;
-		arg_var.e.cw_wind_deg.innerHTML = deg_to_direction( Number(wind_deg) );
-		arg_var.e.cw_wind_deg.title = Number(wind_deg);
-		arg_var.e.cw_wind_speed.innerHTML = wind_speed_fix;
+			// 各値を表示
+
+			arg_var.e.cw_temp.innerHTML = temp;
+			arg_var.e.cw_temp_max.innerHTML = temp_max;
+			arg_var.e.cw_temp_min.innerHTML = temp_min;
+			arg_var.e.cw_icon.style.backgroundImage = "url(https://openweathermap.org/img/wn/" + weather.icon + "@4x.png)";
+			arg_var.e.cw_description.innerHTML = weather.description;
+			arg_var.e.cw_position.innerHTML = weather_name;
+			arg_var.e.cw_wind_deg.innerHTML = deg_to_direction( Number(wind_deg) );
+			arg_var.e.cw_wind_deg.title = Number(wind_deg);
+			arg_var.e.cw_wind_speed.innerHTML = wind_speed_fix;
+
+		}
 
 	}
 

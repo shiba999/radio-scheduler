@@ -1,5 +1,10 @@
 <?php
 
+// WSL 環境対策
+// WSL なら変数を定義 : そうでなければ「空文字」
+
+//define("AUDIO_ENV", file_exists("/mnt/wslg/PulseServer") ? "PULSE_SERVER=unix:/mnt/wslg/PulseServer " : "");
+
 // 設定ファイル読み込み関数
 
 function get_settings() {
@@ -37,12 +42,16 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	// 2. streamlink + mpv のコマンドをPHP側で組み立てる
 
-	$exec_command = sprintf(
+/*	$exec_command = sprintf(
 		//"sudo -u www-data %s -p %s",
 		"%s -p %s",
 		escapeshellarg($streamlink),
 		escapeshellarg($player_path)
-	);
+	);*/
+
+	// AUDIO_ENV は WSL 用の定数 ( WSL以外なら空欄 )
+
+	$exec_command = AUDIO_ENV . escapeshellarg($streamlink) . " -p " . escapeshellarg($player_path);
 
 	$args_array = array();
 
@@ -171,11 +180,12 @@ function audio_play($file, $volume = false) {
 
 	// 最後に & があると即時バックグラウンド実行されるので戻り値は貰えない。
 	// 最後の & を取ると戻り値を受け取れるが、再生終了まで処理中になる。
-	// --no-video は mpv 固有のオプションかもしれないね
 
 	// 4. 再生処理
 
-	$exec_command = $player_path;
+	// AUDIO_ENV は WSL 用の定数 ( WSL以外なら空欄 )
+
+	$exec_command = AUDIO_ENV . $player_path;
 
 	// ソケット
 

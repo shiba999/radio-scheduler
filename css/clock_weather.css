@@ -169,7 +169,7 @@
 
 /* 天気予報一式 */
 
-.cw_weather {
+#cw_weather {
 	display: flex;
 	justify-content: space-between;
 	align-items: stretch;
@@ -178,7 +178,7 @@
 
 /* 位置調整 */
 
-.cw_weather span {
+#cw_weather span {
 	flex: 1;
 }
 
@@ -364,7 +364,7 @@
 		margin: 0 2vw 3vw 2vw;
 	}
 
-	.cw_weather {
+	#cw_weather {
 		display: initial;
 		justify-content: initial;
 		align-items: initial;

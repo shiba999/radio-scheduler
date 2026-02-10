@@ -212,13 +212,23 @@
 
 	// デバイス用 html を生成
 
-	let audio_device_select = '<option value="">音声再生に使用したいデバイスを選択してください</option>';
+	if ( audio_device_object ) {
 
-	for ( let n = 0; n < audio_device_object.length; n++ ) {
-		audio_device_select += '<option value="' + audio_device_object[n]["value"] + '">' + audio_device_object[n]["label"] + '</option>';
+		let audio_device_select = '<option value="">音声再生に使用したいデバイスを選択してください</option>';
+
+		for ( let n = 0; n < audio_device_object.length; n++ ) {
+			audio_device_select += '<option value="' + audio_device_object[n]["value"] + '">' + audio_device_object[n]["label"] + '</option>';
+		}
+
+		playback_device.innerHTML = audio_device_select;
+
+	} else {
+
+		playback_device.innerHTML = '<option value="">音声デバイスを取得できませんでした。</option>';
+
 	}
 
-	playback_device.innerHTML = audio_device_select;
+
 
 	// 現在保存中の設定情報を取得してフォーム項目に反映
 
@@ -226,7 +236,7 @@
 
 		const setting_object = await fnc.fetch_template("../php/setting_get.php", "");
 
-		console.log(setting_object);
+		//console.log(setting_object);
 
 		if (setting_object.streamlink_path) {
 			streamlink_path.value = setting_object.streamlink_path;
@@ -603,6 +613,10 @@
 	//console.log(mixer_object);
 
 	let mixer_html = "";
+
+	if ( mixer_object.length === 0 ) {
+		mixer_html = "<p>音声デバイスを取得できませんでした。</p>";
+	}
 
 	for ( let key in mixer_object ) {
 
