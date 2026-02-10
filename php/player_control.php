@@ -72,7 +72,7 @@ function radio_play($channel, $volume = false, $length = 0) {
 		array_push($args_array, "--volume=" . $volume);
 	} else {
 		$saved_volume = file_get_contents(PROJECT_ROOT . "/log/volume.log");// 保存中の音量
-		if ( ! ctype_digit( (string) $val ) ) { $saved_volume = 65; }
+		if ( ! ctype_digit( (string) $saved_volume ) ) { $saved_volume = 65; }
 		array_push($args_array, "--volume=" . $saved_volume);
 	}
 
@@ -205,7 +205,7 @@ function audio_play($file, $volume = false) {
 		$exec_command .= " --volume='" . $volume . "'";
 	} else {
 		$saved_volume = file_get_contents(PROJECT_ROOT . "/log/volume.log");// 保存中の音量
-		if ( ! ctype_digit( (string) $val ) ) { $saved_volume = 65; }
+		if ( ! ctype_digit( (string) $saved_volume ) ) { $saved_volume = 65; }
 		//array_push($args_array, "--volume=" . $saved_volume);
 		$exec_command .= " --volume='" . $saved_volume . "'";
 	}
