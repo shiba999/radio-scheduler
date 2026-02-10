@@ -495,36 +495,139 @@ button, .station a {
 }
 
 #message_box,
-#audio_display {
+#audio_box {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-#audio_box,
-#audio_bg,
-#audio_display {
-	z-index: 100;
-}
-
-#message_box,
 #message_bg,
-#message_bg {
-	z-index: 101;
-}
-
-#message_bg {
+#audio_bg {
 	background-color: rgba(0, 0, 0, 0.68);
-	z-index: 101;
 }
 
-#message_display {
-	z-index: 102;
+#message_display,
+#audio_display {
+	box-sizing: border-box;
+	border: solid #ccc 5px;
 	background-color: #eee;
 	color: #111;
 	display: inline-block;
-	padding: 1.0em 1.5em;
+	padding: 1.2em;
 	border-radius: 5px;
+}
+
+#audio_box {
+	z-index: 100;
+}
+
+#audio_bg {
+	z-index: 101;
+}
+
+#audio_display {
+	z-index: 102;
+}
+
+#message_box {
+	z-index: 105;
+}
+
+#message_bg {
+	z-index: 106;
+}
+
+#message_display {
+	z-index: 107;
+}
+
+/* 一時的に表示 */
+
+#audio_box {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+/* audio_box UI */
+
+#audio_display {
+	width: 90%;
+	max-width: 480px;
+}
+
+#ab_name,
+.ad_bar,
+.ad_tools,
+#ad_bar_bg,
+#ad_bar_value,
+.ad_tools {
+	display: inline-block;
+	width: 100% !important;
+}
+
+#ab_name {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.ad_bar {
+	height: 16px;
+}
+
+#ad_bar_bg,
+#ad_bar_value {
+	height: 10px;
+}
+
+.ad_bar {
+	position: relative;
+	box-sizing: border-box;
+	margin: 5px 0;
+	border: solid #ddd 3px;
+	border-radius: 2px;
+}
+
+#ad_bar_bg,
+#ad_bar_value {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+#ad_bar_bg {
+	background: #ccc;
+}
+
+#ad_bar_value {
+	background: #666;
+}
+
+#ab_time_num {
+	font-size: 90%;
+	font-weight: bold;
+	color: #555;
+}
+
+.ad_tools {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#ab_pause,
+#ab_stop {
+	box-sizing: border-box;
+	width: 34px;
+	height: 34px;
+	line-height: 28px;
+	font-size: 20px;
+	border: solid #ddd 3px;
+	background: #666;
+	color: #eee;
+	border-radius: 3px;
+	cursor: pointer;
 }
 
 /* フェード効果 */
