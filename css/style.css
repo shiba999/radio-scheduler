@@ -513,7 +513,7 @@ button, .station a {
 	background-color: #eee;
 	color: #111;
 	display: inline-block;
-	padding: 1.2em;
+	padding: 1.0em;
 	border-radius: 5px;
 }
 
@@ -543,10 +543,10 @@ button, .station a {
 
 /* 一時的に表示 */
 
-#audio_box {
+/*#audio_box {
 	opacity: 1;
 	pointer-events: auto;
-}
+}*/
 
 /* audio_box UI */
 
@@ -562,7 +562,8 @@ button, .station a {
 #ad_bar_value,
 .ad_tools {
 	display: inline-block;
-	width: 100% !important;
+	/*width: 100% !important;*/
+	width: 100%;
 }
 
 #ab_name {
@@ -630,12 +631,21 @@ button, .station a {
 	cursor: pointer;
 }
 
+#ab_pause svg,
+#ab_stop svg {
+	display: inline-block;
+	fill: #eee;
+	width: 12px;
+	height: 12px;
+	margin: auto;
+}
+
 /* フェード効果 */
 
 .fade {
 	opacity: 0;
 	pointer-events: none;/* 透明時はクリック不可 */
-	transition: opacity 0.5s;/* アニメーション時間 */
+	transition: opacity 0.3s;/* アニメーション時間 */
 }
 
 .fade.is-visible {
@@ -776,7 +786,8 @@ input[type="button"] {
 /* スケジュール追加ボタン */
 
 #add_button {
-	font-size: 72%;
+	font-size: 78%;
+	padding: 1.0em 2.0em;
 	margin: 10px !important;
 }
 

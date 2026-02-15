@@ -11,7 +11,7 @@ $check_array = array(
 	"../log/radio.log",
 	"../log/player.log",
 	"../log/volume.log",
-	"../log/audio.log",
+	//"../log/audio.log",
 	"../log/reboot.log",
 	"../log/cron.log",
 	"../json/schedule.json",

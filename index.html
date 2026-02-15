@@ -159,7 +159,18 @@
 
 <div id="audio_box" class="fade">
 	<div id="audio_bg"></div>
-	<div id="audio_display">* audio *</div>
+	<div id="audio_display">
+		<span id="ab_name">audio file name</span>
+		<span class="ad_bar">
+			<span id="ad_bar_bg"></span>
+			<span id="ad_bar_value"></span>
+		</span>
+		<span class="ad_tools">
+			<span id="ab_pause"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 85.87 79.37"><rect y="0" width="31.18" height="79.37"/><rect x="54.69" y="0" width="31.18" height="79.37"/></svg></span>
+			<span id="ab_time_num">00:00 / 00:00</span>
+			<span id="ab_stop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 85.87 79.37"><rect x="3.25" y="0" width="79.37" height="79.37"/></svg></span>
+		</span>
+	</div><!-- 再生 (Play) &#9654; , 一時停止 (Pause) &#9208 , 停止 (Stop) &#9209 -->
 </div>
 
 <script type="module">
@@ -210,7 +221,7 @@ async function get_cache_version( max_retries = 30, func = function(v){} ) {
 			if ( func ) func( "サーバー応答確認中です (" + attempt + "s)" );// 引数に関数が入っていればそちらで出力する
 
 			if ( attempt < max_retries ) {
-				await new Promise( resolve => setTimeout(resolve, 1000) ); // 1秒待機
+				await new Promise( resolve => setTimeout(resolve, 1000) );// 1秒待機
 			} else {
 				return {result: false, version: "取得失敗"};
 			}
@@ -551,13 +562,28 @@ window.onload = async function() {
 	// 処理 6 * * * * * * * * * * * * * * * * * * * *
 	// 現在再生中か・どの局を再生中かを確認する
 
-	await mod.con.radio_status_check(mod.var, mod.fnc);
+	//await mod.con.radio_status_check(mod.var, mod.fnc);
 
 	// 処理 7 * * * * * * * * * * * * * * * * * * * *
 	// 音声ファイルが再生中か監視開始
+	// ラジオ再生中なら radio , ファイル再生中なら file , 何も再生していない場合は false
 
-	mod.aud.check_audio(mod.var, mod.fnc);
-	mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );
+	//mod.aud.check_audio(mod.var, mod.fnc);
+	//mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );
+	const this_audio_type = await mod.aud.check_player(mod.var, mod.fnc);
+
+	//console.log(this_audio_type);
+
+	if ( this_audio_type.type == "file" ) {
+		mod.aud.check_audio(mod.var, mod.fnc);
+		mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 1000, mod.var, mod.fnc) );
+	} else if ( this_audio_type.type == "radio" ) {
+		mod.con.show_playing_info(this_audio_type.file, mod.var);
+	}
+
+	if ( this_audio_type.type != "radio" ) {
+		mod.con.init_play_info(mod.var);
+	}
 
 	// 処理 8 * * * * * * * * * * * * * * * * * * * *
 	// 地域ID からお知らせ情報を取得する
@@ -636,9 +662,11 @@ window.onload = async function() {
 
 	window.addEventListener("pageshow", async function(event) {
 
+		console.log("pageshow");
+
 		mod.con.get_volume(mod.var, mod.fnc);// 音量取得
-		mod.aud.check_audio(mod.var, mod.fnc);// 音声ファイル監視
-		mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );// 音声ファイル監視
+		//mod.aud.check_audio(mod.var, mod.fnc);// 音声ファイル監視
+		//mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );// 音声ファイル監視
 
 	});
 

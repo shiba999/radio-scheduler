@@ -50,8 +50,9 @@ function radio_play($channel, $volume = false, $length = 0) {
 	);*/
 
 	// AUDIO_ENV は WSL 用の定数 ( WSL以外なら空欄 )
+	// --retry-streams 10 --retry-open 10 はストリーム切断時の保険的再接続オプション
 
-	$exec_command = AUDIO_ENV . escapeshellarg($streamlink) . " -p " . escapeshellarg($player_path);
+	$exec_command = AUDIO_ENV . escapeshellarg($streamlink) . " --retry-streams 10 --retry-open 10 -p " . escapeshellarg($player_path);
 
 	$args_array = array();
 
@@ -110,7 +111,11 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	exec($exec_command);
 
-	// 7. ログファイルの確認 (再生成功か失敗かを確認)
+	$return_array = array();
+
+	// プレイヤーの起動確認は Socket を使用することにしてみた。
+
+/*	// 7. ログファイルの確認 (再生成功か失敗かを確認)
 
 	$max_retries = 30;// 最大待機回数
 	$retry = 0;
@@ -144,7 +149,7 @@ function radio_play($channel, $volume = false, $length = 0) {
 	}
 
 	$return_array["retry"] = $retry;
-	$return_array["log"] = $log_content;
+	$return_array["log"] = $log_content;*/
 
 	echo json_encode($return_array);
 
@@ -166,7 +171,7 @@ function audio_play($file, $volume = false) {
 	// 監視用ログ
 
 	$log_file = PROJECT_ROOT . "/log/player.log";
-	$audio_log_file = PROJECT_ROOT . "/log/audio.log";
+	//$audio_log_file = PROJECT_ROOT . "/log/audio.log";
 
 	// 1. 再生中だった場合はプレイヤーを停止
 
@@ -218,10 +223,12 @@ function audio_play($file, $volume = false) {
 
 	// ログファイル
 
-	$exec_command .= " --log-file=" . escapeshellarg($log_file) . " " . escapeshellarg($file)
+	$exec_command .= " --log-file=" . escapeshellarg($log_file) . " " . escapeshellarg($file) . " > /dev/null 2>&1 &";
+
+/*	$exec_command .= " --log-file=" . escapeshellarg($log_file) . " " . escapeshellarg($file)
 		. " > /dev/null 2>&1 & echo \"\$! " . escapeshellarg($file_name) . "\" > "
 		. escapeshellarg($audio_log_file)
-	;
+	;*/
 
 	//echo $exec_command;
 
@@ -229,7 +236,11 @@ function audio_play($file, $volume = false) {
 
 	exec($exec_command);
 
-	// 5. 待機しながら起動確認
+	$status = "exec";
+
+	// プレイヤーの起動確認は Socket を使用することにしてみた。
+
+/*	// 5. 待機しながら起動確認
 
 	$situation = "stopped";
 	$max_attempts = 25;// 最大試行回数
@@ -264,7 +275,7 @@ function audio_play($file, $volume = false) {
 
 	if ( $status !== "playing" ) {
 		$status = "error";// プロセスが立ち上がらなかった場合
-	}
+	}*/
 
 	echo $status;
 
@@ -279,8 +290,8 @@ function player_kill($echo = true) {
 
 	// 監視用ログ
 
-	$log_file = PROJECT_ROOT . "/log/radio.log";
-	$audio_log_file = PROJECT_ROOT . "/log/audio.log";
+	//$log_file = PROJECT_ROOT . "/log/radio.log";
+	//$audio_log_file = PROJECT_ROOT . "/log/audio.log";
 
 	// 1. プレイヤーを停止
 
@@ -290,7 +301,11 @@ function player_kill($echo = true) {
 		$return_var
 	);
 
-	// 2. プレイヤーが完全に止まるまで短い間隔で確認
+	echo "exec";
+
+	// プレイヤーの停止判断は Socket を使用することにしてみた。
+
+/*	// 2. プレイヤーが完全に止まるまで短い間隔で確認
 
 	$situation = "running";
 	$max_attempts = 25;// 最大試行回数
@@ -338,7 +353,7 @@ function player_kill($echo = true) {
 
 	if ( $echo === true ) {
 		echo $situation;
-	}
+	}*/
 
 }
 
