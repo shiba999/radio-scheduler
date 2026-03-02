@@ -83,22 +83,40 @@
 
 		console.log(result);
 
-		// 再生状況の確認
+		// 停止されたかの確認 (少しづつ待機しながら確認)
 
-		const send_params_result = {
-			type: "get",
-			property: "media-title",
-			id: 1
-		};
+		let count = 1;
+		let stop_flag = false;
 
-		const query_string_result = new URLSearchParams(send_params_result).toString();
-		const result_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_result);
+		for ( let n = 0; n < 20; n++ ) {
 
-		console.log(result_array);
+			await arg_fnc.js_sleep(500);// 少し待機
+
+			// Socket でプレイヤーが起動しているか確認
+
+			const send_params_result = {
+				type: "get",
+				property: "media-title",
+				id: 1
+			};
+
+			const query_string_result = new URLSearchParams(send_params_result).toString();
+			const result_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_result);
+
+			console.log(result_array);
+
+			if ( result_array.error === "not_working" ) {
+				stop_flag = true;
+				break;
+			}
+
+			count++;
+
+		}
 
 		let result_value = false;
 
-		if ( result_array.error == "timeout" ) {
+		if ( stop_flag === true ) {
 
 			init_play_info(arg_val);// 停止に伴う表示の初期化
 
@@ -107,8 +125,6 @@
 			result_value = true;
 
 		} else {
-
-			// 停止できなかった場合
 
 			console.log("[!] Stop failed...");
 
@@ -116,46 +132,6 @@
 			//init_play_info(arg_val);// 表示の初期化
 
 		}
-
-/*		if ( result_array.error == "success" ) {
-
-			// 再生情報をフッターや一覧にも反映
-
-			show_playing_info(this_ch_id, arg_val);
-
-			// 再生しているメッセージを表示し、少し待ってからメッセージ非表示させる。
-
-			arg_fnc.msg_fade_in("只今再生中です ( Channel ID: " + channel + " )");
-			await arg_fnc.js_sleep(3000);
-			arg_fnc.msg_fade_out();
-
-		} else {
-
-			arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " )");
-			init_play_info(arg_val);// 表示の初期化
-
-		}*/
-
-/*		let result_value = false;
-
-		if ( result == "stopped" ) {
-
-			init_play_info(arg_val);// 停止に伴う表示の初期化
-
-			console.log("Stopped successfully");
-
-			result_value = true;
-
-		} else {
-
-			// 停止できなかった場合
-
-			console.log("[!] Stop failed...");
-
-			arg_fnc.msg_fade_in("停止に失敗しました");
-			//init_play_info(arg_val);// 表示の初期化
-
-		}*/
 
 		return result_value;
 
@@ -277,7 +253,7 @@
 			let count = 1;
 			let success_flag = false;
 
-			for ( let n = 0; n < 10; n++ ) {
+			for ( let n = 0; n < 30; n++ ) {
 
 				await arg_fnc.js_sleep(500);// 少し待機
 
@@ -303,20 +279,6 @@
 
 			}
 
-/*			// 再生状況の確認
-
-			const send_params_result = {
-				type: "get",
-				property: "media-title",
-				id: 1
-			};
-
-			const query_string_result = new URLSearchParams(send_params_result).toString();
-			const result_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_result);
-
-			console.log(result_array);*/
-
-			//if ( result_array.error == "success" ) {
 			if ( success_flag === true ) {
 
 				// 再生情報をフッターや一覧にも反映
@@ -335,31 +297,6 @@
 				init_play_info(arg_val);// 表示の初期化
 
 			}
-
-			// object.result > success なら再生成功
-
-/*			if ( object.result == "success" ) {
-
-				// 再生結果に伴う表示切り替え処理
-
-				const this_channel = object.channel;
-
-				// 再生情報をフッターや一覧にも反映
-
-				show_playing_info(this_ch_id, arg_val);
-
-				// 再生しているメッセージを表示し、少し待ってからメッセージ非表示させる。
-
-				arg_fnc.msg_fade_in("只今再生中です ( Channel ID: " + this_ch_id + " )");
-				await arg_fnc.js_sleep(3000);
-				arg_fnc.msg_fade_out();
-
-			} else {
-
-				arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " )");
-				init_play_info(arg_val);// 表示の初期化
-
-			}*/
 
 		}
 

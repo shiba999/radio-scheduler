@@ -131,7 +131,7 @@
 
 		// duration: ストリームなら 0.000 , mp3 なら音声の長さが返される
 
-		const send_params_duration = {
+/*		const send_params_duration = {
 			type: "get",
 			property: "duration",
 			id: 2
@@ -140,7 +140,7 @@
 		const query_string_duration = new URLSearchParams(send_params_duration).toString();
 		const duration_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_duration);
 
-		//console.log(duration_array);
+		console.log(duration_array);*/
 
 		// filename: ストリームなら - , mp3 ならファイル名が返される
 
@@ -159,7 +159,8 @@
 
 		let audio_type;
 
-		if ( ! title_array.data.includes("http") || filename_array.data.includes(".mp3") || Number(duration_array.data) > 0 ) {
+		//if ( ! title_array.data.includes("http") || filename_array.data.includes(".mp3") || Number(duration_array.data) > 0 ) {
+		if ( ! title_array.data.includes("http") || filename_array.data.includes(".mp3") ) {
 
 			audio_type = "file";
 			player_info.filename = title_array.data;// ファイル名保存

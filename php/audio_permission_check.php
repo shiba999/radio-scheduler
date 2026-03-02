@@ -65,10 +65,11 @@ if ( $playback_device != "" ) {
 	$exec_command .= " --audio-device='" . $playback_device . "'";
 }
 
-// 音量
+// 音量 (テスト再生時は音量は行って数以上の方が良いかもしれない)
 
 $saved_volume = file_get_contents(PROJECT_ROOT . "/log/volume.log");// 保存中の音量
-if ( ! ctype_digit( (string) $saved_volume ) ) { $saved_volume = 65; }
+if ( ! ctype_digit( (string) $saved_volume ) ) { $saved_volume = 85; }// 保存中の音量が存在しない場合は 65
+if ( (int) $saved_volume < 85 ) { $saved_volume = 85; }// 音量が 85 未満の場合は 85 に設定
 //array_push($args_array, "--volume=" . $saved_volume);
 $exec_command .= " --volume='" . $saved_volume . "'";
 

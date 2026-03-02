@@ -17,6 +17,7 @@
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<meta name="apple-mobile-web-app-title" content="ラジオの操作・予約再生が可能なアプリ「らぢ助 (Radio Scheduler)」です。" />
+	<meta name="google" content="notranslate" />
 </head>
 
 <body id="controller">
@@ -134,7 +135,7 @@
 	</span>
 	<span class="cw_clock">
 		<span id="cw_hour">--</span><span class="colon">:</span><span id="cw_minute">--</span><span class="colon portrait">:</span><span id="cw_second" class="portrait">--</span></span>
-	<span id="cw_weather" style="display: none;"><!-- 未設定なら非表示 -->
+	<span id="cw_weather"><!-- 未設定なら非表示 style="display: none;" -->
 		<span class="temp_set">
 			<span id="cw_temp">---</span><span class="celsius_big">&#8451;</span>
 			<span class="portrait"><br /></span>
@@ -408,6 +409,8 @@ window.onload = async function() {
 
 	const fetch_cv_result = await get_cache_version(15);
 
+	//console.log(fetch_cv_result);
+
 	// バージョンを取得できない場合はタイムアウト表示
 
 	if ( fetch_cv_result.result === true ) {
@@ -423,25 +426,30 @@ window.onload = async function() {
 	// 処理 2 * * * * * * * * * * * * * * * * * * * *
 	// indexedDB から現在のキャッシュバージョンを取得
 
-	const idb_cv_result = await load_idb_cache_version();
+	//const idb_cv_result = await load_idb_cache_version();
 
-	console.log("fetch: " + mod.cv + " , indexedDB: " + idb_cv_result);
+	//console.log(idb_cv_result);
+
+	//console.log("fetch: " + mod.cv + " , indexedDB: " + idb_cv_result);
 
 	// 使用するモジュールをインポートする (仮インポートのシチュエーションあり)
 
-	await load_import_module(idb_cv_result, "load 1");
+	//await load_import_module(idb_cv_result, "load 1");
+	await load_import_module(mod.cv, "load 1");
 
 	// 読込時のバージョンを保存しておく
 	// サービスワーカー更新時にバージョンが変わったことを
 	// 判断させるために使用する (現在使用していない)
 
-	const starting_version = mod.cv;
+	//const starting_version = mod.cv;
 
 	// IndexedDB から保存情報の確認
 
 	const idb_object = await mod.idb.get_idb_object();
 
 	// 受け取った IndexedDB の値を収納
+
+	//console.log(idb_object);
 
 	mod.var.v.region = mod.idb.idb_finding_Values(idb_object, "id");
 	mod.var.v.channels = mod.idb.idb_finding_Values(idb_object, "stations");
@@ -454,27 +462,35 @@ window.onload = async function() {
 
 	// 処理 3 * * * * * * * * * * * * * * * * * * * *
 
-	// サービスワーカーインストールでキャッシュを保存
+	// ### サービスワーカーは設定ページで任意インストールする様に変更 ###
+	// サービスワーカーが既にインストールされている場合は再読み込みを行う
+	// バージョンの更新があった場合はメッセージを受信する
 	// ?cv= でサービスワーカーへバージョンを渡す
 
 	if ("serviceWorker" in navigator) {
 
-		// サービスワーカーから受信するメッセージ用イベントの登録
+		const registration = await navigator.serviceWorker.getRegistration();
 
-		navigator.serviceWorker.addEventListener("message", function (event) {
-			serviceworker_Message_processing(event);
-		});
+		if ( registration ) {
 
-		// サービスワーカーの登録開始
+			// サービスワーカーから受信するメッセージ用イベントの登録
 
-		navigator.serviceWorker.register(
-			"./sw.js?cv=" + mod.cv,
-			{scope: "./", type: "module"}
-		).then(function(registration) {
-			console.log("ServiceWorker を登録しました: [scope] ", registration.scope);
-		}).catch(function(error) {
-			console.log("ServiceWorker の登録に失敗しました: ", error);
-		});
+			navigator.serviceWorker.addEventListener("message", function (event) {
+				serviceworker_Message_processing(event);
+			});
+
+			// サービスワーカーの登録開始
+
+			navigator.serviceWorker.register(
+				"./sw.js?cv=" + mod.cv,
+				{scope: "./", type: "module"}
+			).then(function(registration) {
+				console.log("ServiceWorker を登録しました: [scope] ", registration.scope);
+			}).catch(function(error) {
+				console.log("ServiceWorker の登録に失敗しました: ", error);
+			});
+
+		}
 
 	}
 
@@ -649,11 +665,13 @@ window.onload = async function() {
 	//console.log(setting_object);
 
 	if ( setting_object.openweather_api && setting_object.latitude && setting_object.longitude ) {
-		mod.var.e.cw_weather.style.display = "block";
+		//mod.var.e.cw_weather.style.display = "flex";// block ではなく flex
+	} else {
+		mod.var.e.cw_box.classList.add("weather_hidden");// 日付・天気予報 > class 追加 > 天気予報非表示
 	}
 
-	if ( setting_object.length > 0 && setting_object.clock_display !== "false" ) {
-		mod.var.e.cw_box.style.display = "flex";
+	if ( Object.keys(setting_object).length > 0 && setting_object.clock_display === "true" ) {
+		mod.var.e.cw_box.style.display = "flex";// 日付・天気予報 > 表示
 	}
 
 	// ***** 処理終了 *****

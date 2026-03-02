@@ -23,7 +23,7 @@
 
 	// [ indexedDB関係 ] ------------------------------------------
 
-	import * as idb from "./js/indexeddb.js";
+	//import * as idb from "./js/indexeddb.js";
 
 	// インストールイベント：必要なリソースをキャッシュ
 
@@ -40,7 +40,7 @@
 
 			// バージョンの保存
 
-			await idb.update_indexeddb("version", CACHE_VERSION);
+			//await idb.update_indexeddb("version", CACHE_VERSION);
 
 			// 強制的に更新
 

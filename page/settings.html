@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="../css/style.css" type="text/css" />
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 	<title>らぢ助 - Radio Scheduler -</title>
+	<link rel="manifest" href="../manifest.json" />
 </head>
 
 <body class="note">
@@ -119,11 +120,11 @@
 
 	<p>PWAでホーム画面に登録させたい場合は、<a href="../manifest.json" target="_blank">マニフェストファイル</a>の内容を編集し、SSLを発行・設定を行った状態で https からアクセスしてください。※自己署名証明書でも不完全ですがPWAは動作します。</p>
 	<p id="https_href">https href</p>
+	<p id="sw_output" class="cron_path">こちらでサービスワーカー関係の登録解除が可能です。</p>
 	<p>
-		<button id="sw_btn_status">状態確認</button>
-		<button id="sw_btn_reset">ServiceWorker解除 / キャッシュ削除</button>
+		<button id="sw_btn_install">ServiceWorker インストール</button>
+		<button id="sw_btn_reset">ServiceWorker 解除</button>
 	</p>
-	<p id="sw_btn_output">こちらでサービスワーカー関係の登録解除が可能です。</p>
 
 </section>
 
@@ -153,6 +154,8 @@
 
 	//console.log(window.location);
 
+	// フォームで使用する関数 > マルチバイトが含まれていないか確認する関数
+
 	function validate_input(value) {
 
 		// 1) マルチバイト（ASCII以外）チェック
@@ -175,6 +178,10 @@
 		};
 
 	}
+
+	// * * * * * * * * * * * * * * * * * * * * * *
+	// 処理開始
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	const set_form = document.getElementById("set_form");
 	const streamlink_path = document.getElementById("streamlink_path");
@@ -210,7 +217,9 @@
 
 	//console.log(audio_device_object);
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// デバイス用 html を生成
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	if ( audio_device_object ) {
 
@@ -228,9 +237,9 @@
 
 	}
 
-
-
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// 現在保存中の設定情報を取得してフォーム項目に反映
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	async function get_setting_values() {
 
@@ -299,7 +308,9 @@
 
 	get_setting_values();
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// 設定項目を保存する関数
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	setting_set.addEventListener("click", async function(event) {
 
@@ -380,7 +391,9 @@
 
 	});
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// システムで必要なファイルとディレクトリが書き込み可能か確認する関数
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	async function check_permissions() {
 
@@ -408,25 +421,29 @@
 
 	check_permissions();
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// Streamlink チェックボタン
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	sl_check_btn.addEventListener("click", async function(event) {
 
 		sl_check_msg.innerHTML = "Streamlink 確認中です。";
 
-		const res = await fnc.fetch_template("../php/streamlink_check.php", "");
+		const res = await fnc.fetch_template("../php/streamlink_check.php");
 
 		sl_check_msg.innerHTML = "<b>" + res + "</b>";
 
 	});
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// 音声再生権限 確認ボタン
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	app_check_btn.addEventListener("click", async function(event) {
 
 		app_check_msg.innerHTML = "音声再生権限 確認中です。";
 
-		const res = await fnc.fetch_template("../php/audio_permission_check.php", "");
+		const res = await fnc.fetch_template("../php/audio_permission_check.php");
 
 		if ( res.success === true ) {
 			app_check_msg.innerHTML = "音声再生権限が<b>有効</b>です。";
@@ -436,7 +453,9 @@
 
 	});
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// 再生テストボタン
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	document.getElementById("radio").addEventListener("click", async function(event) {
 
@@ -458,11 +477,36 @@
 
 		//console.log(res);
 
-		if ( res === "timeout" ) {
-			test_btn_msg.innerHTML = "タイムアウトしました。Streamlink へアクセスできていない可能性があります。<b>Path to streamlink</b> パスに至るディレクトリのパーミッションは <b>751</b> 以上である必要があります。";
-		} else if ( res === "error" ) {
-			test_btn_msg.innerHTML = "例外エラーです。";
-		} else if ( res.result === "success" ) {
+		let count = 1;
+		let success_flag = false;
+
+		for ( let n = 0; n < 20; n++ ) {
+
+			await fnc.js_sleep(500);// 少し待機
+
+			// Socket でプレイヤーが起動しているか確認
+
+			const send_params_result = {
+				type: "get",
+				property: "filename",
+				id: 1
+			};
+
+			const query_string_result = new URLSearchParams(send_params_result).toString();
+			const result_array = await fnc.fetch_template("../php/socket_control.php", query_string_result);
+
+			//console.log(result_array);
+
+			if ( result_array.error === "success" ) {
+				success_flag = true;
+				break;
+			}
+
+			count++;
+
+		}
+
+		if ( success_flag ) {
 			test_btn_msg.innerHTML = '<spam class="playing"></spam>只今ラジオ再生中です。';
 		} else {
 			test_btn_msg.innerHTML = "ラジオの再生に失敗しました。";
@@ -485,7 +529,41 @@
 
 		//console.log(res);
 
-		if ( res === "playing" ) {
+		// 再生されたかの確認 (少しづつ待機しながら確認)
+
+		let count = 1;
+		let success_flag = false;
+
+		for ( let n = 0; n < 30; n++ ) {
+
+			await fnc.js_sleep(500);// 少し待機
+
+			// Socket でプレイヤーが起動しているか確認
+
+			const send_params_result = {
+				type: "get",
+				property: "filename",
+				id: 1
+			};
+
+			const query_string_result = new URLSearchParams(send_params_result).toString();
+			const result_array = await fnc.fetch_template("../php/socket_control.php", query_string_result);
+
+			//console.log(result_array);
+
+			// 再生が確認できたらファイル名を保存
+
+			if ( result_array.error === "success" ) {
+				success_flag = true;
+				break;
+			}
+
+			count++;
+
+		}
+
+		//if ( res === "playing" ) {
+		if ( success_flag ) {
 			test_btn_msg.innerHTML = '<spam class="playing"></spam>音声ファイルを再生しました。';
 		} else {
 			test_btn_msg.innerHTML = "音声ファイル再生に失敗しました。";
@@ -499,7 +577,37 @@
 
 		//console.log(res);
 
-		if ( res === "stopped" ) {
+		let count = 1;
+		let stop_flag = false;
+
+		for ( let n = 0; n < 10; n++ ) {
+
+			await fnc.js_sleep(500);// 少し待機
+
+			// Socket でプレイヤーが起動しているか確認
+
+			const send_params_result = {
+				type: "get",
+				property: "media-title",
+				id: 1
+			};
+
+			const query_string_result = new URLSearchParams(send_params_result).toString();
+			const result_array = await fnc.fetch_template("../php/socket_control.php", query_string_result);
+
+			//console.log(result_array);
+
+			if ( result_array.error === "not_working" ) {
+				stop_flag = true;
+				break;
+			}
+
+			count++;
+
+		}
+
+		//if ( res === "stopped" ) {
+		if ( stop_flag ) {
 			test_btn_msg.innerHTML = "プレイヤーを停止しました。";
 		} else {
 			test_btn_msg.innerHTML = "プレイヤー停止に失敗しました。";
@@ -507,69 +615,9 @@
 
 	});
 
-	// サービスワーカー関係のボタン
-
-	const sw_output = document.getElementById("sw_btn_output");
-
-	// サービスワーカー状況確認
-
-	async function check_sw_status() {
-
-		if ( ! ("serviceWorker" in navigator) ) {
-			sw_output.innerHTML = "Service Worker 未サポート";
-			return;
-		}
-
-		const registration = await navigator.serviceWorker.getRegistration();
-
-		sw_output.innerHTML = registration 
-			? "Service Worker は有効です (" + registration.active.scriptURL + ")"
-			: "Service Worker 未登録です"
-		;
-
-	}
-
-	document.getElementById("sw_btn_status").addEventListener("click", async function(event) {
-		check_sw_status();
-	});
-
-	// サービスワーカーキャッシュ削除
-
-	async function reset_service_worker() {
-
-		if ( ! confirm("Service Worker とキャッシュを削除しますか？") ) return;
-
-		try {
-
-			if ( "serviceWorker" in navigator ) {
-
-				// サービスワーカー削除
-
-				const registrations = await navigator.serviceWorker.getRegistrations();
-				await Promise.all( registrations.map(r => r.unregister()) );
-
-				// キャッシュ削除
-
-				const cache_names = await caches.keys();
-				await Promise.all( cache_names.map(name => caches.delete(name)) );
-
-			}
-
-			// 完全リフレッシュ
-
-			window.location.reload(true);
-
-		} catch (error) {
-			alert('リセットエラー: ' + error.message);
-		}
-
-	}
- 
-	document.getElementById("sw_btn_reset").addEventListener("click", async function(event) {
-		reset_service_worker();
-	});
-
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// サーバー情報を取得して cron の案内で使用する
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	const definition = await fnc.fetch_template("../php/server.php", "");
 
@@ -592,7 +640,9 @@
 
 	document.getElementById("https_href").innerHTML = parent_url_html;
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// 再起動ログの表示
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	const cb = new Date().getTime();
 
@@ -605,7 +655,9 @@
 
 	document.getElementById("last_reboot").innerHTML = reboot_log.trim();
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// ミキサー情報の取得
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	const mixer_box = document.getElementById("mixer_box");
 	const mixer_object = await fnc.fetch_template("../php/mixer_get.php");
@@ -668,7 +720,9 @@
 
 	mixer_box.innerHTML = mixer_html;
 
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// ミキサー内のデバイス操作
+	// * * * * * * * * * * * * * * * * * * * * * *
 
 	mixer_box.addEventListener("click", async function(event) {
 
@@ -723,6 +777,146 @@
 
 		}
 
+	});
+
+	// * * * * * * * * * * * * * * * * * * * * * *
+	// サービスワーカー関係
+	// * * * * * * * * * * * * * * * * * * * * * *
+
+	const sw_output = document.getElementById("sw_output");
+	const sw_install = document.getElementById("sw_btn_install");
+	const sw_reset = document.getElementById("sw_btn_reset");
+
+	// サービスワーカーからメッセージを受信したときに使用する関数
+
+	function serviceworker_message_processing(event) {
+
+		console.log("@ [message] Received from Service Worker");
+
+		// キャッシュの更新通知
+		// キャッシュバスターを実行してリロードメッセージを表示
+
+		if (event.data.type === "CACHE_UPDATE_COMPLETE") {
+			//css_js_cachebuster(event.data.version, "Cache update complete");
+			sw_output.innerHTML = event.data.message + '<br />反映を行うためにページのリロードを行ってください。<br /><input type="button" value="リロード" onclick="window.location.reload();" />';
+		}
+
+	}
+
+	// サービスワーカーの登録関数
+	// サービスワーカーのバージョンを確認してから実施
+
+	async function register_service_worker() {
+
+		if ("serviceWorker" in navigator) {
+
+			// バージョンの確認
+
+			const cv_url = "../cv.txt?t=" + Date.now();
+			const response = await fetch( cv_url, {cache: "no-cache", credentials: "same-origin"} );
+			const cv_text = await response.text();
+			const cv_value = cv_text.trim();
+
+			// サービスワーカーから受信するメッセージ用イベントの登録
+
+			navigator.serviceWorker.addEventListener("message", function (event) {
+				serviceworker_message_processing(event);
+			});
+
+			// サービスワーカーの登録開始
+
+			navigator.serviceWorker.register(
+				"../sw.js?cv=" + cv_value,
+				{scope: "../", type: "module"}
+			).then(function(registration) {
+				console.log("ServiceWorker を登録しました: [scope] ", registration.scope);
+			}).catch(function(error) {
+				console.log("ServiceWorker の登録に失敗しました: ", error);
+			});
+
+		}
+
+	}
+
+	// サービスワーカー状況確認
+
+	if ( ! ("serviceWorker" in navigator) ) {
+
+		sw_output.innerHTML = "Service Worker 未サポート";
+		sw_install.style.display = "none";
+		sw_reset.style.display = "none";
+
+	} else {
+
+		// サービスワーカー関係のボタンを表示
+
+		//sw_buttons.style.display = "block";
+
+		// サービスワーカーの有効確認
+
+		const registration = await navigator.serviceWorker.getRegistration();
+
+		if ( registration ) {
+
+			//console.log(registration);
+
+			sw_output.innerHTML = "Service Worker は有効です<br />(" + registration.active.scriptURL + ")";
+
+			sw_install.style.display = "none";
+
+			register_service_worker();
+
+		} else {
+
+			sw_output.innerHTML = "Service Worker 未登録です";
+			sw_reset.style.display = "none";
+
+		}
+
+	}
+
+	// サービスワーカー > 解除関数
+
+	async function reset_service_worker() {
+
+		if ( ! confirm("Service Worker とキャッシュを削除しますか？") ) return;
+
+		try {
+
+			if ( "serviceWorker" in navigator ) {
+
+				// サービスワーカー削除
+
+				const registrations = await navigator.serviceWorker.getRegistrations();
+				await Promise.all( registrations.map(r => r.unregister()) );
+
+				// キャッシュ削除
+
+				const cache_names = await caches.keys();
+				await Promise.all( cache_names.map(name => caches.delete(name)) );
+
+			}
+
+			// 完全リフレッシュ
+
+			window.location.reload(true);
+
+		} catch (error) {
+			alert('リセットエラー: ' + error.message);
+		}
+
+	}
+ 
+ 	// サービスワーカー > 解除実行ボタン
+ 
+	sw_reset.addEventListener("click", async function(event) {
+		reset_service_worker();
+	});
+
+	// サービスワーカー > インストール
+
+	sw_install.addEventListener("click", async function(event) {
+		register_service_worker();
 	});
 
 </script>

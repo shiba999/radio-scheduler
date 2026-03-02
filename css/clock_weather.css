@@ -1,7 +1,31 @@
 @charset "utf-8";
 
+/* #clock_weather_box 時計・天気予報 > 表中の場合 */
+
+body:has(#clock_weather_box[style*="display: flex"]) {
+	background-color: #000;
+}
+
+body:has(#clock_weather_box[style*="display: flex"]) header,
+body:has(#clock_weather_box[style*="display: flex"]) footer,
+body:has(#clock_weather_box[style*="display: flex"]) section,
+body:has(#clock_weather_box[style*="display: flex"]) .server_ip,
+body:has(#clock_weather_box[style*="display: flex"]) #option_open,
+body:has(#clock_weather_box[style*="display: flex"]) #watch_open,
+body:has(#clock_weather_box[style*="display: flex"]) #audio_box {
+	display: none;
+}
+
+/*
+----------------------------------
+画面が横長だった場合
+短辺の vh , cqh 基準とする
+----------------------------------
+*/
+
 #clock_weather_box {
-	/*font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans", Meiryo, sans-serif;*/
+	/*font-family: 'Monospace', system-ui, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Noto Sans CJK JP", sans-serif;*/
+	font-family: "Consolas", "Monaco", "Lucida Console", "Courier New", "Monospace", monospace, system-ui, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Noto Sans CJK JP", sans-serif;
 	background-color: #000;
 	position: fixed;
 	display: flex;
@@ -11,36 +35,85 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	width: 100%;
 	z-index: 1000;
 	box-sizing: border-box;
-	padding: 5vh;
-	color: #eee;
+	padding: 5vh 5vw;
 	line-height: 1;
 }
 
-#cw_reiwa,
-.month_day_set .slash,
-.colon,
-.celsius_big,
-.celsius,
-.speed {
-	color: #999;
+/*
+[簡易的]
+16:9 で表示領域を固定している場合に、
+ブラウザサイズがより横長になった場合は
+padding の横方向は不要になっていく
+9:16 の表示領域で、ブラウザサイズがより縦長になった場合もしかり
+...と言った padding の動的設定を行いたい。
+*/
+
+/* 16:9 より横長 > 横方向の padding 不要 */
+
+@media (min-aspect-ratio: 1.86) {
+	#clock_weather_box {
+		padding: 5vh 0vw;
+	}
 }
 
-/* 日付関係 */
+/* 9:16 より縦長 > 縦方向の padding 不要 */
+
+@media (max-aspect-ratio: 0.5) {
+	#clock_weather_box {
+		padding: 0vh 5vw;
+	}
+}
+
+#cw_reiwa, .month_day_set .slash, .colon, .celsius_big, .celsius, .speed {
+    color: #999;
+}
+
+/* #cw_weather 天気予報 > 表示中の場合 */
+
+.cw_date {
+	height: 27%;
+}
+.cw_clock {
+	height: 63%;
+}
+#cw_weather {
+	height: 30%;
+}
+
+/* #cw_weather 天気予報 > 非表示の場合 */
+
+.weather_hidden .cw_date {
+	height: 30%;
+	margin-top: 5%;
+}
+.weather_hidden .cw_clock {
+	height: 60%;
+}
+.weather_hidden #cw_weather {
+	display: none;
+}
+
+/* 梱包する要素内のサイズの基準となる様に設定 cqw , cqh を有効に */
+
+.cw_date,
+.cw_clock,
+#cw_weather {
+	container-type: size;
+}
+
+/*
+----------------------------------
+上段 > 日付関係
+----------------------------------
+*/
 
 .cw_date {
 	display: flex;
 	justify-content: space-between;
 	align-items: stretch;
 	position: relative;
-}
-
-/* 位置調整 */
-
-.cw_date span {
-	flex: 1;
 }
 
 /* 月日曜日 (左) */
@@ -65,14 +138,29 @@
 	text-align: right;
 }
 
+#radio_icon {
+	width: 50cqh;
+	height: 50cqh;
+	display: inline-block;
+}
+
+#radio_icon svg {
+	width: 50cqh;
+	height: 50cqh;
+	display: inline-block;
+	fill: #555;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
 /* 月 / 日 */
 
 .month_day_box {
-	background-color: #ddd;
-	color: #333;
+	background-color: #ccc;
+	color: #222;
 	text-align: center;
-	padding: 2vh 2.5vh 1.5vh 2.5vh;
-	border-radius: 1vh;
+	padding: 10cqh 15cqh 8cqh 15cqh;
+	border-radius: 7cqh;
 	overflow: hidden;
 	display: inline-block;
 }
@@ -83,29 +171,23 @@
 }
 
 #cw_month {
-	font-size: 3vh;
+	font-size: 12cqh;
 	font-weight: bold;
-	letter-spacing: -0.1vh;
+	letter-spacing: -0.02em;
 }
 
 #cw_day {
-	font-size: 12vh;
+	font-size: 46cqh;
 	font-weight: bold;
-	letter-spacing: -0.25vh;
+	letter-spacing: 0em;
 	vertical-align: bottom;
+	margin: 1cqh 0;
 }
 
 #cw_youbi {
-	font-size: 4vh;
-	margin-top: -0.5vh;
-	letter-spacing: 0.25vh;
+	font-size: 20cqh;
+	letter-spacing: 0.1em;
 }
-
-/*.month_day_box .slash {
-	font-size: 16vh;
-	margin: 0;
-	vertical-align: middle;
-}*/
 
 /* 年 / 年号 */
 
@@ -115,35 +197,26 @@
 }
 
 #cw_reiwa {
-	font-size: 4vh;
+	font-size: 24cqh;
 }
 
 #cw_year {
-	font-size: 8vh;
+	font-size: 56cqh;
 	font-weight: bold;
-	margin-top: 1vh;
+	margin-top: 4cqh;
 }
 
-#radio_icon {
-	width: 6vh;
-	display: inline-block;
-}
-
-#radio_icon svg {
-	width: 6vh;
-	height: 6vh;
-	display: inline-block;
-	fill: #555;
-	vertical-align: middle;
-	cursor: pointer;
-}
-
-/* 時計 */
+/*
+----------------------------------
+中段 > 時計
+----------------------------------
+*/
 
 .cw_clock {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	letter-spacing: 0;
 }
 
 #cw_hour,
@@ -154,25 +227,31 @@
 	vertical-align: middle;
 }
 
+/* cqh: 梱包する要素の高さに対する大きさ 100cqh = 100% */
+
 #cw_hour,
 #cw_minute,
 #cw_second {
-	font-size: 30vh;
-	font-weight: bold;
+	font-size: 72cqh;
 	letter-spacing: 0;
 }
 
 .colon {
-	font-size: 24vh;
-	margin: 0 2vh 3vh 2vh;
+	font-size: 64cqh;
+	margin: 0 -2cqh 8cqh -2cqh;
 }
 
-/* 天気予報一式 */
+/*
+----------------------------------
+下段 > 天気予報関係
+----------------------------------
+*/
 
 #cw_weather {
 	display: flex;
 	justify-content: space-between;
-	align-items: stretch;
+	/*align-items: stretch;*/
+	align-items: flex-end;
 	position: relative;
 }
 
@@ -182,10 +261,19 @@
 	flex: 1;
 }
 
+#clock_weather_box {
+	aspect-ratio: 16 / 9;
+	max-width: 100%;
+	max-height: 100%;
+	margin: auto;
+}
+
 /* 気温 (左) */
 
 .temp_set {
+	display: inline-block;
 	text-align: left;
+	align-self: flex-end;
 }
 
 /* 天気情報 (強制的に中央) */
@@ -193,7 +281,7 @@
 .weather_set {
 	position: absolute;
 	left: 50%;
-	bottom: 0;
+	bottom: 5%;
 	transform: translateX(-50%);
 	text-align: center;
 	white-space: nowrap;
@@ -213,42 +301,31 @@
 	flex-wrap: wrap;*/
 }
 
-.temp_set {
-	display: inline-block;
-	text-align: left;
-	align-self: flex-end;
-}
-
 #cw_temp {
-	font-size: 16vh;
-	font-weight: bold;
+	font-size: 64cqh;
 }
 
 .cw_temp_m {
 }
 
 #cw_temp_max {
-	font-size: 8vh;
-	font-weight: bold;
+	font-size: 28cqh;
 	color: #ef6109;
 }
 
 #cw_temp_min {
-	font-size: 8vh;
-	font-weight: bold;
+	font-size: 26cqh;
 	color: #10bcf0;
 }
 
 .celsius_big {
-	font-size: 8vh;
-	font-weight: bold;
-	margin: 0 1vh;
+	font-size: 26cqh;
+	margin: 0 4cqh;
 }
 
 .celsius {
-	font-size: 4vh;
-	font-weight: bold;
-	margin: 0 1vh;
+	font-size: 16cqh;
+	margin: 0 4cqh;
 }
 
 /* 天気予報 */
@@ -263,15 +340,15 @@
 }
 
 #cw_icon {
-	height: 28vh;
-	width: 28vh;
+	height: 76cqh;
+	width: 76cqh;
 	background-position: center center;
 	background-repeat: no-repeat;
 	background-size: 135%;
 }
 
 #cw_description {
-	font-size: 4vh;
+	font-size: 18cqh;
 	font-weight: bold;
 }
 
@@ -284,131 +361,201 @@
 #cw_position {
 	display: inline-block;
 	width: 100%;
-	margin-bottom: 1vh;
-	font-size: 6vh;
-	font-weight: bold;
+	margin-bottom: 4cqh;
+	font-size: 24cqh;
 	color: #666;
+	font-weight: bold;
 }
 
 #cw_wind_deg {
 	display: inline-block;
-	font-size: 12vh;
-	font-weight: bold;
+	font-size: 48cqh;
 	color: #328805;
+	font-weight: bold;
 }
 
 #cw_wind_speed {
-	font-size: 12vh;
-	font-weight: bold;
-	margin-left: 2vh;
+	font-size: 58cqh;
+	margin-left: 12cqh;
 }
 
 .speed {
-	font-size: 8vh;
-	font-weight: bold;
-	margin-left: 1vh;
+	font-size: 32cqh;
+	margin-left: 8cqh;
 }
 
+
+
 /*
-	申し訳程度のレスポンシブ
-	画面が縦長だった場合
+----------------------------------
+画面が縦長だった場合
+短辺の vw , cqw 基準とする
+実際には 縦横比率 1.2:1.0 程度から切り替え
+----------------------------------
 */
 
-@media (orientation: portrait) {
+/* 正方形に近い状態は一部要素を表示 */
+
+/*@media (max-aspect-ratio: 1.3) and (min-aspect-ratio: 0.8) {*/
+@media (max-aspect-ratio: 1.2) {
 
 	#clock_weather_box {
-		/*background-color: #333;*/
-		padding: 5vw;
+		aspect-ratio: 9 / 16;
+		max-width: 100%;
+		max-height: 100%;
+		margin: auto;
+	}
+
+	.cw_date {
+		height: 20%;
+		align-items: flex-end;
+	}
+	.cw_clock {
+		height: 35%;
+	}
+	#cw_weather {
+		height: 35%;
+	}
+
+	/* #cw_weather 天気予報 > 非表示の場合 */
+
+/*#clock_weather_box:has(#cw_weather:not([style*="display: none"])) .cw_date {
+		height: 20%;
+	}
+	#clock_weather_box:has(#cw_weather:not([style*="display: none"])) .cw_clock {
+		height: 40%;
+	}*/
+
+	.weather_hidden .cw_date {
+		height: 50%;
+		margin: 5cqw 0;
+	}
+	.weather_hidden .cw_clock {
+		height: 50%;
+		align-items: flex-start;
+		margin: 5cqw 0;
 	}
 
 	.portrait {
 		display: none !important;
 	}
 
+	/*
+	----------------------------------
+	上段 > 日付関係
+	----------------------------------
+	*/
+
+	/* 月 / 日 */
+
 	.month_day_box {
-		padding: 2vw 2.5vw 1.5vw 2.5vw;
+		padding: 2cqw 3cqw 2cqw 3cqw;
+		border-radius: 2cqw;
 	}
 
 	#cw_month {
-		font-size: 3.5vw;
+		font-size: 4cqw;
 	}
 
 	#cw_day {
-		font-size: 12.5vw;
+		font-size: 12cqw;
+		margin: 0.5cqw 0;
 	}
 
 	#cw_youbi {
-		font-size: 5vw;
+		font-size: 5cqw;
 	}
 
-	/*.month_day_set .slash {
-		font-size: 14vw;
-	}*/
+	/* 年 / 年号 */
 
 	#cw_reiwa {
-		font-size: 4vw;
+		font-size: 6cqw;
 	}
 
 	#cw_year {
-		font-size: 8vw;
-		margin-top: 1vw;
+		font-size: 12cqw;
+		font-weight: bold;
+		margin-top: 1cqw;
 	}
+
+	/* アイコン (右) */
+
+	#radio_icon {
+		width: 14cqw;
+		height: 14cqw;
+	}
+
+	#radio_icon svg {
+		width: 14cqw;
+		height: 14cqw;
+	}
+
+	/*
+	----------------------------------
+	中段 > 時計
+	----------------------------------
+	*/
 
 	#cw_hour,
 	#cw_minute {
-		font-size: 32vw;
+		font-size: 38cqw;
+		letter-spacing: 0;
 	}
 
 	.colon {
-		font-size: 24vw;
-		margin: 0 2vw 3vw 2vw;
+		font-size: 26cqw;
+		margin: 0 2cqw 4cqw 2cqw;
 	}
 
+	/*
+	----------------------------------
+	下段 > 天気予報関係
+	----------------------------------
+	*/
+
 	#cw_weather {
-		display: initial;
-		justify-content: initial;
-		align-items: initial;
-		/*padding-bottom: 18vw;*/
+		flex-direction: column;
+		justify-content: space-between;
 	}
 
 	.temp_set,
-	.weather_set {
+	.weather_set,
+	.wind_set {
 		display: block;
-		text-align: initial;
-		align-self: initial;
 		text-align: center;
+		margin: 0 auto;
 	}
 
-	.weather_set {
-		position: relative;
-		left: initial;
-		bottom: initial;
-		transform: initial;
-	}
-
-	.temp_set {
-		margin-bottom: 2vw;
-	}
+	/* ここらへんまで終わってる */
 
 	#cw_temp {
-		font-size: 14vw;
+		font-size: 14cqw;
 	}
 
 	#cw_temp_max,
 	#cw_temp_min {
-		font-size: 8vw;
+		font-size: 7cqw;
 	}
 
 	#cw_temp_max{
-		margin-left: 2vw;
+		margin-left: 2cqw;
 	}
 
 	.celsius_big {
-		font-size: 8vw;
+		font-size: 7cqw;
 	}
 
 	.celsius {
-		font-size: 4vw;
+		font-size: 5cqw;
+	}
+
+	.weather_set {
+		position: initial;
+		left: initial;
+		bottom: initial;
+		transform: initial;
+		text-align: center;
+		white-space: nowrap;
 	}
 
 	#cw_icon,
@@ -418,12 +565,12 @@
 	}
 
 	#cw_icon {
-		height: 22vw;
-		width: 22vw;
+		height: 24cqw;
+		width: 24cqw;
 	}
 
 	#cw_description {
-		font-size: 6vw;
+		font-size: 8cqw;
 	}
 
 	#cw_wind_deg,
@@ -433,41 +580,40 @@
 
 	#cw_wind_deg,
 	#cw_wind_speed {
-		font-size: 12vw;
+		font-size: 12cqw;
 	}
 
 	#cw_position {
 		white-space: inherit;
 		display: initial;
 		margin-bottom: initial;
-		font-size: 6vw;
+		font-size: 8cqw;
 	}
 
 	#cw_wind_deg {
-		margin-left: 2vw;
+		margin-left: 4cqw;
 	}
 
 	#cw_description {
-		margin-left: 2vw;
+		margin-left: 4cqw;
 	}
 
 	#cw_wind_speed {
-		margin-left: 2vw;
+		margin-left: 4cqw;
 	}
 
 	.speed {
 		font-size: 5vw;
-		margin: 0 2vw 0 2vw;
-	}
-
-	#radio_icon {
-		bottom: 10vw;
-		height: 10vw;
-	}
-
-	#radio_icon svg {
-		width: 6vw;
-		height: 6vw;
+		margin: 0 0 0 4cqw;
 	}
 
 }
+
+/*@media (orientation: portrait) {
+}*/
+
+
+
+
+
+
