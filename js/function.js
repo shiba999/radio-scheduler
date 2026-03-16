@@ -206,7 +206,9 @@
 
 	// メッセージを背景クリックで非表示に
 
-	msg_bg.addEventListener("click", async function() {
-		msg_fade_out();
-	});
+	if ( msg_bg ) {
+		msg_bg.addEventListener("click", async function() {
+			msg_fade_out();
+		});
+	}
 

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<link rel="stylesheet" class="cachebuster" href="./css/clock_weather.css" type="text/css" />
+	<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+	<title>時計・カレンダー・天気予報 | らぢ助 - Radio Scheduler -</title>
+	<link rel="manifest" href="./manifest.json" />
+	<link rel="apple-touch-icon" sizes="512x512" href="./icon/icon512.png" />
+	<link rel="apple-touch-icon" sizes="192x192" href="./icon/icon192.png" />
+	<link rel="apple-touch-icon" sizes="180x180" href="./icon/icon180.png" />
+	<link rel="apple-touch-icon" sizes="152x152" href="./icon/icon152.png" />
+	<link rel="apple-touch-icon" sizes="120x120" href="./icon/icon120.png" />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="apple-mobile-web-app-title" content="ラジオの操作・予約再生が可能なアプリ「らぢ助 (Radio Scheduler)」です。" />
+	<meta name="google" content="notranslate" />
+</head>
+
+<body id="ccw">
+
+<div id="clock_weather_box">
+	<span class="cw_date">
+		<span class="month_day_set">
+			<span class="month_day_box">
+				<span id="cw_month">--</span><span id="cw_day">--</span><span id="cw_youbi">---</span>
+			</span>
+		</span>
+		<span class="year_set">
+			<span id="cw_reiwa">Reiwa.-</span><span id="cw_year">----</span>
+		</span>
+		<span id="to_radio"><span onclick="location.href='./'" id="radio_icon"></span></span>
+	</span>
+	<span class="cw_clock">
+		<span id="cw_hour">--</span><span class="colon">:</span><span id="cw_minute">--</span><span class="colon portrait">:</span><span id="cw_second" class="portrait">--</span></span>
+	<span id="cw_weather"><!-- 未設定なら非表示 style="display: none;" -->
+		<span class="temp_set">
+			<span id="cw_temp">---</span><span class="celsius_big">&#8451;</span>
+			<span class="portrait"><br /></span>
+			<span id="cw_temp_max">---</span><span class="celsius">&#8451;</span>
+			<span id="cw_temp_min">---</span><span class="celsius">&#8451;</span>
+		</span>
+		<span class="weather_set">
+			<span id="cw_icon" style="background-image: url(https://openweathermap.org/img/wn/01d@4x.png);"></span>
+			<span id="cw_description">天気</span>
+		</span>
+		<span class="wind_set">
+			<span id="cw_position">地域名</span>
+			<span id="cw_wind_deg">↑</span><span id="cw_wind_speed">1</span><span class="speed">m/s</span>
+		</span>
+	</span>
+</div>
+
+<script type="module">
+
+// 1秒周期でキャッシュバージョンの取得を試みる
+// 取得できれば true とバージョン文字列を返す
+// 取得できなければ false を返す
+
+async function get_cache_version( max_retries = 30, func = function(v){} ) {
+
+	//console.log(func);
+
+	const url = "./cv.txt?t=" + Date.now();
+    
+	for ( let attempt = 1; attempt <= max_retries; attempt++ ) {
+
+		//console.log(max_retries + "/" + attempt);
+
+		try {// キャッシュ無効 (常に最新) で読み込み
+
+			const response = await fetch( url, {cache: "no-cache", credentials: "same-origin"} );
+
+			//console.log(response);
+
+			if ( ! response.ok ) throw new Error( "HTTP " + response.status );
+
+			const cv = await response.text();
+
+			return {result: true, version: cv.trim()};
+
+		} catch (error) {
+
+			//console.log("error: " + attempt);
+
+			if ( func ) func( "サーバー応答確認中です (" + attempt + "s)" );// 引数に関数が入っていればそちらで出力する
+
+			if ( attempt < max_retries ) {
+				await new Promise( resolve => setTimeout(resolve, 1000) );// 1秒待機
+			} else {
+				return {result: false, version: "取得失敗"};
+			}
+
+		}
+
+	}
+
+}
+
+let mod = [];// モジュール収納先
+
+// キャッシュバスター
+// css ファイルを ***.css?v=*** の様にパラメータ付きの形式に置き換える
+// 複数回実行すると ***.css?v=123?v=123?v=123 の様にパラメータが増え続けるので
+// オリジナルのファイルに整形を行ってから再度パラメータを付与している
+
+function css_js_cachebuster(version, location = "Unknown") {
+
+	const cb_elements = document.getElementsByClassName("cachebuster");
+
+	//console.log( "class: cachebuster ... " + cb_elements.length );
+	//console.log("+ version: " + version);
+
+	for ( let n = 0; n < cb_elements.length; n++ ) {
+
+		const old_link = cb_elements[n];
+
+		// 元のhrefを取得
+		// ここでは css のみの更新とする
+		// js ファイルをここでキャッシュバスターするとエラーの原因となるので mod へインポートすること
+
+		const old_link_href = old_link.href;
+		const old_link_split = old_link_href.split("?");
+		const original_href = old_link_split[0];
+
+		// 新しいlink要素を作成
+
+		const new_link = document.createElement("link");
+
+		new_link.rel = "stylesheet";
+		new_link.className = "cachebuster";
+		new_link.type = "text/css";
+
+		new_link.onload = function() {
+			console.log("- [" + location + "] Cache Buster (CSS): " + new_link.href);
+		};
+
+		new_link.href = original_href + "?v=" + version;
+
+		// 古いlink要素へ置き換え
+
+		old_link.parentNode.replaceChild(new_link, old_link);
+
+	}
+
+}
+
+// 読み込むモジュールをキャッシュバージョン付きでインポートする
+
+async function load_import_module(version, location = "Unknown") {
+
+	mod.var = await import("./js/variable.js?v=" + version);
+	mod.fnc = await import("./js/function.js?v=" + version);
+	//mod.idb = await import("./js/indexeddb.js?v=" + version);
+	//mod.aud = await import("./js/audio.js?v=" + version);
+	//mod.sch = await import("./js/schedule.js?v=" + version);
+	//mod.not = await import("./js/notice.js?v=" + version);
+	//mod.con = await import("./js/control.js?v=" + version);
+	mod.opw = await import("./js/openweather.js?v=" + version);
+
+}
+
+// -------------------------------------------------------
+// ページ読込時に実行
+// -------------------------------------------------------
+
+window.onload = async function() {
+
+	console.log("* * * Load setup start * * *");
+
+	// 処理 1 * * * * * * * * * * * * * * * * * * * *
+
+	// 最初にサーバーの生存確認
+	// キャッシュバージョンファイルを読み込んでバージョンを取得
+
+	const fetch_cv_result = await get_cache_version(15);
+
+	//console.log(fetch_cv_result);
+
+	// バージョンを取得できない場合はタイムアウト表示
+
+	if ( fetch_cv_result.result === true ) {
+		mod.cv = fetch_cv_result.version;
+	} else {
+		mod.cv = 1;
+	}
+
+	// 使用するモジュールをインポートする (仮インポートのシチュエーションあり)
+
+	await load_import_module(mod.cv, "ccw");
+
+	// キャッシュバスターでキャッシュ内のファイルを使用させる
+
+	css_js_cachebuster(mod.cv, "Window onLoad");
+
+	// 時計・天気予報の実行 > この先で天気情報も取得
+	// 初期非表示であっても開始しておく
+
+	mod.var.v.clock_interval.push( setInterval(mod.opw.time_and_date, 1000, mod.var, mod.fnc) );
+
+	// 設定情報で時計が初期表示の場合は時計を開く
+	// openweathermap 関連の情報が設定されているなら該当領域を表示
+
+	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php");
+
+	if ( ! setting_object.openweather_api && ! setting_object.latitude && ! setting_object.longitude ) {
+		mod.var.e.cw_box.classList.add("weather_hidden");// 日付・天気予報 > class 追加 > 天気予報非表示
+	}
+
+	// 嵩張る svg ファイルの表示
+
+	mod.var.e.radio_icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 382.69"><path d="M420.21,94.88H125.43L385.93,19.49c5.29-1.44,8.4-6.9,6.95-12.19-1.44-5.28-6.88-8.4-12.19-6.95L33.48,95.24c-.3.08-.57.22-.86.33C14.09,98.96,0,115.19,0,134.68v208.22c0,21.94,17.85,39.79,39.79,39.79h380.41c21.94,0,39.79-17.85,39.79-39.79v-208.22c0-21.94-17.85-39.79-39.79-39.79ZM131.53,319.85c-44.44,0-80.47-36.03-80.47-80.46s36.03-80.47,80.47-80.47,80.46,36.03,80.46,80.47-36.03,80.46-80.46,80.46ZM276.3,311.92c-11.62,0-21.07-9.45-21.07-21.07s9.45-21.07,21.07-21.07,21.07,9.45,21.07,21.07-9.45,21.07-21.07,21.07ZM415.98,306.26c0,3.43-2.78,6.2-6.2,6.2h-79.51c-3.43,0-6.2-2.78-6.2-6.2v-30.82c0-3.43,2.78-6.2,6.2-6.2h79.51c3.43,0,6.2,2.78,6.2,6.2v30.82ZM415.98,228.54c0,3.52-2.6,6.36-5.82,6.36h-149.13c-3.21,0-5.82-2.85-5.82-6.36v-63.26c0-3.52,2.6-6.36,5.82-6.36h149.13c3.21,0,5.82,2.85,5.82,6.36v63.26Z"/></svg>';
+
+};
+
+</script>
+
+</body>
+</html>

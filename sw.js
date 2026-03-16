@@ -8,6 +8,7 @@
 		"./",
 		"./index.html",
 		"./css/style.css?v=" + CACHE_VERSION,
+		"./css/clock_weather.css?v=" + CACHE_VERSION,
 		"./js/function.js?v=" + CACHE_VERSION,
 		"./js/indexeddb.js?v=" + CACHE_VERSION,
 		"./js/audio.js?v=" + CACHE_VERSION,

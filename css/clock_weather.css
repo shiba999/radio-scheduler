@@ -16,6 +16,11 @@ body:has(#clock_weather_box[style*="display: flex"]) #audio_box {
 	display: none;
 }
 
+#ccw {
+	background-color: #000;
+	color: #eee;
+}
+
 /*
 ----------------------------------
 画面が横長だった場合

@@ -293,7 +293,7 @@
 
 			} else {
 
-				arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " )");
+				arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " ) Retry: " + count);
 				init_play_info(arg_val);// 表示の初期化
 
 			}

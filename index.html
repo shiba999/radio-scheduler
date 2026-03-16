@@ -115,7 +115,7 @@
 
 </section>
 
-<div id="watch_open"></div>
+<div onclick="location.href='./ccw.html'" id="watch_open"></div>
 
 <footer>
 	<p class="copy">らぢ助 - Radio Scheduler -<br />&copy; 2025 <a href="https://weblabyrinth.net" target="_blank">WebLabyrinth</a></p>
@@ -379,7 +379,7 @@ async function load_import_module(version, location = "Unknown") {
 	mod.sch = await import("./js/schedule.js?v=" + version);
 	mod.not = await import("./js/notice.js?v=" + version);
 	mod.con = await import("./js/control.js?v=" + version);
-	mod.opw = await import("./js/openweather.js?v=" + version);
+	//mod.opw = await import("./js/openweather.js?v=" + version);
 
 }
 
@@ -642,7 +642,7 @@ window.onload = async function() {
 	const server_object = await mod.fnc.fetch_template("./php/server.php");
 	mod.var.e.server_ip.innerHTML = server_object.ip.replace(" ", "<br />");
 
-	// 時計・天気予報の実行 > この先で天気情報も取得
+/*	// 時計・天気予報の実行 > この先で天気情報も取得
 	// 初期非表示であっても開始しておく
 
 	mod.var.v.clock_interval.push( setInterval(mod.opw.time_and_date, 1000, mod.var, mod.fnc) );
@@ -672,7 +672,7 @@ window.onload = async function() {
 
 	if ( Object.keys(setting_object).length > 0 && setting_object.clock_display === "true" ) {
 		mod.var.e.cw_box.style.display = "flex";// 日付・天気予報 > 表示
-	}
+	}*/
 
 	// ***** 処理終了 *****
 
