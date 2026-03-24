@@ -1,0 +1,17 @@
+<?php
+
+// fetch で直接 json ファイルを読み込んでも良いが、PHPを経由して
+// header で明示的に読み込む情報の形式を宣言すると確実性が増す
+
+header("Content-Type: application/json; charset=UTF-8");// json を受け取る場合は明示的にJSONと宣言
+
+$ca_file = "../json/clock_action.json";
+$ca_json = file_get_contents($ca_file);
+
+if ( ! $ca_json || ! is_array( json_decode($ca_json, true) ) ) {
+	$ca_json = "[]";
+}
+
+echo $ca_json;
+
+?>
