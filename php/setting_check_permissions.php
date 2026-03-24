@@ -15,6 +15,7 @@ $check_array = array(
 	"../log/reboot.log",
 	"../log/cron.log",
 	"../json/schedule.json",
+	"../json/clock_action.json",
 	"../socket",
 	"../upload_tmp",
 	"../upload",

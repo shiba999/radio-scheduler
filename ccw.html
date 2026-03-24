@@ -19,38 +19,31 @@
 	<meta name="google" content="notranslate" />
 </head>
 
+<style type="text/css" id="font_size">
+
+.fs_date {
+	font-size: 100%;
+}
+
+.fs_clock {
+	font-size: 100%;
+}
+
+.fs_weather {
+	font-size: 100%;
+}
+
+</style>
+
 <body id="ccw">
 
-<div id="clock_weather_box">
-	<span class="cw_date">
-		<span class="month_day_set">
-			<span class="month_day_box">
-				<span id="cw_month">--</span><span id="cw_day">--</span><span id="cw_youbi">---</span>
-			</span>
-		</span>
-		<span class="year_set">
-			<span id="cw_reiwa">Reiwa.-</span><span id="cw_year">----</span>
-		</span>
-		<span id="to_radio"><span onclick="location.href='./'" id="radio_icon"></span></span>
-	</span>
-	<span class="cw_clock">
-		<span id="cw_hour">--</span><span class="colon">:</span><span id="cw_minute">--</span><span class="colon portrait">:</span><span id="cw_second" class="portrait">--</span></span>
-	<span id="cw_weather"><!-- 未設定なら非表示 style="display: none;" -->
-		<span class="temp_set">
-			<span id="cw_temp">---</span><span class="celsius_big">&#8451;</span>
-			<span class="portrait"><br /></span>
-			<span id="cw_temp_max">---</span><span class="celsius">&#8451;</span>
-			<span id="cw_temp_min">---</span><span class="celsius">&#8451;</span>
-		</span>
-		<span class="weather_set">
-			<span id="cw_icon" style="background-image: url(https://openweathermap.org/img/wn/01d@4x.png);"></span>
-			<span id="cw_description">天気</span>
-		</span>
-		<span class="wind_set">
-			<span id="cw_position">地域名</span>
-			<span id="cw_wind_deg">↑</span><span id="cw_wind_speed">1</span><span class="speed">m/s</span>
-		</span>
-	</span>
+<div id="clock_weather_box" style="opacity:0">
+	<span id="cw_date"></span>
+	<span id="cw_date_mid"></span>
+	<span id="cw_clock"></span>
+	<span id="cw_weather"></span>
+	<span id="cw_weather_mid"></span>
+	<span id="to_radio"><span onclick="location.href='./'" id="radio_icon"></span></span>
 </div>
 
 <script type="module">
@@ -195,23 +188,65 @@ window.onload = async function() {
 
 	css_js_cachebuster(mod.cv, "Window onLoad");
 
-	// 時計・天気予報の実行 > この先で天気情報も取得
-	// 初期非表示であっても開始しておく
-
-	mod.var.v.clock_interval.push( setInterval(mod.opw.time_and_date, 1000, mod.var, mod.fnc) );
-
 	// 設定情報で時計が初期表示の場合は時計を開く
 	// openweathermap 関連の情報が設定されているなら該当領域を表示
 
 	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php");
 
-	if ( ! setting_object.openweather_api && ! setting_object.latitude && ! setting_object.longitude ) {
+	// 画面表示のタイプによっては天気予報非表示の場合もあります
+
+	let display_type = setting_object.clock_display;
+
+	//console.log(display_type);
+
+	if ( ! display_type ) {
+		display_type = "full";
+	}
+
+	mod.var.e.cw_box.classList.add(display_type);
+
+	if ( ! setting_object.openweather_api && ! setting_object.latitude && ! setting_object.longitude || display_type === "mini" ) {
 		mod.var.e.cw_box.classList.add("weather_hidden");// 日付・天気予報 > class 追加 > 天気予報非表示
 	}
 
 	// 嵩張る svg ファイルの表示
 
 	mod.var.e.radio_icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 382.69"><path d="M420.21,94.88H125.43L385.93,19.49c5.29-1.44,8.4-6.9,6.95-12.19-1.44-5.28-6.88-8.4-12.19-6.95L33.48,95.24c-.3.08-.57.22-.86.33C14.09,98.96,0,115.19,0,134.68v208.22c0,21.94,17.85,39.79,39.79,39.79h380.41c21.94,0,39.79-17.85,39.79-39.79v-208.22c0-21.94-17.85-39.79-39.79-39.79ZM131.53,319.85c-44.44,0-80.47-36.03-80.47-80.46s36.03-80.47,80.47-80.47,80.46,36.03,80.46,80.47-36.03,80.46-80.46,80.46ZM276.3,311.92c-11.62,0-21.07-9.45-21.07-21.07s9.45-21.07,21.07-21.07,21.07,9.45,21.07,21.07-9.45,21.07-21.07,21.07ZM415.98,306.26c0,3.43-2.78,6.2-6.2,6.2h-79.51c-3.43,0-6.2-2.78-6.2-6.2v-30.82c0-3.43,2.78-6.2,6.2-6.2h79.51c3.43,0,6.2,2.78,6.2,6.2v30.82ZM415.98,228.54c0,3.52-2.6,6.36-5.82,6.36h-149.13c-3.21,0-5.82-2.85-5.82-6.36v-63.26c0-3.52,2.6-6.36,5.82-6.36h149.13c3.21,0,5.82,2.85,5.82,6.36v63.26Z"/></svg>';
+
+	// 時計・天気予報の関数へ送る値の整理
+
+	let ccw_opacity = 1.0;
+	let ccw_date_size = 100;
+	let ccw_clock_size = 100;
+	let ccw_weather_size = 100;
+
+	if ( setting_object.opacity ) {
+		ccw_opacity = Number(setting_object.opacity) / 100;
+	}
+
+	if ( setting_object.date_size ) {
+		ccw_date_size = Number(setting_object.date_size);
+	}
+
+	if ( setting_object.clock_size ) {
+		ccw_clock_size = Number(setting_object.clock_size);
+	}
+
+	if ( setting_object.weather_size ) {
+		ccw_weather_size = Number(setting_object.weather_size);
+	}
+
+	// 時計・天気予報の実行
+
+	const ccw_ini = {
+		"type": display_type,
+		"opacity": ccw_opacity,
+		"date_size": ccw_date_size,
+		"clock_size": ccw_clock_size,
+		"weather_size": ccw_weather_size
+	};
+
+	mod.var.v.clock_interval.push( setInterval(mod.opw.time_and_date, 1000, mod.var, mod.fnc, ccw_ini) );
 
 };
 

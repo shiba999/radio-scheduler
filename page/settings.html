@@ -18,7 +18,7 @@
 
 <section class="card settings">
 
-	<h2>Settings</h2>
+	<h2>設定</h2>
 
 	<p>ツールを使用するためには、以下のソフトウェアを事前にインストールさせておく必要があります。</p>
 
@@ -40,7 +40,7 @@
 		<p class="comment">ラジオや音声ファイルの再生に使用するソフト名を入力してください。</p>
 
 		<p><label for="player_path" class="check">Path to player<span>[例] /usr/bin/mpv</span></label><input type="text" id="player_path" name="player_path" value="" /></p>
-		<p class="comment"><b>which mpv</b> で表示されたパスを設定してください。<br />※仮想環境にインストールした場合は、その中で確認してください。</p>
+		<p class="comment"><b>which mpv</b> で表示されたパスを設定してください。</p>
 
 		<p><label for="amixer_path" class="check">Path to amixer<span>[例] /usr/bin/amixer</span></label><input type="text" id="amixer_path" name="amixer_path" value="" /></p>
 		<p class="comment"><b>which amixer</b> で表示されたパスを設定してください。</p>
@@ -63,65 +63,77 @@
 		<p><label for="latitude" class="check">Latitude<span>[例] 42.8985</span></label><input type="text" id="latitude" name="latitude" value="" /></p>
 		<p class="comment">天気予報を取得したい位置の<b>緯度</b>を入力してください。<br />座標は <b><a href="https://www.google.co.jp/maps/" target="_blank">GoogleMap</a></b> から取得可能です。※マップ上を右クリックで取得できます。モバイル端末なら長押しで表示されます。</p>
 
-		<p><label for="longitude" class="check">Longitude<span>[例] 143.2024</span></label><input type="text" id="longitude" name="longitude" value="" /></p>
+		<p><label for="longitude">Longitude<span>[例] 143.2024</span></label><input type="text" id="longitude" name="longitude" value="" /></p>
 		<p class="comment">天気予報を取得したい位置の<b>経度</b>を入力してください。<br />座標は <b><a href="https://www.google.co.jp/maps/" target="_blank">GoogleMap</a></b> から取得可能です。※マップ上を右クリックで取得できます。モバイル端末なら長押しで表示されます。</p>
 
-		<p><label for="clock_display" class="check">Clock display<span></span></label><input type="checkbox" id="clock_display" name="clock_display" /></p>
-		<p class="comment">コントロールパネルを開いた時に、時計と天気予報を表示する場合はチェックを入れてください。</p>
+		<p><label class="check" style="display:block;margin-bottom:0">Clock display</label><label for="cd_full" class="check">Full</label><input type="radio" id="cd_full" name="clock_display" value="full" checked /><label for="cd_mid" class="check">Medium</label><input type="radio" id="cd_mid" name="clock_display" value="mid" /><label for="cd_mini" class="check">Minimum</label><input type="radio" id="cd_mini" name="clock_display" value="mini" /></p>
+		<p class="comment">時計 / 天気予報の表示タイプを選択してください。<br /><b>Fill</b>: 日付・時計・天気予報 全て表示<br /><b>Medium</b>: 時計表示・日付と天気予報は簡易表示<br /><b>Minimum</b>: 時計のみ表示</p>
 
-		<p><label for="timezone" class="check">timezone<span>[例] Asia/Tokyo</span></label><input type="text" id="timezone" name="timezone" value="" /></p>
+		<p><label for="date_size">Date font size<span class="sf_value">100</span></label><button class="sf_reset" style="margin-top:1.0em !important;">Reset</button><input type="range" id="date_size" class="range" name="date_size" min="50" max="150" value="100" /></p>
+		<p><label for="clock_size" style="margin-top:0">Clock font size<span class="sf_value">100</span></label><button class="sf_reset">Reset</button><input type="range" id="clock_size" class="range" name="clock_size" min="50" max="150" value="100" /></p>
+		<p><label for="weather_size" style="margin-top:0">Weather font size<span class="sf_value">100</span></label><button class="sf_reset">Reset</button><input type="range" id="weather_size" class="range" name="weather_size" min="50" max="150" value="100" /></p>
+		<p class="comment">日付 / 時計 / 天気予報 の文字サイズを変更可能です。<br />表示させているモニターで文字がはみ出る時や、表示を小さくしたい場合は調整してください。<br /><b>50% ～ 150% ※デフォルト: 100</b></p>
+
+		<p><label for="opacity">Opacity<span class="sf_value">100</span></label><button class="sf_reset" style="margin-top:1.0em !important;">Reset</button><input type="range" id="opacity" class="range" name="opacity" min="0" max="100" value="100" /></p>
+		<p class="comment">時計表示の透明度です。夜間眩しい場合は輝度調整替わりに使用してください。<br /><b>0% (透明) ～ 100% (不透明) ※デフォルト: 100</b></p>
+
+		<p><label for="timezone" class="check">Timezone<span>[例] Asia/Tokyo</span></label><input type="text" id="timezone" name="timezone" value="" /></p>
 		<p class="comment"><b>Asia/Tokyo</b> 以外のタイムゾーンで利用する場合は変更してください。</p>
 
-		<p><span id="setting_message">各設定情報を入力してください。</span><br /><button id="setting_set" type="submit">Submit</button></p>
+		<p><span id="setting_message">各設定情報を入力してください。</span><br /><button id="setting_set" type="submit">保存</button></p>
 
 	</div>
 
-	<h2>Audio Mixer</h2>
+	<h2>実行予約（時計画面のみ）</h2>
 
-	<div id="mixer_box">
-		<p>端末内の音量調整をここで行ないます。</p>
-	</div>
+	<p>時計表示画面でアクションを予約します。「時」の単位が変更されるタイミングで１時間に１回実行されます。<br />キーボードなど、端末に操作デバイスが用意されていない場合に使用してください。<br />※アクションは時計画面側で一度実行されると削除されます。</p>
+	<p id="ss_output"><b>現在アクションは登録されていません。</b></p>
+	<p class="btn_set"><button id="ss_reload" class="action_btn" type="button" data-value="reload">ページリロード</button><button id="ss_cancel" class="action_btn" type="button" data-value="cancel">予約をキャンセル</button></p>
 
-	<h2>Last reboot time</h2>
+	<h2>オーディオミキサー</h2>
+
+	<div id="mixer_box"><p>端末内の音量調整をここで行ないます。</p></div>
+
+	<h2>再起動ログ</h2>
 
 	<p id="last_reboot">Last reboot time</p>
 
-	<h2>Permissions</h2>
+	<h2>ファイルの書き込み権限</h2>
 
 	<p>システムで使用する以下のファイルとディレクトリ全てに書き込み許可を付与してください。</p>
 	<p id="permissions_output">permissions_output</p>
 
-	<h2>Streamlink Check</h2>
+	<h2>Streamlink の確認</h2>
 
 	<p>PHP から Streamlink が実行可能か確認しましょう。実行可能な場合はバージョン情報が得られます。</p>
-	<p><button id="sl_check" type="button">Streamlink 確認</button></p>
+	<p class="btn_set"><button id="sl_check" type="button">Streamlink 確認</button></p>
 	<p id="sl_check_output">Streamlink 確認ボタンを押してください。</p>
 
-	<h2>Audio playback permission check</h2>
+	<h2>音声再生権限の確認</h2>
 
-	<p>PHP が音声再生権限を持っているか確認しましょう。</p>
-	<p><button id="app_check" type="button">音声再生権限確認</button></p>
+	<p>PHP 経由で音声再生が可能な状態か確認しましょう。</p>
+	<p class="btn_set"><button id="app_check" type="button">音声再生権限確認</button></p>
 	<p id="app_check_output">音声再生権限確認ボタンを押してください。</p>
 
-	<h2>Play test</h2>
+	<h2>再生テスト</h2>
 
 	<p>Software 設定が完了したら、各ボタンで音声が再生可能か確認してみましょう。<br />再生されない場合は、ソフト名やパスを間違えているか、音声再生権限が無い可能性があります。</p>
 
-	<p class="test_btn"><button id="radio" data-value="RN1" type="button">ラジオ再生 (RN1)</button><button id="audio" data-value="awakening.mp3" type="button">音声ファイル再生</button><button id="stop" type="button">プレイヤー停止</button></p>
+	<p class="btn_set"><button id="radio" data-value="RN1" type="button">ラジオ再生 (RN1)</button><button id="audio" data-value="awakening.mp3" type="button">音声ファイル再生</button><button id="stop" type="button">プレイヤー停止</button></p>
 
 	<p id="test_btn_output">ラジオ及び音声ファイルの再生ボタンを押してください。</p>
 
-	<h2>Cron path</h2>
+	<h2>Cron</h2>
 
 	<p>スケジューラーを使用する場合は、以下の cron を追加してください。<br /><b>sudo crontab -u www-data -e</b></p>
 	<p class="cron_path">*/1 * * * * php <span id="project_root">{PROJECT_ROOT}</span>/php/cron.php</p>
 
-	<h2>ServiceWorker</h2>
+	<h2>サービスワーカー</h2>
 
 	<p>PWAでホーム画面に登録させたい場合は、<a href="../manifest.json" target="_blank">マニフェストファイル</a>の内容を編集し、SSLを発行・設定を行った状態で https からアクセスしてください。※自己署名証明書でも不完全ですがPWAは動作します。</p>
 	<p id="https_href">https href</p>
 	<p id="sw_output" class="cron_path">こちらでサービスワーカー関係の登録解除が可能です。</p>
-	<p>
+	<p class="btn_set">
 		<button id="sw_btn_install">ServiceWorker インストール</button>
 		<button id="sw_btn_reset">ServiceWorker 解除</button>
 	</p>
@@ -196,6 +208,10 @@
 	const latitude = document.getElementById("latitude");
 	const longitude = document.getElementById("longitude");
 	const clock_display = document.getElementById("clock_display");
+	const date_size = document.getElementById("date_size");
+	const clock_size = document.getElementById("clock_size");
+	const weather_size = document.getElementById("weather_size");
+	const opacity = document.getElementById("opacity");
 	const timezone = document.getElementById("timezone");
 	const setting_set = document.getElementById("setting_set");
 	const set_msg = document.getElementById("setting_message");
@@ -243,7 +259,7 @@
 
 	async function get_setting_values() {
 
-		const setting_object = await fnc.fetch_template("../php/setting_get.php", "");
+		const setting_object = await fnc.fetch_template("../php/setting_get.php");
 
 		//console.log(setting_object);
 
@@ -291,8 +307,32 @@
 			longitude.value = setting_object.longitude;
 		}
 
-		if (setting_object.clock_display !== "false") {
-			clock_display.checked = setting_object.clock_display;
+		if ( setting_object.clock_display == "" || setting_object.clock_display == "true" ) {
+			setting_object.clock_display = "full";// 旧バージョンからのコンバート
+		}
+
+		if (setting_object.clock_display) {
+			document.querySelector('input[name="clock_display"][value="' + setting_object.clock_display + '"]').checked = true;
+		}
+
+		if ( setting_object.date_size != "" ) {
+			date_size.value = setting_object.date_size;
+			date_size.previousElementSibling.previousElementSibling.querySelector(".sf_value").textContent = setting_object.date_size;
+		}
+
+		if (setting_object.clock_size) {
+			clock_size.value = setting_object.clock_size;
+			clock_size.previousElementSibling.previousElementSibling.querySelector(".sf_value").textContent = setting_object.clock_size;
+		}
+
+		if (setting_object.weather_size) {
+			weather_size.value = setting_object.weather_size;
+			weather_size.previousElementSibling.previousElementSibling.querySelector(".sf_value").textContent = setting_object.weather_size;
+		}
+
+		if (setting_object.opacity) {
+			opacity.value = setting_object.opacity;
+			opacity.previousElementSibling.previousElementSibling.querySelector(".sf_value").textContent = setting_object.opacity;
 		}
 
 		if (setting_object.timezone) {
@@ -307,6 +347,55 @@
 	}
 
 	get_setting_values();
+
+
+	// <input type="range" /> 操作時に実行する関数
+
+	const update_range_value = function(event) {
+
+		const change = event.currentTarget;// 操作されたスライダー自身
+
+		// previousElementSibling > 一つ手前 (二つ使っている)
+
+		const sf_value = change.previousElementSibling.previousElementSibling.querySelector('.sf_value');
+
+		if (sf_value) {
+			sf_value.textContent = change.value;
+		}
+
+	};
+
+	// すべての <input type="range" /> にイベントを登録
+
+	const ranges = document.querySelectorAll(".range");
+
+	ranges.forEach( function(slider) {
+		slider.addEventListener("change", update_range_value);
+	});
+
+
+	// <input type="range" /> の値をリセットする関数
+
+	const reset_range_value = function(event) {
+
+		// 一つ下要素の値を 100 に変更
+
+		const range = event.currentTarget.nextElementSibling;
+		range.value = 100;
+
+		// 一つ上にある値も変更
+
+		const sf_value = event.currentTarget.previousElementSibling.querySelector('.sf_value');
+		sf_value.textContent = 100;
+
+	};
+
+	const reset_buttons = document.querySelectorAll(".sf_reset");
+
+	reset_buttons.forEach( function(button) {
+		button.addEventListener("click", reset_range_value);
+	});
+
 
 	// * * * * * * * * * * * * * * * * * * * * * *
 	// 設定項目を保存する関数
@@ -325,12 +414,18 @@
 		const openweather_api_value = openweather_api.value;
 		const latitude_value = latitude.value;
 		const longitude_value = longitude.value;
-		const clock_display_value = clock_display.checked;
+		const clock_display_value = document.querySelector('input[name="clock_display"]:checked').value;
+		const date_size_value = date_size.value;
+		const clock_size_value = clock_size.value;
+		const weather_size_value = weather_size.value;
+		const opacity_value = opacity.value;
 		const timezone_value = timezone.value;
 
 		const value_array = new Array(sl_path_value, player_value, p_path_value, amixer_path_value, reboot_path_value, shutdown_path_value, playback_options_value, openweather_api_value, latitude_value, longitude_value, timezone_value);
 
 		//console.log(value_array);
+
+		// 入力値のチェック (マルチバイトが混入していないか確認)
 
 		let false_count = 0
 		let false_value_array = new Array();
@@ -366,6 +461,10 @@
 				latitude: latitude_value,
 				longitude: longitude_value,
 				clock_display: clock_display_value,
+				date_size: date_size_value,
+				clock_size: clock_size_value,
+				weather_size: weather_size_value,
+				opacity: opacity_value,
 				timezone: timezone_value
 			};
 
@@ -392,12 +491,72 @@
 	});
 
 	// * * * * * * * * * * * * * * * * * * * * * *
+	// 実行予約（時計画面のみ）
+	// * * * * * * * * * * * * * * * * * * * * * *
+
+	// memo:	サービスワーカー関係で http 接続時には https へのリンクを
+	// 			https 接続時には http へのリンクを表示させる様にしてみる
+
+	// 予約されたアクションの内容を確認して表示
+
+	const ss_output = document.getElementById("ss_output");
+	const ss_reload = document.getElementById("ss_reload");
+	const ss_cancel = document.getElementById("ss_cancel");
+
+	async function check_clock_action() {
+
+		const cca_object = await fnc.fetch_template("../php/clock_action_get.php");
+
+		//console.log(cca_object);
+
+		if ( cca_object.length > 0 ) {
+
+			let ss_msg = "アクションが登録されています";
+
+			// リロードが登録されているかの確認
+
+			if ( cca_object.includes("reload") ) {
+				ss_msg += " [リロード]";
+			}
+
+			ss_output.innerHTML = "<b>" + ss_msg + "</b>";
+
+		} else {
+			ss_output.innerHTML = "<b>現在アクションは登録されていません。</b>";
+		}
+
+	}
+
+	check_clock_action();
+
+	// アクション登録ボタン (class="action_btn")
+
+	document.addEventListener("click", async function(event) {
+
+		if ( event.target.classList.contains("action_btn") && event.target.dataset.value ) {
+
+			const params = new URLSearchParams({
+				action: event.target.dataset.value 
+			});
+
+			const query_string = new URLSearchParams(params).toString();
+			const res = await fnc.fetch_template("../php/clock_action_set.php", query_string);
+
+			//console.log(res);
+
+			check_clock_action();
+
+		}
+
+	});
+
+	// * * * * * * * * * * * * * * * * * * * * * *
 	// システムで必要なファイルとディレクトリが書き込み可能か確認する関数
 	// * * * * * * * * * * * * * * * * * * * * * *
 
 	async function check_permissions() {
 
-		const permissions_object = await fnc.fetch_template("../php/setting_check_permissions.php", "");
+		const permissions_object = await fnc.fetch_template("../php/setting_check_permissions.php");
 
 		//console.log(permissions_object);
 

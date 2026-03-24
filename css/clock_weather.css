@@ -29,7 +29,6 @@ body:has(#clock_weather_box[style*="display: flex"]) #audio_box {
 */
 
 #clock_weather_box {
-	/*font-family: 'Monospace', system-ui, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Noto Sans CJK JP", sans-serif;*/
 	font-family: "Consolas", "Monaco", "Lucida Console", "Courier New", "Monospace", monospace, system-ui, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Noto Sans CJK JP", sans-serif;
 	background-color: #000;
 	position: fixed;
@@ -44,6 +43,7 @@ body:has(#clock_weather_box[style*="display: flex"]) #audio_box {
 	box-sizing: border-box;
 	padding: 5vh 5vw;
 	line-height: 1;
+	transition: opacity 0.5s ease;
 }
 
 /*
@@ -71,40 +71,61 @@ padding の横方向は不要になっていく
 	}
 }
 
-#cw_reiwa, .month_day_set .slash, .colon, .celsius_big, .celsius, .speed {
+.cw_reiwa, .month_day_set .slash, .colon, .celsius_big, .celsius, .speed {
     color: #999;
+}
+
+/* 文字の大きさを JavaScript 経由で調整する場合はこの class を付与させる */
+
+.fs_date,
+.fs_clock,
+.fs_weather {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+	vertical-align: middle;
 }
 
 /* #cw_weather 天気予報 > 表示中の場合 */
 
-.cw_date {
+.full #cw_date {
 	height: 27%;
 }
-.cw_clock {
+.full #cw_clock {
 	height: 63%;
 }
-#cw_weather {
+.full #cw_weather {
 	height: 30%;
 }
 
 /* #cw_weather 天気予報 > 非表示の場合 */
 
-.weather_hidden .cw_date {
+.full .weather_hidden #cw_date {
 	height: 30%;
 	margin-top: 5%;
 }
-.weather_hidden .cw_clock {
+.full .weather_hidden #cw_clock {
 	height: 60%;
 }
-.weather_hidden #cw_weather {
+.full .weather_hidden #cw_weather {
+	display: none;
+}
+
+/* Mid 要素は非表示 */
+
+.full #cw_date_mid,
+.full #cw_weather_mid {
 	display: none;
 }
 
 /* 梱包する要素内のサイズの基準となる様に設定 cqw , cqh を有効に */
 
-.cw_date,
-.cw_clock,
-#cw_weather {
+#cw_date,
+#cw_date_mid,
+#cw_clock,
+#cw_weather,
+#cw_weather_mid {
 	container-type: size;
 }
 
@@ -114,7 +135,7 @@ padding の横方向は不要になっていく
 ----------------------------------
 */
 
-.cw_date {
+#cw_date {
 	display: flex;
 	justify-content: space-between;
 	align-items: stretch;
@@ -130,30 +151,37 @@ padding の横方向は不要になっていく
 /* 年 (強制的に中央) */
 
 .year_set {
+	text-align: center;
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
-	text-align: center;
 	white-space: nowrap;
 }
 
-/* アイコン (右) */
+/*
+	アイコン (右) 要素的には #clock_weather_box 直下の一番最後に位置する
+	アイコンだけはピクセル指定にした
+*/
 
 #to_radio {
-	text-align: right;
+	position: fixed;
+	width: 36px;
+	height: 36px;
+	top: 20px;
+	right: 36px;
 }
 
 #radio_icon {
-	width: 50cqh;
-	height: 50cqh;
+	width: 100%;
+	height: 100%;
 	display: inline-block;
 }
 
 #radio_icon svg {
-	width: 50cqh;
-	height: 50cqh;
+	width: 100%;
+	height: 100%;
 	display: inline-block;
-	fill: #555;
+	fill: #333;
 	vertical-align: middle;
 	cursor: pointer;
 }
@@ -164,8 +192,8 @@ padding の横方向は不要になっていく
 	background-color: #ccc;
 	color: #222;
 	text-align: center;
-	padding: 10cqh 15cqh 8cqh 15cqh;
-	border-radius: 7cqh;
+	padding: 0.75em 1.0em 0.8em 1.0em;
+	border-radius: 0.3em;
 	overflow: hidden;
 	display: inline-block;
 }
@@ -173,24 +201,25 @@ padding の横方向は不要になっていく
 .month_day_box span {
 	display: block;
 	font-weight: bold;
+	margin: -0.02em 0;
 }
 
-#cw_month {
-	font-size: 12cqh;
+.cw_month {
+	font-size: 1.2em;
 	font-weight: bold;
 	letter-spacing: -0.02em;
 }
 
-#cw_day {
-	font-size: 46cqh;
+.cw_day {
+	font-size: 3.8em;
 	font-weight: bold;
 	letter-spacing: 0em;
 	vertical-align: bottom;
 	margin: 1cqh 0;
 }
 
-#cw_youbi {
-	font-size: 20cqh;
+.cw_youbi {
+	font-size: 1.2em;
 	letter-spacing: 0.1em;
 }
 
@@ -201,14 +230,14 @@ padding の横方向は不要になっていく
 	text-align: center;
 }
 
-#cw_reiwa {
-	font-size: 24cqh;
+.cw_reiwa {
+	font-size: 1.4em;
 }
 
-#cw_year {
-	font-size: 56cqh;
+.cw_year {
+	font-size: 4.2em;
 	font-weight: bold;
-	margin-top: 4cqh;
+	margin-top: 0.1em;
 }
 
 /*
@@ -217,16 +246,20 @@ padding の横方向は不要になっていく
 ----------------------------------
 */
 
-.cw_clock {
+#cw_clock {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	letter-spacing: 0;
 }
 
-#cw_hour,
-#cw_minute,
-#cw_second,
+#cw_clock {
+	font-size: 38cqh;
+}
+
+.cw_hour,
+.cw_minute,
+.cw_second,
 .colon {
 	display: inline-block;
 	vertical-align: middle;
@@ -234,16 +267,16 @@ padding の横方向は不要になっていく
 
 /* cqh: 梱包する要素の高さに対する大きさ 100cqh = 100% */
 
-#cw_hour,
-#cw_minute,
-#cw_second {
-	font-size: 72cqh;
+.cw_hour,
+.cw_minute,
+.cw_second {
+	font-size: 1.0em;
 	letter-spacing: 0;
 }
 
 .colon {
-	font-size: 64cqh;
-	margin: 0 -2cqh 8cqh -2cqh;
+	font-size: 0.9em;
+	margin: 0 -0.05em 0.15em -0.05em;
 }
 
 /*
@@ -306,31 +339,31 @@ padding の横方向は不要になっていく
 	flex-wrap: wrap;*/
 }
 
-#cw_temp {
-	font-size: 64cqh;
+.cw_temp {
+	font-size: 4.2em;
 }
 
 .cw_temp_m {
 }
 
-#cw_temp_max {
-	font-size: 28cqh;
+.cw_temp_max {
+	font-size: 1.8em;
 	color: #ef6109;
 }
 
-#cw_temp_min {
-	font-size: 26cqh;
+.cw_temp_min {
+	font-size: 1.8em;
 	color: #10bcf0;
 }
 
 .celsius_big {
-	font-size: 26cqh;
-	margin: 0 4cqh;
+	font-size: 2.0em;
+	margin: 0 0.3em;
 }
 
 .celsius {
-	font-size: 16cqh;
-	margin: 0 4cqh;
+	font-size: 0.8em;
+	margin: 0 0.4em;
 }
 
 /* 天気予報 */
@@ -339,21 +372,21 @@ padding の横方向は不要になっていく
 	display: inline-block;
 }
 
-#cw_icon,
-#cw_description {
+.cw_icon,
+.cw_description {
 	display: block;
 }
 
-#cw_icon {
-	height: 76cqh;
-	width: 76cqh;
+.cw_icon {
+	height: 6.4em;
+	width: 6.4em;
 	background-position: center center;
 	background-repeat: no-repeat;
 	background-size: 135%;
 }
 
-#cw_description {
-	font-size: 18cqh;
+.cw_description {
+	font-size: 1.2em;
 	font-weight: bold;
 }
 
@@ -363,33 +396,31 @@ padding の横方向は不要になっていく
 	align-self: flex-end;
 }
 
-#cw_position {
+.cw_position {
 	display: inline-block;
 	width: 100%;
-	margin-bottom: 4cqh;
-	font-size: 24cqh;
+	margin-bottom: 0.2em;
+	font-size: 1.6em;
 	color: #666;
 	font-weight: bold;
 }
 
-#cw_wind_deg {
+.cw_wind_deg {
 	display: inline-block;
-	font-size: 48cqh;
+	font-size: 3.8em;
 	color: #328805;
 	font-weight: bold;
 }
 
-#cw_wind_speed {
-	font-size: 58cqh;
-	margin-left: 12cqh;
+.cw_wind_speed {
+	font-size: 4.6em;
+	margin-left: 0.2em;
 }
 
 .speed {
-	font-size: 32cqh;
-	margin-left: 8cqh;
+	font-size: 2.2em;
+	margin-left: 0.2em;
 }
-
-
 
 /*
 ----------------------------------
@@ -401,7 +432,6 @@ padding の横方向は不要になっていく
 
 /* 正方形に近い状態は一部要素を表示 */
 
-/*@media (max-aspect-ratio: 1.3) and (min-aspect-ratio: 0.8) {*/
 @media (max-aspect-ratio: 1.2) {
 
 	#clock_weather_box {
@@ -411,11 +441,11 @@ padding の横方向は不要になっていく
 		margin: auto;
 	}
 
-	.cw_date {
+	#cw_date {
 		height: 20%;
 		align-items: flex-end;
 	}
-	.cw_clock {
+	#cw_clock {
 		height: 35%;
 	}
 	#cw_weather {
@@ -424,24 +454,18 @@ padding の横方向は不要になっていく
 
 	/* #cw_weather 天気予報 > 非表示の場合 */
 
-/*#clock_weather_box:has(#cw_weather:not([style*="display: none"])) .cw_date {
-		height: 20%;
-	}
-	#clock_weather_box:has(#cw_weather:not([style*="display: none"])) .cw_clock {
-		height: 40%;
-	}*/
-
-	.weather_hidden .cw_date {
+	.weather_hidden #cw_date {
 		height: 50%;
 		margin: 5cqw 0;
 	}
-	.weather_hidden .cw_clock {
+	.weather_hidden #cw_clock {
 		height: 50%;
 		align-items: flex-start;
 		margin: 5cqw 0;
 	}
 
-	.portrait {
+	.portrait,
+	.cw_second {
 		display: none !important;
 	}
 
@@ -454,45 +478,29 @@ padding の横方向は不要になっていく
 	/* 月 / 日 */
 
 	.month_day_box {
-		padding: 2cqw 3cqw 2cqw 3cqw;
-		border-radius: 2cqw;
+		padding: 0.55em 0.8em 0.5em 0.8em;
 	}
 
-	#cw_month {
-		font-size: 4cqw;
+	.cw_month {
+		font-size: 1.0em;
 	}
 
-	#cw_day {
-		font-size: 12cqw;
-		margin: 0.5cqw 0;
+	.cw_day {
+		font-size: 3.4em;
 	}
 
-	#cw_youbi {
-		font-size: 5cqw;
+	.cw_youbi {
+		font-size: 1.0em;
 	}
 
 	/* 年 / 年号 */
 
-	#cw_reiwa {
-		font-size: 6cqw;
+	.cw_reiwa {
+		font-size: 1.2em;
 	}
 
-	#cw_year {
-		font-size: 12cqw;
-		font-weight: bold;
-		margin-top: 1cqw;
-	}
-
-	/* アイコン (右) */
-
-	#radio_icon {
-		width: 14cqw;
-		height: 14cqw;
-	}
-
-	#radio_icon svg {
-		width: 14cqw;
-		height: 14cqw;
+	.cw_year {
+		font-size: 2.8em;
 	}
 
 	/*
@@ -501,15 +509,15 @@ padding の横方向は不要になっていく
 	----------------------------------
 	*/
 
-	#cw_hour,
-	#cw_minute {
-		font-size: 38cqw;
+	.cw_hour,
+	.cw_minute,
+	.cw_second {
+		font-size: 0.7em;
 		letter-spacing: 0;
 	}
 
 	.colon {
-		font-size: 26cqw;
-		margin: 0 2cqw 4cqw 2cqw;
+		font-size: 0.6em;
 	}
 
 	/*
@@ -518,7 +526,7 @@ padding の横方向は不要になっていく
 	----------------------------------
 	*/
 
-	#cw_weather {
+	#cw_weather .fs_weather {
 		flex-direction: column;
 		justify-content: space-between;
 	}
@@ -531,27 +539,24 @@ padding の横方向は不要になっていく
 		margin: 0 auto;
 	}
 
-	/* ここらへんまで終わってる */
-
-	#cw_temp {
-		font-size: 14cqw;
-	}
-
-	#cw_temp_max,
-	#cw_temp_min {
-		font-size: 7cqw;
-	}
-
-	#cw_temp_max{
-		margin-left: 2cqw;
+	.cw_temp {
+		font-size: 2.6em;
 	}
 
 	.celsius_big {
-		font-size: 7cqw;
+		font-size: 1.4em;
+	}
+
+	.cw_temp_max {
+		font-size: 1.6em;
+	}
+
+	.cw_temp_min {
+		font-size: 1.6em;
 	}
 
 	.celsius {
-		font-size: 5cqw;
+		font-size: 0.6em;
 	}
 
 	.weather_set {
@@ -563,62 +568,207 @@ padding の横方向は不要になっていく
 		white-space: nowrap;
 	}
 
-	#cw_icon,
-	#cw_description {
+	.cw_icon,
+	.cw_description {
 		display: inline-block;
 		vertical-align: middle;
 	}
 
-	#cw_icon {
-		height: 24cqw;
-		width: 24cqw;
+	.cw_icon {
+		height: 3.4em;
+		width: 3.4em;
+		margin: 0 1.0em 0.3em 0;
 	}
 
-	#cw_description {
-		font-size: 8cqw;
+	.cw_description {
+		font-size: 1.0em;
 	}
 
-	#cw_wind_deg,
-	#cw_wind_speed {
+	.cw_wind_deg,
+	.cw_wind_speed {
 		vertical-align: initial;
 	}
 
-	#cw_wind_deg,
-	#cw_wind_speed {
-		font-size: 12cqw;
+	.cw_wind_deg,
+	.cw_wind_speed {
+		font-size: 2.8em;
 	}
 
-	#cw_position {
+	.cw_position {
 		white-space: inherit;
 		display: initial;
 		margin-bottom: initial;
-		font-size: 8cqw;
+		font-size: 1.8em;
 	}
 
-	#cw_wind_deg {
-		margin-left: 4cqw;
+	.cw_wind_deg {
+		margin-left: 0.4em;
 	}
 
-	#cw_description {
-		margin-left: 4cqw;
-	}
-
-	#cw_wind_speed {
-		margin-left: 4cqw;
+	.cw_wind_speed {
+		margin-left: 0.4em;
 	}
 
 	.speed {
-		font-size: 5vw;
-		margin: 0 0 0 4cqw;
+		font-size: 1.6em;
 	}
 
 }
 
-/*@media (orientation: portrait) {
-}*/
+/*
+============================================
+表示タイプ > mini
+時計のみ表示
+但しコントロールパネルへのリンクは表示
+============================================
+*/
 
+.mini .month_day_set,
+.mini .year_set {
+	display: none;
+}
 
+.mini #cw_clock {
+	height: 100vh;
+	align-items: center;
+}
 
+/*
+============================================
+表示タイプ > mid
+全て表示するが一部非表示とする
+時計以外は小さく表示
+============================================
+*/
 
+/*
+Full と Mid の表示切り替えは
+HTMLを別途用意して切り替えた方がスッキリする気がする
+Full:
+	変更なし
+Mid:
+	上段は日付とアイコンのみ > 2026.03.17 Tue
+	下段は地域名と気温と天気アイコンのみ > 帯広 12℃ ☀
+あと、画面の切り替えは時計以外は日付が変わるタイミングで十分
+*/
 
+.mid #cw_date_mid {
+	height: 27%;
+}
+.mid #cw_clock {
+	height: 63%;
+}
+.mid #cw_weather_mid {
+	height: 30%;
+}
+
+/* Full 要素は非表示 */
+
+.mid #cw_date,
+.mid #cw_weather {
+	display: none;
+}
+
+#cw_date_mid,
+#cw_weather_mid {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	color: #ccc;
+	font-weight: bold;
+}
+
+/* 上段日付情報 簡素版 */
+
+.mid_year,
+.mid_month,
+.mid_day {
+	font-size: 2.0em;
+}
+
+.mid_slash {
+	font-size: 1.6em;
+	margin: 0 0.15em 0.05em 0.15em;
+}
+
+.mid_youbi {
+	font-size: 1.6em;
+	margin: 0.3em 0 0.1em 0.5em;
+}
+
+.mid_brackets_l,
+.mid_brackets_r {
+	font-size: 1.2em;
+}
+
+.mid_brackets_l {
+	margin: 0 0.1em 0.1em 0.5em;
+}
+
+.mid_brackets_r {
+	margin: 0 0.1em 0.1em 0.1em;
+}
+
+/* 下段天気予報 簡素版 */
+
+.mid_temp {
+	font-size: 3.2em;
+	margin-right: 0.1em;
+}
+
+.mid_celsius,
+.mid_position {
+	font-size: 1.8em;
+	color: #999;
+	margin-top: 0.5em;
+}
+
+.mid_icon {
+	width: 5.0em;
+	height: 5.0em;
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 135%;
+	margin: 0 1.0em 0.35em 1.0em;
+}
+
+@media (max-aspect-ratio: 1.2) {
+
+	.mid #cw_date_mid {
+		height: 20%;
+	}
+	.mid #cw_clock {
+		height: 40%;
+	}
+	.mid #cw_weather_mid {
+		height: 45%;
+		padding-bottom: 30%;
+		box-sizing: border-box;
+	}
+
+	.mid #to_radio {
+		position: fixed;
+		width: 36px;
+		height: 36px;
+		top: initial;
+		bottom: 10%;
+		left: calc( 50% - 18px );
+		right: initial;
+	}
+
+	/* 上段日付情報 簡素版 */
+
+	/* 下段天気予報 簡素版 */
+
+	.mid_temp {
+		font-size: 0.8em;
+	}
+
+	.mid_celsius,
+	.mid_position {
+		font-size: 0.5em;
+	}
+
+}
 

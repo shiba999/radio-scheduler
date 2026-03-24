@@ -1153,6 +1153,7 @@ input[type="button"] {
     display: inline-block;
 	font-weight: bold;
 	margin: 1.0em 0 0.5em 0;
+	vertical-align: middle;
 }
 
 .settings label span {
@@ -1175,10 +1176,12 @@ input[type="button"] {
 	background-color: #ddd;
 }
 
-.settings input[type="checkbox"] {
+.settings input[type="checkbox"],
+.settings input[type="radio"] {
 	width: 2em;
 	height: 2em;
 	vertical-align: middle;
+	margin: 1.0em 2.0em 0.5em 1.0em;
 }
 
 .settings .comment {
@@ -1193,9 +1196,13 @@ input[type="button"] {
 	background-color: #ddd;
 }
 
-.settings button {
+#set_form button,
+.btn_set button {
 	padding: 1.25em 2.25em;
 	border: 3px solid #555;
+}
+
+#set_form button {
 	margin: 1.0em 1.0em 1.0em 0;
 }
 
@@ -1216,10 +1223,23 @@ input[type="button"] {
 	background-color: #ddd;
 }
 
+.settings input[type="range"] {
+	width: 100%;
+}
+
 .settings a {
 	font-size: 100%;
 	font-weight: bold;
 	color: #fffedc;
+}
+
+.sf_reset {
+	font-size: 82%;
+	margin: 0 0 0.75em 1.5em !important;
+	padding: 0.5em 1.0em !important;
+	vertical-align: middle;
+	border: 0 !important;
+	border-radius: 3px;
 }
 
 #last_reboot,
@@ -1307,6 +1327,11 @@ input[type="button"] {
 
 #mixer_box input {
 	margin: 0;
+}
+
+.btn_set {
+	background-color: #333;
+	text-align: center;
 }
 
 /* tool */

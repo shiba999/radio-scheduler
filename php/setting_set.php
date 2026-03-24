@@ -22,6 +22,10 @@ $setting_object = array(
 	"latitude" => $_POST["latitude"],
 	"longitude" => $_POST["longitude"],
 	"clock_display" => $_POST["clock_display"],
+	"date_size" => $_POST["date_size"],
+	"clock_size" => $_POST["clock_size"],
+	"weather_size" => $_POST["weather_size"],
+	"opacity" => $_POST["opacity"],
 	"timezone" => $_POST["timezone"]
 );
 
