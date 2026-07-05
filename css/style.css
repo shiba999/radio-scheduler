@@ -1163,7 +1163,10 @@ input[type="button"] {
 	font-weight: normal;
 }
 
-.settings input[type="text"] {
+.settings input[type="text"],
+.settings input[type="number"],
+.settings input[type="email"],
+.settings input[type="password"] {
     width: 100%;
 	box-sizing: border-box;
 	background-color: #bbb;
@@ -1172,7 +1175,10 @@ input[type="button"] {
 	border-radius: 3px;
 }
 
-.settings input[type="text"]:hover {
+.settings input[type="text"]:hover,
+.settings input[type="number"]:hover,
+.settings input[type="email"]:hover,
+.settings input[type="password"]:hover {
 	background-color: #ddd;
 }
 
@@ -1187,23 +1193,32 @@ input[type="button"] {
 .settings .comment {
 	background-color: #333;
 	padding: 0.75em 1.25em;
-	font-size: 90%;
-	line-height: 1.35em;
+	font-size: 78%;
+	line-height: 1.55em;
 	margin: 0 1.20em 1.0em 1.20em;
 }
 
-.settings input[type="text"]:hover {
-	background-color: #ddd;
+.form_box {
+	background: #3e3e3e;
+	padding: 0.5em 1.0em 1.0em 1.0em;
 }
 
-#set_form button,
+.form_box button,
 .btn_set button {
 	padding: 1.25em 2.25em;
 	border: 3px solid #555;
 }
 
-#set_form button {
+.form_box button {
 	margin: 1.0em 1.0em 1.0em 0;
+}
+
+.form_box p:first-of-type {
+	margin-top: 0;
+}
+
+.form_box p:last-of-type {
+	margin-bottom: 0;
 }
 
 .settings button:hover {
@@ -1242,7 +1257,35 @@ input[type="button"] {
 	border-radius: 3px;
 }
 
-#last_reboot,
+#send_test {
+	background: #333;
+	color: #999;
+	font-size: 88%;
+	padding: 0.5em 1.0em;
+	border-radius: 5px;
+	margin-left: 1.0em;
+	cursor: pointer;
+}
+
+#send_test:hover {
+	background: #222;
+	color: #ccc;
+}
+
+#cron_log {
+	overflow-x: auto;
+	margin: 1.0em 0 1.5em 0;
+	height: 20em;
+}
+
+#current_region {
+	text-align: center;
+	font-size: 1.05em;
+	font-weight: bold;
+}
+
+#region_and_channel,
+#cron_log,
 #permissions_output,
 .cron_path,
 #mixer_box {
@@ -1257,6 +1300,7 @@ input[type="button"] {
     display: block;
 }
 
+#cron_log,
 #permissions_output .permission {
     color: #0ebe00;
 }

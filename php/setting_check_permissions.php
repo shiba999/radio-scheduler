@@ -6,20 +6,20 @@
 header("Content-Type: application/json; charset=UTF-8");// json を受け取る場合は明示的にJSONと宣言
 
 $check_array = array(
-	"../json/settings.json",
-	"../log/settings.log",
-	"../log/radio.log",
-	"../log/player.log",
-	"../log/volume.log",
-	//"../log/audio.log",
-	"../log/reboot.log",
-	"../log/cron.log",
-	"../json/schedule.json",
-	"../json/clock_action.json",
-	"../socket",
-	"../upload_tmp",
-	"../upload",
-	"../json/openweather.json"
+	"../json/settings.json",// 基本設定
+	"../json/clock_owm.json",// 時計・天気預保設定
+	"../json/sendmail.json",// メール送信設定
+	"../json/gmail_token.json",// Gmail API のトークン保存先
+	"../log/settings.log",// オーディオパーミッションチェックで使用 (デバッグ用)
+	"../log/player.log",// ラジオ・音声ファイル再生時のデバッグ用
+	"../log/volume.log",// 現在の音量
+	"../log/cron.log",// cron 実行ログ保存先
+	"../json/schedule.json",// スケジュール保存先
+	"../json/clock_action.json",// 時計画面のアクション登録用
+	"../socket",// Socket 領域
+	"../upload_tmp",// アップロード処理領域
+	"../upload",// アップロードファイル保存先
+	"../json/openweather.json"// 天気予報 api 受信情報保存先
 );
 $result_array = array();
 

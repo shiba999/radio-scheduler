@@ -22,31 +22,11 @@ function system_reboot( $delay = 0 ) {
 	$reboot_path = $settings_object["reboot_path"];
 
 	$message = "";// これは別の場所から再起動した場合用のコールバック用
+	$return_value = false;// return用
 
 	if ( $reboot_path != "" ) {
 
-		// タイムゾーンは設定されていなくても "Asia/Tokyo" となるようにしている
-		// "Asia/Tokyo" 以外に設定されていれば、対応したタイムゾーンになる
-		// このソフトを日本以外で使う人は居ないとは思うけど
-
-		$timezone_text = "UTC";
-
-		if ( isset($settings_object["timezone"]) ) {
-			$timezone_text = $settings_object["timezone"];
-		} else {
-			$timezone_text = "Asia/Tokyo";
-		}
-
-		date_default_timezone_set($timezone_text);
-
-		// 再起動のログ生成
-
-		$log_file = PROJECT_ROOT . "/log/reboot.log";
-		$log_text = "Latest restart time: " . date("Y/m/d (D) G:i:s");
-		$log_storage = false;
-
-		//$test = "delay: " . $delay . " ---> ";
-
+		// $delay で指定分待機後に再起動
 		// at は標準では root 以外許可されていなかったので sleep を使用した。
 
 		if ( $delay > 0 ) {
@@ -56,15 +36,14 @@ function system_reboot( $delay = 0 ) {
 			exec("sudo " . $reboot_path . " & 2>&1", $output, $return_var);
 		}
 
-		$message = "";// これは別の場所から再起動した場合用のコールバック用
-
 		if ( $return_var === 0 ) {// 再起動が受理された
 
-			if ($log_storage) {
-				file_put_contents($log_file, $log_text);
-			}
+			//if ($log_storage) {
+			//	file_put_contents($log_file, $log_text);
+			//}
 
 			$message = "再起動を実行します。";
+			$return_value = true;
 
 		} else {// 何らかの要因で再起動失敗
 
@@ -79,6 +58,7 @@ function system_reboot( $delay = 0 ) {
 	}
 
 	echo $message;
+	return $return_value;
 
 }
 

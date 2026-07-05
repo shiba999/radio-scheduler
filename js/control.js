@@ -211,6 +211,57 @@
 
 	}
 
+	// ラジオの再生確認関数
+
+	async function radio_playback_check(arg_fnc, channel) {
+
+		const params = new URLSearchParams({
+			cmd: "play",
+			channel: channel
+		});
+
+		const query_string = new URLSearchParams(params).toString();
+		const object = await arg_fnc.fetch_template("./php/player_radio.php", query_string);
+
+		//console.log(object);
+
+		//await arg_fnc.js_sleep(3000);
+
+		// 再生されたかの確認 (少しづつ待機しながら確認)
+
+		let count = 1;
+		let success_flag = false;
+
+		for ( let n = 0; n < 30; n++ ) {
+
+			await arg_fnc.js_sleep(500);// 少し待機
+
+			// Socket でプレイヤーが起動しているか確認
+
+			const send_params_result = {
+				type: "get",
+				property: "filename",
+				id: 1
+			};
+
+			const query_string_result = new URLSearchParams(send_params_result).toString();
+			const result_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_result);
+
+			console.log(result_array);
+
+			if ( result_array.error === "success" ) {
+				success_flag = true;
+				break;
+			}
+
+			count++;
+
+		}
+
+		return success_flag;
+
+	}
+
 	// チェンネル一覧領域をクリックした場合のイベント
 	// ラジオ再生・停止を制御している
 
@@ -232,11 +283,13 @@
 				in_process.style.display = "flex";// .in_process 表示
 			}
 
-			// チャンネル情報を取り出して php へ送ってラジオを再生する
+			// チャンネル情報を取り出して php へ送ってラジオを再生する (1回目)
 
 			let this_ch_id = event.target.dataset.ch;
 
-			const params = new URLSearchParams({
+			let playback_result = await radio_playback_check(arg_fnc, this_ch_id);
+
+/*			const params = new URLSearchParams({
 				cmd: "play",
 				channel: this_ch_id
 			});
@@ -277,9 +330,9 @@
 
 				count++;
 
-			}
+			}*/
 
-			if ( success_flag === true ) {
+			if ( playback_result === true ) {
 
 				// 再生情報をフッターや一覧にも反映
 
@@ -293,8 +346,34 @@
 
 			} else {
 
-				arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " ) Retry: " + count);
-				init_play_info(arg_val);// 表示の初期化
+				//arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " ) Retry: " + count);
+				//init_play_info(arg_val);// 表示の初期化
+
+				// 1回目の実行で再生されなかった場合 > プロバイダの地域が変更された可能性がある。
+				// その場合は全国共通で視聴可能なチャンネルの再生を試みる (2回目)
+				// ラジオNIKKEI (RN1)
+
+				playback_result = await radio_playback_check(arg_fnc, "RN1");
+
+				if ( playback_result === true ) {
+
+					// 再生情報をフッターや一覧にも反映
+
+					show_playing_info("RN1", arg_val);
+
+					// 再生しているメッセージを表示し、少し待ってからメッセージ非表示させる。
+
+					arg_fnc.msg_fade_in("只今再生中です ( Channel ID: RN1 ) Pre-playback");
+					await arg_fnc.js_sleep(3000);
+					arg_fnc.msg_fade_out();
+
+				} else {
+
+					//arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " > RN1 ) Retry: " + count);
+					arg_fnc.msg_fade_in("再生に失敗しました ( Channel ID: " + this_ch_id + " > RN1 )");
+					init_play_info(arg_val);// 表示の初期化
+
+				}
 
 			}
 
@@ -352,7 +431,7 @@
 
 	// ラジオが現在再生中か・どの局を再生中かを確認する
 
-	export async function radio_status_check(arg_val, arg_fnc) {
+/*	export async function radio_status_check(arg_val, arg_fnc) {
 
 		const playback_status_object = await arg_fnc.fetch_template("./php/radio_playback_status.php");
 		//const playback_status_object = await playback_status_json.json();
@@ -368,7 +447,7 @@
 			init_play_info(arg_val);
 		}
 
-	}
+	}*/
 
 	// フッターの音量調整バーで音量表示処理
 

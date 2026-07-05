@@ -576,16 +576,9 @@ window.onload = async function() {
 	mod.con.get_volume(mod.var, mod.fnc);
 
 	// 処理 6 * * * * * * * * * * * * * * * * * * * *
-	// 現在再生中か・どの局を再生中かを確認する
-
-	//await mod.con.radio_status_check(mod.var, mod.fnc);
-
-	// 処理 7 * * * * * * * * * * * * * * * * * * * *
 	// 音声ファイルが再生中か監視開始
 	// ラジオ再生中なら radio , ファイル再生中なら file , 何も再生していない場合は false
 
-	//mod.aud.check_audio(mod.var, mod.fnc);
-	//mod.var.v.set_interval.push( setInterval(mod.aud.check_audio, 2000, mod.var, mod.fnc) );
 	const this_audio_type = await mod.aud.check_player(mod.var, mod.fnc);
 
 	//console.log(this_audio_type);
@@ -601,12 +594,12 @@ window.onload = async function() {
 		mod.con.init_play_info(mod.var);
 	}
 
-	// 処理 8 * * * * * * * * * * * * * * * * * * * *
+	// 処理 7 * * * * * * * * * * * * * * * * * * * *
 	// 地域ID からお知らせ情報を取得する
 
 	mod.not.maintenance_information(mod.var, mod.fnc);
 
-	// 処理 9 * * * * * * * * * * * * * * * * * * * *
+	// 処理 8 * * * * * * * * * * * * * * * * * * * *
 	// スケジュールと音声ファイル一覧の html を表示させる
 
 	// スケジュールと音声ファイル関係は複数のモジュールを使用するため
@@ -622,7 +615,7 @@ window.onload = async function() {
 
 	await mod.sch.update_schedule_audio_html(mod_ctx);
 
-	// 処理 10 * * * * * * * * * * * * * * * * * * * *
+	// 処理 9 * * * * * * * * * * * * * * * * * * * *
 	// 操作イベントの登録・表示関係の処理
 
 	// アップロード関係のイベントセットアップを実行
@@ -641,38 +634,6 @@ window.onload = async function() {
 
 	const server_object = await mod.fnc.fetch_template("./php/server.php");
 	mod.var.e.server_ip.innerHTML = server_object.ip.replace(" ", "<br />");
-
-/*	// 時計・天気予報の実行 > この先で天気情報も取得
-	// 初期非表示であっても開始しておく
-
-	mod.var.v.clock_interval.push( setInterval(mod.opw.time_and_date, 1000, mod.var, mod.fnc) );
-
-	// 時計 UI の開閉
-
-	mod.var.e.radio_icon.addEventListener("click", async function() {
-		mod.var.e.cw_box.style.display = "none";
-	});
-
-	mod.var.e.watch_open.addEventListener("click", async function() {
-		mod.var.e.cw_box.style.display = "flex";
-	});
-
-	// 設定情報で時計が初期表示の場合は時計を開く
-	// openweathermap 関連の情報が設定されているなら該当領域を表示
-
-	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php");
-
-	//console.log(setting_object);
-
-	if ( setting_object.openweather_api && setting_object.latitude && setting_object.longitude ) {
-		//mod.var.e.cw_weather.style.display = "flex";// block ではなく flex
-	} else {
-		mod.var.e.cw_box.classList.add("weather_hidden");// 日付・天気予報 > class 追加 > 天気予報非表示
-	}
-
-	if ( Object.keys(setting_object).length > 0 && setting_object.clock_display === "true" ) {
-		mod.var.e.cw_box.style.display = "flex";// 日付・天気予報 > 表示
-	}*/
 
 	// ***** 処理終了 *****
 

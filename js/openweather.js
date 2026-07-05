@@ -41,7 +41,7 @@
 
 		const ow_object = await arg_fnc.fetch_template("./php/get_openweather_json.php");
 
-		//console.log(ow_object);
+		console.log(ow_object);
 
 		if ( ow_object.update != "error" )	{
 
@@ -109,6 +109,11 @@
 				+ '<span class="mid_icon" style="background-image: url(https://openweathermap.org/img/wn/' + weather.icon + '@4x.png);"></span>'
 				+ '<span class="mid_position">' + weather_name + '</span>'
 			+ '</span>';
+
+		} else {
+
+			arg_var.e.cw_weather.style.display = "none";
+			arg_var.e.cw_weather_mid.style.display = "none";
 
 		}
 

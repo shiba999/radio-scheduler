@@ -5,13 +5,19 @@
 
 header("Content-Type: application/json; charset=UTF-8");// json を受け取る場合は明示的にJSONと宣言
 
-$setting_file = "../json/settings.json";
-$setting_json = file_get_contents($setting_file);
+if ( isset($_POST["file"]) ) {
 
-if ( $setting_json == "" ) {
-	$setting_json = json_encode(array());
+	$filename = $_POST["file"];
+
+	$file = "../json/" . $filename . ".json";
+	$json = file_get_contents($file);
+
+	if ( $json == "" ) {
+		$json = json_encode(array());
+	}
+
+	echo $json;
+
 }
-
-echo $setting_json;
 
 ?>

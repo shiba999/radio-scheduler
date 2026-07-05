@@ -1,5 +1,4 @@
 
-
 	const audio_box = document.getElementById("audio_box");
 	const audio_bg = document.getElementById("audio_bg");
 	const audio_name = document.getElementById("ab_name");
@@ -129,19 +128,6 @@
 
 		}
 
-		// duration: ストリームなら 0.000 , mp3 なら音声の長さが返される
-
-/*		const send_params_duration = {
-			type: "get",
-			property: "duration",
-			id: 2
-		};
-
-		const query_string_duration = new URLSearchParams(send_params_duration).toString();
-		const duration_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_duration);
-
-		console.log(duration_array);*/
-
 		// filename: ストリームなら - , mp3 ならファイル名が返される
 
 		const send_params_filename = {
@@ -159,7 +145,6 @@
 
 		let audio_type;
 
-		//if ( ! title_array.data.includes("http") || filename_array.data.includes(".mp3") || Number(duration_array.data) > 0 ) {
 		if ( ! title_array.data.includes("http") || filename_array.data.includes(".mp3") ) {
 
 			audio_type = "file";
@@ -183,7 +168,6 @@
 		} else {
 
 			audio_type = "radio";
-			//audio_stop_button_control(arg_var);// set_interval 削除
 
 		}
 
@@ -212,21 +196,6 @@
 
 	export async function check_audio(arg_var, arg_fnc) {
 
-		//console.log("check_audio() -----");
-
-		// ファイル名
-
-/*		const send_params_filename = {
-			type: "get",
-			property: "filename",
-			id: 1
-		};
-
-		const query_string_filename = new URLSearchParams(send_params_filename).toString();
-		const filename_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_filename);
-
-		audio_name.innerHTML = filename_array.data;*/
-
 		// 一時停止状態
 		// この値を保存しておけば、一時停止実行時にもっとスムーズになると思う。
 
@@ -243,7 +212,6 @@
 
 		if ( pause_array.error === "not_working" ) {
 			console.log("not_working");
-			//audio_stop_button_control(arg_var);
 			clearInterval( arg_var.v.set_interval.shift() );// check_audio 停止
 			audio_box.classList.remove("is-visible");// プレイヤー非表示
 			return;
@@ -260,17 +228,6 @@
 		} else {
 			audio_pause.innerHTML = icon_pause;
 		}
-
-		// 音声の長さ（秒）
-
-/*		const send_params_duration = {
-			type: "get",
-			property: "duration",
-			id: 3
-		};
-
-		const query_string_duration = new URLSearchParams(send_params_duration).toString();
-		const duration_array = await arg_fnc.fetch_template("./php/socket_control.php", query_string_duration);*/
 
 		// 音声の現在位置（秒）
 
@@ -304,25 +261,12 @@
 
 		audio_bar_value.style.width = this_bar_width + "px";
 
-/*		const player_state = await arg_fnc.fetch_template("./php/audio_check.php");
-
-		//console.log( JSON.stringify(player_state) );
-
-		if ( player_state.state === true ) {// 再生中だった場合は停止
-			audio_play_button_control(arg_var, player_state.file);
-		} else if ( player_state.state === false ) {// 停止中だった場合は再生
-			audio_stop_button_control(arg_var);
-		}*/
-
 	}
 
 	// 音声ファイル再生時に各ボタンを調整
 	// 再生中は音声ファイル削除ボタンは無効
 
 	function audio_play_button_control(arg_var, filename) {
-
-		//filename = decodeURI(filename);
-		//filename = encodeURI(filename);
 
 		//console.log(filename);
 
@@ -441,7 +385,6 @@
 
 			// 再生が確認できたら総時間を保存して UI 表示
 
-			//if ( play_result === "playing" ) {
 			if ( success_flag === true ) {
 
 				const send_params_duration = {
@@ -459,7 +402,6 @@
 
 				// 音声ファイル再生状況監視開始
 
-				//check_audio(ctx.var, ctx.fnc);// すぐ実行だと Socket が間に合わない模様
 				ctx.var.v.set_interval.push( setInterval(check_audio, 1000, ctx.var, ctx.fnc) );
 
 			} else {
@@ -467,54 +409,6 @@
 				ctx.var.e.up_msg.innerHTML = "[再生失敗] " + this_name;
 
 			}
-
-/*			if ( ctx.var.v.audio_play === false ) {
-
-				let this_name = event.target.dataset.name;
-
-				const send_params = {
-					file: decodeURI(this_name)
-				};
-
-				const play_string = new URLSearchParams(send_params).toString();
-				const play_result = await ctx.fnc.fetch_template("./php/player_audio.php", play_string);
-
-				console.log(play_result);
-
-				if ( play_result === "playing" ) {
-
-					//audio_play_button_control(ctx.var, this_name);// 再生開始: ボタンスタイル調整
-
-					//ctx.con.init_play_info(ctx.var);// ラジオ情報初期化
-
-					audio_box.classList.add("is-visible");// プレイヤー表示
-
-					// 音声ファイル再生状況監視開始
-
-					//check_audio(ctx.var, ctx.fnc);// すぐ実行だと Socket が間に合わない模様
-					ctx.var.v.set_interval.push( setInterval(check_audio, 1000, ctx.var, ctx.fnc) );
-
-				} else {
-
-					ctx.var.e.up_msg.innerHTML = "[再生失敗] " + this_name;
-
-				}
-
-			} else {
-
-				const result = await ctx.fnc.fetch_template("./php/player_stop.php");
-
-				//console.log(result);
-
-				// 再生停止: ボタンスタイル調整
-
-				if ( result == "stopped" ) {
-					audio_stop_button_control(ctx.var);
-				} else {
-					ctx.var.e.up_msg.innerHTML = "*** 再生停止できませんでした ***";
-				}
-
-			}*/
 
 		}
 
@@ -595,18 +489,6 @@
 			audio_pause.addEventListener("click", async function() {
 
 				// 一時停止状態の確認
-
-/*				const send_params_pause = {
-					type: "get",
-					property: "pause",
-					id: 1
-				};
-
-				const query_string_pause = new URLSearchParams(send_params_pause).toString();
-				const pause_array = await ctx.fnc.fetch_template("./php/socket_control.php", query_string_pause);*/
-
-				//console.log(pause_array);
-				//console.log(pause_array.data);
 
 				let pause_value = false;
 

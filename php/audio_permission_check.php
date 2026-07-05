@@ -15,30 +15,6 @@ $settings_log = PROJECT_ROOT . "/log/settings.log";
 
 file_put_contents($settings_log, "");
 
-// WSL専用: 有効な WSLg ソケットを探す関数
-
-/*function get_wsl_pulse_server() {
-
-	$default_path = "/mnt/wslg/PulseServer";
-
-	// もしファイルが存在し、書き込み（通信）可能であればそのパスを返す
-
-	if ( file_exists($default_path) ) {
-		return "unix:" . $default_path;
-	}
-
-	return null;
-
-}
-
-$pulse_path = get_wsl_pulse_server();
-
-$audio_env = "";
-
-if ( $pulse_path ) {
-	$audio_env = "PULSE_SERVER=" . $pulse_path . " ";
-}*/
-
 $settings_json = file_get_contents(PROJECT_ROOT . "/json/settings.json");
 $settings_object = json_decode($settings_json, true);
 
@@ -80,10 +56,6 @@ if ( $playback_options != "" ) {
 }
 
 $exec_command .= " --log-file=" . escapeshellarg($settings_log) . " " . escapeshellarg($audio_file) . " > /dev/null 2>&1 &";
-
-//$exec_command = AUDIO_ENV . $player_path . " --no-video --log-file=" . escapeshellarg($settings_log) . " " . escapeshellarg($audio_file) . " > /dev/null 2>&1 &";
-
-//echo $exec_command . "\n\n";
 
 exec($exec_command);
 

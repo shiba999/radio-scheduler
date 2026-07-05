@@ -191,7 +191,14 @@ window.onload = async function() {
 	// 設定情報で時計が初期表示の場合は時計を開く
 	// openweathermap 関連の情報が設定されているなら該当領域を表示
 
-	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php");
+	const send_params_title = {
+		file: "clock_owm"
+	};
+
+	const query_string_title = new URLSearchParams(send_params_title).toString();
+	const setting_object = await mod.fnc.fetch_template("./php/setting_get.php", query_string_title);
+
+	console.log(setting_object);
 
 	// 画面表示のタイプによっては天気予報非表示の場合もあります
 

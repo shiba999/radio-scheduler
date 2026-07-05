@@ -3,7 +3,7 @@
 // WSL 環境対策
 // WSL なら変数を定義 : そうでなければ「空文字」
 
-//define("AUDIO_ENV", file_exists("/mnt/wslg/PulseServer") ? "PULSE_SERVER=unix:/mnt/wslg/PulseServer " : "");
+define("AUDIO_ENV", file_exists("/mnt/wslg/PulseServer") ? "PULSE_SERVER=unix:/mnt/wslg/PulseServer " : "");
 
 // 設定ファイル読み込み関数
 
@@ -26,6 +26,7 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	$settings_object = get_settings();
 	$streamlink = $settings_object["streamlink_path"];
+	$streamlink_plugin = $settings_object["sl_plugin_path"];
 	$player = $settings_object["player"];
 	$player_path = $settings_object["player_path"];
 	$amixer_path = $settings_object["amixer_path"];
@@ -34,7 +35,7 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	// 監視用ログ
 
-	$log_file = PROJECT_ROOT . "/log/radio.log";
+	$log_file = PROJECT_ROOT . "/log/player.log";
 
 	// 1. 再生中だった場合はプレイヤーを停止
 
@@ -42,17 +43,10 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	// 2. streamlink + mpv のコマンドをPHP側で組み立てる
 
-/*	$exec_command = sprintf(
-		//"sudo -u www-data %s -p %s",
-		"%s -p %s",
-		escapeshellarg($streamlink),
-		escapeshellarg($player_path)
-	);*/
-
 	// AUDIO_ENV は WSL 用の定数 ( WSL以外なら空欄 )
 	// --retry-streams 10 --retry-open 10 はストリーム切断時の保険的再接続オプション
 
-	$exec_command = AUDIO_ENV . escapeshellarg($streamlink) . " --retry-streams 10 --retry-open 10 -p " . escapeshellarg($player_path);
+	$exec_command = AUDIO_ENV . escapeshellarg($streamlink) . " --plugin-dir " . escapeshellarg($streamlink_plugin) . " --retry-streams 10 --retry-open 10 -p " . escapeshellarg($player_path);
 
 	$args_array = array();
 
@@ -113,51 +107,13 @@ function radio_play($channel, $volume = false, $length = 0) {
 
 	$return_array = array();
 
-	// プレイヤーの起動確認は Socket を使用することにしてみた。
-
-/*	// 7. ログファイルの確認 (再生成功か失敗かを確認)
-
-	$max_retries = 30;// 最大待機回数
-	$retry = 0;
-	$log_content = "";
-
-	while ( $retry < $max_retries ) {
-
-		//sleep(1);
-		usleep(500000);// 1000000 で 1秒です
-
-		clearstatcache();
-
-		$log_content = file_get_contents($log_file);
-
-		if ($log_content !== false) {
-
-			// Waiting以外のログ確認
-
-			if ( stripos($log_content, "Available streams:") !== false ) {
-				$return_array["result"] = "success";
-				break;// 判定可能ログが来たので抜ける
-			} else if ( stripos($log_content, "error:" ) !== false ) {
-				$return_array["result"] = "failure";
-				break;// 判定可能ログが来たので抜ける
-			}
-
-		}
-
-		$retry++;
-
-	}
-
-	$return_array["retry"] = $retry;
-	$return_array["log"] = $log_content;*/
-
-	echo json_encode($return_array);
+	echo json_encode($return_array);// その後のプレイヤー再生までの監視は Socket を使用することにした。
 
 }
 
 // 音声ファイルをファイル名を受け取って再生する関数
 
-function audio_play($file, $volume = false) {
+function audio_play($file, $volume = false, $option = array()) {
 
 	// 設定読み込み
 
@@ -171,7 +127,6 @@ function audio_play($file, $volume = false) {
 	// 監視用ログ
 
 	$log_file = PROJECT_ROOT . "/log/player.log";
-	//$audio_log_file = PROJECT_ROOT . "/log/audio.log";
 
 	// 1. 再生中だった場合はプレイヤーを停止
 
@@ -206,31 +161,49 @@ function audio_play($file, $volume = false) {
 	// それ以外は保存された音量で再生
 
 	if ( $volume !== false ) {
-		//shell_exec($amixer_path . " -c 0 -M sset PCM " . $volume . "%");
 		$exec_command .= " --volume='" . $volume . "'";
 	} else {
 		$saved_volume = file_get_contents(PROJECT_ROOT . "/log/volume.log");// 保存中の音量
 		if ( ! ctype_digit( (string) $saved_volume ) ) { $saved_volume = 65; }
-		//array_push($args_array, "--volume=" . $saved_volume);
 		$exec_command .= " --volume='" . $saved_volume . "'";
 	}
 
-	// 再生オプション
+	// 再生オプション (設定からのオプション)
 
 	if ( $playback_options != "" ) {
 		$exec_command .= " " . trim($playback_options);
+	}
+
+	// 再生オプション (引数からのオプション)
+	// $option = array()
+
+	// ループ再生
+	// --loop-playlist=inf : 無限リピート
+	// --loop-playlist=3 : 3回再生して終わり
+
+	if ( array_key_exists("loop", $option) ) {
+
+		// 99 以上指定は無限ループとする
+
+		$loop_value = $option["loop"];
+		if ($loop_value > 98) $loop_value = "inf";
+
+		$exec_command .= " --loop-playlist=" . $loop_value;
+
+	}
+
+	// シャッフル再生
+	// --shuffle
+
+	if ( array_key_exists("shuffle", $option) ) {
+		if ($option["shuffle"] === true) $exec_command .= " --shuffle";
 	}
 
 	// ログファイル
 
 	$exec_command .= " --log-file=" . escapeshellarg($log_file) . " " . escapeshellarg($file) . " > /dev/null 2>&1 &";
 
-/*	$exec_command .= " --log-file=" . escapeshellarg($log_file) . " " . escapeshellarg($file)
-		. " > /dev/null 2>&1 & echo \"\$! " . escapeshellarg($file_name) . "\" > "
-		. escapeshellarg($audio_log_file)
-	;*/
-
-	//echo $exec_command;
+	echo "\n\n" . $exec_command . "\n\n";
 
 	// 再生実行
 
@@ -238,46 +211,7 @@ function audio_play($file, $volume = false) {
 
 	$status = "exec";
 
-	// プレイヤーの起動確認は Socket を使用することにしてみた。
-
-/*	// 5. 待機しながら起動確認
-
-	$situation = "stopped";
-	$max_attempts = 25;// 最大試行回数
-	$attempt = 0;
-	$interval = 300000;// 1回あたり 0.3秒
-
-	while ( $attempt < $max_attempts ) {
-
-		$pgrep_output = [];
-		$pgrep_return = 0;
-
-		exec(
-			"pgrep " . $player,
-			$pgrep_output,
-			$pgrep_return
-		);
-
-		// プレイヤーのプロセスが存在する → 再生開始と判断
-
-		if ( ! empty($pgrep_output) ) {
-			$status = "playing";
-			break;
-		}
-
-		usleep($interval);
-
-		$attempt++;
-
-	}
-
-	// 6. 最大回数まで試しても止まらなければ stopped のまま
-
-	if ( $status !== "playing" ) {
-		$status = "error";// プロセスが立ち上がらなかった場合
-	}*/
-
-	echo $status;
+	echo $status;// その後のプレイヤー再生までの監視は Socket を使用することにした。
 
 }
 
@@ -288,11 +222,6 @@ function player_kill($echo = true) {
 	$settings_object = get_settings();
 	$player = $settings_object["player"];
 
-	// 監視用ログ
-
-	//$log_file = PROJECT_ROOT . "/log/radio.log";
-	//$audio_log_file = PROJECT_ROOT . "/log/audio.log";
-
 	// 1. プレイヤーを停止
 
 	exec(
@@ -301,59 +230,7 @@ function player_kill($echo = true) {
 		$return_var
 	);
 
-	echo "exec";
-
-	// プレイヤーの停止判断は Socket を使用することにしてみた。
-
-/*	// 2. プレイヤーが完全に止まるまで短い間隔で確認
-
-	$situation = "running";
-	$max_attempts = 25;// 最大試行回数
-	$attempt = 0;
-	$interval = 300000;// 1回あたり 0.3秒
-
-	while ( $attempt < $max_attempts ) {
-
-		// pgrep でプレイヤーのプロセス確認
-
-		$pgrep_output = [];
-		$pgrep_return = 0;
-
-		exec(
-			"pgrep " . $player,
-			$pgrep_output,
-			$pgrep_return
-		);
-
-		// プロセスが存在しない → 停止完了
-
-		if ( empty($pgrep_output) ) {
-
-			file_put_contents($log_file, "");// ログを空にするのはラジオ用
-			file_put_contents($audio_log_file, "");// 音声ファイル用のログも空にする
-			$situation = "stopped";
-
-			break;
-
-		}
-
-		// まだ動いているので少し待機して再チェック
-
-		usleep($interval);
-
-		$attempt++;
-
-	}
-
-	// 3. 最大回数まで試しても止まらなければ running のまま
-
-	if ( $status !== "stopped" ) {
-		$status = "error";// プロセスが止まらなかった場合
-	}
-
-	if ( $echo === true ) {
-		echo $situation;
-	}*/
+	echo "exec";// その後のプレイヤー停止までの監視は Socket を使用することにした。
 
 }
 
